@@ -1,0 +1,145 @@
+.userBar {
+  padding: 2px 0px;
+  height: 44px;
+  backdrop-filter: blur(8px);
+  margin: auto 30px auto auto;
+  background-color: #1f1f1f34;
+  display: flex;
+  font-family: BlinkMacSystemFont, -apple-system, Segoe UI, Roboto, Helvetica,
+    Arial, sans-serif;
+  color: rgba(255, 255, 255, 0.799);
+  font-weight: bold;
+
+  // .userBar__img-container
+
+  &__img-container {
+    border-right: 1px solid #1f1f1f36;
+    width: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #1f1f1f63;
+    }
+  }
+
+  // .userBar__img
+
+  &__img {
+    width: inherit;
+    height: inherit;
+  }
+
+  // .userBar__nickName
+
+  &__nickName {
+    padding: 0px 8px;
+    border-right: 1px solid #1f1f1f36;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #1f1f1f63;
+    }
+  }
+
+  // .userBar__newContent
+
+  &__newContent {
+    padding: 0px 8px;
+    border-right: 1px solid #1f1f1f36;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #1f1f1f63;
+    }
+  }
+
+  // .userBar__plus
+
+  &__plus {
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
+  }
+
+  // .userBar__arrow
+
+  &__arrow {
+    width: 12px;
+    height: 12px;
+    margin-left: 5px;
+  }
+
+  // .userBar__notice
+
+  &__notice {
+    width: 50px;
+    border-right: 1px solid #1f1f1f36;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #1f1f1f63;
+    }
+  }
+
+  // .userBar__noticeImg
+
+  &__noticeImg {
+    background-image: url("../../../../assets/media/world.png");
+    width: 22px;
+    height: 22px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: red;
+    font-size: 16px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+
+  // .userBar__chat
+
+  &__chat {
+    width: 50px;
+    border-right: 1px solid #1f1f1f36;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #1f1f1f63;
+    }
+  }
+
+  // .userBar__chatImg
+
+  &__chatImg {
+    background-image: url("../../../../assets/media/message.png");
+    width: 25px;
+    height: 25px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: red;
+    font-size: 16px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+}

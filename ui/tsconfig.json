@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "target": "ESNext",
+    "module": "umd",
+    "lib": ["ESNext", "dom"],
+    "sourceMap": true,
+    "jsx": "react-jsx", // позволяет не импортировать в каждый файл React, рендерит _jsx вызовы вместо React.createelement
+    "noEmit": true, // отключает генерацию ts -> js, отдавая предпочтение условно babel
+    "noImplicitAny": true, // ошибка при не указании типа переменной и автоматического присвоения any
+    "strictNullChecks": true, // строгая проверка значений, которые могут выдать undefined / null в определенных случаях
+    "allowSyntheticDefaultImports": true, // import react вместо import * as react;
+    "moduleResolution": "node",
+    "typeRoots": ["./types"],
+    "types": ["node"]
+  }
+}

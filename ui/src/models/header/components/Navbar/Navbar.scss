@@ -1,0 +1,78 @@
+.navbar {
+  height: 55px;
+  width: 100%;
+  backdrop-filter: blur(8px);
+  background-color: #1f1f1f47;
+  display: flex;
+  padding: 10px 30px 10px 50px;
+
+  // .navbar__item
+
+  &__item {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: white;
+      background-color: #1f1f1f0d;
+    }
+
+    & img {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+    }
+  }
+
+  // .navbar__search
+
+  &__search {
+    margin: 0 0px 0 auto;
+    display: flex;
+    width: 315px;
+    color: rgba(255, 255, 255, 1);
+    background: rgba(255, 255, 255, 0.15);
+    background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    box-shadow: inset rgb(255 255 255 / 10%) 0px 1px 0px;
+    border-radius: 3px;
+    align-items: center;
+
+    & input {
+      height: 100%;
+      width: 275px;
+      background: inherit;
+      background-image: inherit;
+      box-shadow: inherit;
+      border-radius: inherit;
+      font-size: 16px;
+      color: white;
+      padding: 0px 10px;
+    }
+    & input::placeholder {
+      color: white;
+    }
+  }
+  // .navbar__search-img
+  &__search-img {
+    width: 40px;
+    height: 100%;
+    background: inherit;
+    background-image: inherit;
+    box-shadow: inherit;
+    border-radius: inherit;
+    background-size: 18px 18px;
+    background-image: url("../../../../assets/media/search.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+  }
+}

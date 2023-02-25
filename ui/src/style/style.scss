@@ -1,0 +1,56 @@
+@import "./_fonts";
+@import "./custom";
+@import "./const";
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  @extend %variable-maxWidth;
+  margin: 0 auto;
+}
+
+.workplace {
+  width: 100%;
+  min-height: calc(100vh - 215px);
+  background-color: #eae5e4;
+  padding: 20px 30px;
+}
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]:before {
+  position: absolute;
+  content: "";
+  opacity: 0;
+  background-color: black;
+  color: white;
+  padding: 10px;
+  font-size: 14px;
+  top: -11px;
+  font-family: "Times New Roman", Times, serif;
+  transform: translateY(-100%);
+  text-align: center;
+  font-weight: lighter;
+}
+[data-tooltip]:after {
+  content: "";
+  position: absolute;
+  border-width: 7px 8px 0 8px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.7) transparent transparent transparent;
+  top: -11px;
+  transform: rotate(0deg);
+  opacity: 0;
+}
+[data-tooltip]:hover:before {
+  content: attr(data-tooltip);
+  opacity: 1;
+}
+[data-tooltip]:hover::after {
+  opacity: 1;
+}
