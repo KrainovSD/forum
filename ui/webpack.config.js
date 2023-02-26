@@ -87,5 +87,6 @@ module.exports = {
     static: "./src",
     hot: true,
     port: 8080,
+    historyApiFallback: true, // обработка роутинга
   },
 };

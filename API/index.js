@@ -10,13 +10,13 @@ app.use(untils.logger);
 import * as dotenv from "dotenv";
 dotenv.config({ path: "environment.env", silent: true });
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 const PRODUCTION = process.env.PRODUCTION || false;
 
 if (!PRODUCTION) {
   app.use((req, res, next) => {
     res.header({
-      "Access-Control-Allow-Origin": "http://192.168.0.102:3000",
+      "Access-Control-Allow-Origin": "http://192.168.0.102:8080",
       "Access-Control-Allow-Methods": "DELETE,GET,POST,PUT",
       "Access-Control-Allow-Headers": "Content-Type,Authorization",
       "Access-Control-Allow-Credentials": "true",

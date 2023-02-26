@@ -1,0 +1,16 @@
+.black-button {
+  margin-top: 20px;
+  background: #575757;
+  width: 100%;
+  padding: 10px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: #737373;
+  }
+}

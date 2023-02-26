@@ -14,7 +14,8 @@ class AuthController {
         email,
         userName
       );
-      return res.status(result.status).json({ message: result.message || "" });
+
+      return res.status(result.status).json(result.message || "");
     } catch (e) {
       req.err = e;
       return res.status(500).json();
@@ -25,9 +26,7 @@ class AuthController {
       const { nickName, password } = req.body;
       const result = await authService.login(nickName, password);
       if (result.status !== 200)
-        return res
-          .status(result.status)
-          .json({ message: result.message || "" });
+        return res.status(result.status).json(result.message || "");
 
       await this.#setTokenInCookies(result.refreshToken, res);
 
@@ -44,10 +43,11 @@ class AuthController {
       const userID = req.userID;
       const { token: refreshToken } = req.cookies;
       const result = await authService.logout(userID, refreshToken);
+
       return res
         .clearCookie("token")
         .status(result.status)
-        .json({ message: result.message || "" });
+        .json(result.message || "");
     } catch (e) {
       req.err = e;
       return res.clearCookie("token").status(500).json();
@@ -57,12 +57,13 @@ class AuthController {
     try {
       const { token: refreshToken } = req.cookies;
       const result = await authService.token(refreshToken);
-      if (result.status !== 200)
-        return res
-          .status(result.status)
-          .json({ message: result.message || "" });
 
-      return res.status(result.status).json({ token: result.accessToken });
+      if (result.status !== 200)
+        return res.status(result.status).json(result.message || "");
+
+      return res
+        .status(result.status)
+        .json({ token: result.accessToken, role: result.role });
     } catch (e) {
       req.err = e;
       return res.status(500).json();
@@ -72,7 +73,8 @@ class AuthController {
     try {
       const { key } = req.body;
       const result = await authService.confirm(key);
-      return res.status(result.status).json({ message: result.message || "" });
+
+      return res.status(result.status).json(result.message || "");
     } catch (e) {
       req.err = e;
       return res.status(500).json();

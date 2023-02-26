@@ -1,10 +1,14 @@
 @import "./_fonts";
 @import "./custom";
 @import "./const";
+@import "./_animations";
 
 body {
   display: flex;
   flex-direction: column;
+  background-color: #eae5e4;
+  font-family: BlinkMacSystemFont, -apple-system, Segoe UI, Roboto, Helvetica,
+    Arial, sans-serif;
 }
 
 .container {
@@ -14,43 +18,96 @@ body {
 
 .workplace {
   width: 100%;
-  min-height: calc(100vh - 215px);
+  min-height: calc(100vh - 275px);
   background-color: #eae5e4;
   padding: 20px 30px;
 }
 
-[data-tooltip] {
-  position: relative;
+.backDrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
 }
 
-[data-tooltip]:before {
-  position: absolute;
-  content: "";
-  opacity: 0;
-  background-color: black;
-  color: white;
-  padding: 10px;
-  font-size: 14px;
-  top: -11px;
-  font-family: "Times New Roman", Times, serif;
-  transform: translateY(-100%);
-  text-align: center;
-  font-weight: lighter;
+[data-tooltip] {
+  position: relative;
+  &::before {
+    position: absolute;
+    content: attr(data-tooltip);
+    opacity: 0;
+    background-color: black;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    top: -11px;
+    font-family: "Times New Roman", Times, serif;
+    transform: translateY(-100%);
+    text-align: center;
+    font-weight: lighter;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    border-width: 7px 8px 0 8px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.7) transparent transparent transparent;
+    top: -11px;
+    transform: rotate(0deg);
+    opacity: 0;
+    transition: all 0.2s ease;
+  }
+  &:hover::before {
+    opacity: 1;
+  }
+  &:hover::after {
+    opacity: 1;
+  }
 }
-[data-tooltip]:after {
-  content: "";
-  position: absolute;
-  border-width: 7px 8px 0 8px;
-  border-style: solid;
-  border-color: rgba(0, 0, 0, 0.7) transparent transparent transparent;
-  top: -11px;
-  transform: rotate(0deg);
-  opacity: 0;
-}
-[data-tooltip]:hover:before {
-  content: attr(data-tooltip);
-  opacity: 1;
-}
-[data-tooltip]:hover::after {
-  opacity: 1;
+
+[data-tooltip-left] {
+  position: relative;
+  &::before {
+    position: absolute;
+    content: attr(data-tooltip-left);
+    opacity: 0;
+    background-color: black;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    top: -11px;
+    left: 0;
+    font-family: "Times New Roman", Times, serif;
+    transform: translateY(-100%) translateX(-70%);
+    text-align: center;
+    font-weight: lighter;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    border-width: 7px 8px 0 8px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.7) transparent transparent transparent;
+    top: -11px;
+    transform: rotate(0deg);
+    opacity: 0;
+    transition: all 0.2s ease;
+  }
+  &:hover::before {
+    opacity: 1;
+  }
+  &:hover::after {
+    opacity: 1;
+  }
 }

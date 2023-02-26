@@ -89,9 +89,8 @@ class AuthServise {
     );
     if (!checkRefreshToken)
       return { status: 401, message: "Вы не авторизованы!" };
-    const refreshTokenInBD = await authRepo.findRefreshTokenByUserID(
-      checkRefreshToken.id
-    );
+    const { refreshTokenInBD, role } =
+      await authRepo.findRefreshTokenAndRoleByUserID(checkRefreshToken.id);
     if (refreshToken !== refreshTokenInBD)
       return { status: 401, message: "Вы не авторизованы!" };
 
@@ -100,7 +99,7 @@ class AuthServise {
       accessTokenSecret,
       acessTokenLiveTime
     );
-    return { status: 200, accessToken };
+    return { status: 200, accessToken, role };
   }
   async confirm(key) {
     let checkConfrimValid = await authRepo.isValidConfirm(key);

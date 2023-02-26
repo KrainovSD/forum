@@ -96,13 +96,17 @@ class AuthPostgressRepo {
     console.log(saveToken?.rows?.[0]);
   }
 
-  async findRefreshTokenByUserID(userID) {
+  async findRefreshTokenAndRoleByUserID(userID) {
     const refreshToken = await db.query(
-      "SELECT token FROM person WHERE id=$1",
+      "SELECT token, role FROM person WHERE id=$1",
       [userID]
     );
-    if (!refreshToken.rows?.[0]?.token) throw new Error();
-    return refreshToken.rows[0].token;
+    if (!refreshToken.rows?.[0]?.token || !refreshToken.rows?.[0]?.role)
+      throw new Error();
+    return {
+      refreshTokenInBD: refreshToken.rows[0].token,
+      role: refreshToken.rows?.[0]?.role,
+    };
   }
 
   async removeTokenByID(userID) {
@@ -203,8 +207,8 @@ class AuthRepo {
     return this.repo.saveLogin(token, userID);
   }
 
-  async findRefreshTokenByUserID(userID) {
-    return this.repo.findRefreshTokenByUserID(userID);
+  async findRefreshTokenAndRoleByUserID(userID) {
+    return this.repo.findRefreshTokenAndRoleByUserID(userID);
   }
 
   async removeTokenByID(userID) {

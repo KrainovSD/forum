@@ -9,6 +9,38 @@
     Arial, sans-serif;
   color: rgba(255, 255, 255, 0.799);
   font-weight: bold;
+  z-index: 1;
+
+  // .userBar__login
+
+  &__login {
+    height: 100%;
+    border-right: 1px solid rgba(31, 31, 31, 0.2117647059);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    &:hover {
+      background-color: #1f1f1f63;
+    }
+  }
+
+  // .userBar__register
+
+  &__register {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    &:hover {
+      background-color: #1f1f1f63;
+    }
+  }
 
   // .userBar__img-container
 
@@ -33,9 +65,16 @@
     height: inherit;
   }
 
+  // .userBar__nickNameWrapper
+
+  &__nickNameWrapper {
+    position: relative;
+  }
+
   // .userBar__nickName
 
   &__nickName {
+    height: 100%;
     padding: 0px 8px;
     border-right: 1px solid #1f1f1f36;
     display: flex;
