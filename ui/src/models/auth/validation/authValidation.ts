@@ -49,8 +49,9 @@ export const authValidationField = (
       break;
     }
     case "password": {
-      if (fieldData.length < 8) {
-        error[field] = "Пароль должен состоять не менее, чем из 8 символов!";
+      if (fieldData.length < 8 || fieldData.length > 30) {
+        error[field] =
+          "Длина пароля должна быть не менее 8 символов и не более 30 символов!";
         setError({ ...error });
         return;
       }
@@ -65,7 +66,7 @@ export const authValidationField = (
         setError({ ...error });
         return;
       }
-      if (fieldData.length < 2 && fieldData.length > 15) {
+      if (fieldData.length < 2 || fieldData.length > 15) {
         error[field] =
           "Длина Имени не должна превышать 15 символов или быть меньше, чем 2 символа! Если ваше имя содержит более 15-ти символов, используйте, пожалуйста, сокращенную версию!";
         setError({ ...error });

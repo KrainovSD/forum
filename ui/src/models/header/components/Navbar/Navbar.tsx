@@ -1,17 +1,18 @@
+import { NavLink } from "react-router-dom";
 import doc from "../../../../assets/media/doc.png";
 import "./Navbar.scss";
 
 export const Navbar: React.FC = () => {
   return (
     <div className="navbar">
-      <div className="navbar__item">
+      <NavLink to="/rules" className="navbar__item">
         <img src={doc} alt="" />
         <p>Правила форума</p>
-      </div>
-      <div className="navbar__item">
+      </NavLink>
+      <NavLink to="https://krainovdictionary.ru/" className="navbar__item">
         <img src={doc} alt="" />
         <p>KR Dictionary</p>
-      </div>
+      </NavLink>
       <div className="navbar__item">
         <img src={doc} alt="" />
         <p>VK</p>

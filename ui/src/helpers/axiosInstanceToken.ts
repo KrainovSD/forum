@@ -1,7 +1,5 @@
-import { userSlice } from "./../store/reducers/user/userReducer";
-import { useAppDispatch } from "./../hooks/redux";
 import axios, { AxiosInstance } from "axios";
-import { checkAuthData } from "../store/reducers/user/userTypes";
+import { checkAuthData } from "../store/reducers/auth/authTypes";
 
 const PRODUCTION: boolean =
   process.env.NODE_ENV === "production" ? true : false;

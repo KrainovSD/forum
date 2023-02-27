@@ -11,7 +11,7 @@ import bcrypt from "bcrypt";
 const saltRounds = 12;
 
 import authRepo from "./AuthRepo.js";
-//import { sendEmailWithLink } from "../mailer.js";
+import { sendEmailWithLink } from "../../mailer.js";
 
 class AuthServise {
   async register(password, nickName, email, userName) {
@@ -27,13 +27,13 @@ class AuthServise {
 
     await authRepo.createUser(userName, nickName, email, hash, confirmEmailKey);
 
-    /*await sendEmailWithLink(
-        email,
-        "Подтверждение аккаунта",
-        "Пройдите по ссылке, чтобы подтвердить свой аккаунт на Krainovforum",
-        "confirm",
-        confirmEmailKey
-      );*/
+    await sendEmailWithLink(
+      email,
+      "Подтверждение аккаунта",
+      "Пройдите по ссылке, чтобы подтвердить свой аккаунт на Krainov forum",
+      "confirm",
+      confirmEmailKey
+    );
 
     return {
       status: 200,
@@ -45,7 +45,7 @@ class AuthServise {
     const checkLoginValid = await authRepo.isValidLogin(nickName, password);
     if (!checkLoginValid.status)
       return { status: 400, message: checkLoginValid.message };
-    const { id: userID, token: oldRefreshToken } = checkLoginValid;
+    const { id: userID, token: oldRefreshToken, role } = checkLoginValid;
 
     let refreshToken;
     const checkOldToken = await this.#compareToken(
@@ -72,6 +72,7 @@ class AuthServise {
       message: "Вход выполнен успешно!",
       refreshToken,
       accessToken,
+      role,
     };
   }
   async logout(userID, refreshToken) {

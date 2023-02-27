@@ -1,16 +1,8 @@
-import { checkAuth } from "./userActionCreator";
+import { checkAuth } from "./authActionCreator";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { checkAuthData, checkAuthError } from "./userTypes";
+import { authState, checkAuthData, checkAuthError } from "./authTypes";
 
-interface UserState {
-  auth: boolean;
-  role: string;
-  isLoading: boolean;
-  statusError: number;
-  error: string;
-}
-
-const initialState: UserState = {
+const initialState: authState = {
   auth: false,
   role: "guest",
   isLoading: false,
@@ -18,16 +10,17 @@ const initialState: UserState = {
   error: "",
 };
 
-export const userSlice = createSlice({
+export const authSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
     logout: (state) => {
       state.auth = false;
       state.role = "guest";
+      state.statusError = 0;
+      state.error = "";
     },
     setAuth: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
       state.statusError = 0;
       state.error = "";
       state.auth = true;
@@ -47,6 +40,8 @@ export const userSlice = createSlice({
         }
       )
       .addCase(checkAuth.pending, (state) => {
+        state.statusError = 0;
+        state.error = "";
         state.isLoading = true;
       })
       .addCase(
@@ -63,4 +58,4 @@ export const userSlice = createSlice({
   },
 });
 
-export default userSlice.reducer;
+export default authSlice.reducer;

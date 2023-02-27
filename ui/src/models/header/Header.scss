@@ -28,5 +28,8 @@
   &__logo {
     width: 400px;
     margin: auto auto auto 50px;
+    & img {
+      width: 400px;
+    }
   }
 }

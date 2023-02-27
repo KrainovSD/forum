@@ -32,7 +32,11 @@ class AuthController {
 
       return res
         .status(result.status)
-        .json({ message: result.message || "", token: result.accessToken });
+        .json({
+          message: result.message || "",
+          token: result.accessToken,
+          role: result.role,
+        });
     } catch (e) {
       req.err = e;
       return res.status(500).json();

@@ -5,9 +5,10 @@ import "./SubMenu.scss";
 
 interface SubMenuProps {
   isVisible: boolean;
+  logout: () => void;
 }
 
-export const SubMenu: React.FC<SubMenuProps> = ({ isVisible }) => {
+export const SubMenu: React.FC<SubMenuProps> = ({ isVisible, logout }) => {
   return (
     <CSSTransition
       in={isVisible}
@@ -21,7 +22,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({ isVisible }) => {
           <img src={setting} alt="" />
           <p>Настройки профиля</p>
         </div>
-        <div className="userBar__subMenuItem">
+        <div className="userBar__subMenuItem" onClick={logout}>
           <img src={out} alt="" />
           <p>Выйти</p>
         </div>

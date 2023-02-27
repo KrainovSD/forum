@@ -12,6 +12,7 @@
     "allowSyntheticDefaultImports": true, // import react вместо import * as react;
     "moduleResolution": "node",
     "typeRoots": ["./types"],
-    "types": ["node"]
+    "types": ["node"],
+    "importHelpers": true
   }
 }

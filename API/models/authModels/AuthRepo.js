@@ -16,7 +16,12 @@ class AuthPostgressRepo {
 
     if (!firstSimilar.confirmed) await this.#deleteInActive(firstSimilar.id);
     else {
-      if (firstSimilar.email === email)
+      if (firstSimilar.email === email && firstSimilar.nick === nickName)
+        return {
+          status: true,
+          message: "Указанная электронная почта и никнейм уже используются!",
+        };
+      else if (firstSimilar.email === email)
         return {
           status: true,
           message: "Указанная электронная почта уже используется!",
@@ -72,7 +77,7 @@ class AuthPostgressRepo {
 
   async isValidLogin(nickName, password) {
     const user = await db.query(
-      "SELECT id, nick, hash, confirmed, token FROM person WHERE nick=$1",
+      "SELECT id, nick, hash, confirmed, token, role FROM person WHERE nick=$1",
       [nickName]
     );
     if (user.rows?.length === 0)
@@ -85,7 +90,12 @@ class AuthPostgressRepo {
     if (!(await bcrypt.compare(password, hash)))
       return { status: false, message: "Неверно указан никнейм или пароль!" };
 
-    return { status: true, id: user.rows[0].id, token: user.rows[0].token };
+    return {
+      status: true,
+      id: user.rows[0].id,
+      token: user.rows[0].token,
+      role: user.rows[0].role,
+    };
   }
   async saveLogin(token, userID) {
     const now = new Date();

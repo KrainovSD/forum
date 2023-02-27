@@ -16,7 +16,7 @@ const PRODUCTION = process.env.PRODUCTION || false;
 if (!PRODUCTION) {
   app.use((req, res, next) => {
     res.header({
-      "Access-Control-Allow-Origin": "http://192.168.0.102:8080",
+      "Access-Control-Allow-Origin": `http://${process.env.HOST}`,
       "Access-Control-Allow-Methods": "DELETE,GET,POST,PUT",
       "Access-Control-Allow-Headers": "Content-Type,Authorization",
       "Access-Control-Allow-Credentials": "true",
