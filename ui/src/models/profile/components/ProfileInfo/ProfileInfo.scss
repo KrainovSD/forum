@@ -1,0 +1,142 @@
+.profile-info {
+  width: 320px;
+  margin-right: 20px;
+
+  // .profile-info__reputation
+
+  &__reputation {
+    width: 100%;
+    background: #ffffff;
+    margin-top: 20px;
+    border: 1px solid rgba(102, 102, 102, 0.315);
+    border-radius: 3px;
+    box-shadow: rgb(0 0 0 / 10%) 3px 3px 3px;
+  }
+
+  // .profile-info__reputation-back-ground
+
+  &__reputation-back-ground {
+    background-color: #598f5b;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+
+    & h2 {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    & h3 {
+      margin-top: 10px;
+      font-size: 28px;
+      font-weight: 100;
+    }
+    & p {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  }
+
+  // .profile-info__reputation-tracker
+
+  &__reputation-tracker {
+    display: flex;
+    color: #a4a4a4;
+    padding: 5px;
+
+    & div {
+      display: flex;
+      margin: 0px 0px 0px auto;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    & img {
+      width: 10px;
+      height: 10px;
+      margin-left: 5px;
+    }
+  }
+
+  // .profile-info__subscribers
+
+  &__subscribers {
+    margin-top: 20px;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid rgba(102, 102, 102, 0.315);
+    border-radius: 3px;
+    box-shadow: rgb(0 0 0 / 10%) 3px 3px 3px;
+  }
+
+  // .profile-info__subscribers-wrapper
+
+  &__subscribers-wrapper {
+    padding: 5px;
+  }
+
+  // .profile-info__subscribers-header
+
+  &__subscribers-header {
+    background: #4f4f4f;
+    color: #fff;
+    border: 1px solid rgba(102, 102, 102, 0.8);
+    padding: 10px;
+    font-weight: bold;
+  }
+
+  // .profile-info__subscribers-list
+
+  &__subscribers-list {
+    display: grid;
+    width: 100%;
+    padding: 10px 0;
+    gap: 8.5px;
+    grid-template-columns: repeat(auto-fill, 44px);
+    grid-template-rows: repeat(2, 44px);
+    align-items: center;
+    justify-items: center;
+  }
+
+  // .profile-info__subscribers-item
+
+  &__subscribers-item {
+    border: 1px solid #333333;
+    background: #333333;
+    background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.12) 100%
+    );
+
+    & img {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  // .profile-info__subscribers-footer
+
+  &__subscribers-footer {
+    padding: 5px;
+    border-top: 1px solid rgb(184, 184, 184);
+    display: flex;
+  }
+
+  // .profile-info__view-subscribers
+
+  &__view-subscribers {
+    display: flex;
+    margin: 0 0 0 auto;
+    align-items: center;
+    cursor: pointer;
+    color: #a4a4a4;
+
+    & img {
+      width: 10px;
+      height: 10px;
+      margin-left: 5px;
+    }
+  }
+}

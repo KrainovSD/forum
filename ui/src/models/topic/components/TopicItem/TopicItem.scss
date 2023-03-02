@@ -1,0 +1,105 @@
+.topic-item {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(170, 169, 169, 0.385);
+  // .topic-item__icon
+
+  &__icon {
+    width: 21px;
+    height: 21px;
+  }
+
+  // .topic-item__title
+
+  &__title {
+    width: 100%;
+    padding: 0 20px;
+    & ._title {
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  }
+
+  // .topic-item__sub-title-list
+
+  &__sub-title-list {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(50px, 200px));
+    row-gap: 10px;
+
+    & ._sub-title {
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #eae5e4;
+      }
+    }
+  }
+
+  // .topic-item__message-info
+
+  &__message-info {
+    padding: 0 30px;
+    color: #a4a4a4;
+    text-align: center;
+    & h1 {
+      font-size: 22px;
+    }
+    & p {
+      font-size: 14px;
+      margin-top: 5px;
+    }
+  }
+
+  // .topic-item__last-message
+
+  &__last-message {
+    display: flex;
+    align-items: center;
+
+    min-width: 270px;
+    max-width: 270px;
+    overflow: hidden;
+  }
+
+  // .topic-item__last-message-avatar
+
+  &__last-message-avatar {
+    background-color: #565555;
+    border: 1px solid #333333;
+    margin-right: 10px;
+    cursor: pointer;
+    & img {
+      width: 34px;
+      height: 34px;
+    }
+  }
+
+  // .topic-item__last-message-info
+
+  &__last-message-info {
+    max-width: 224px;
+    & ._post {
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 1.5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; /* Многоточие */
+      cursor: pointer;
+    }
+    & ._user {
+      line-height: 1.5;
+      font-size: 14px;
+      & ._blue {
+        color: blue;
+        cursor: pointer;
+      }
+    }
+  }
+}

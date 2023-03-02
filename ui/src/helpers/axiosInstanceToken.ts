@@ -1,3 +1,4 @@
+import { HOST } from "../devConst";
 import axios, { AxiosInstance } from "axios";
 import { checkAuthData } from "../store/reducers/auth/authTypes";
 
@@ -13,7 +14,7 @@ if (PRODUCTION) {
 } else {
   axios.defaults.withCredentials = true; // Разрешение на куки
   instanceToken = axios.create({
-    baseURL: "http://192.168.0.102:3000/",
+    baseURL: HOST,
     timeout: 5000,
   });
 }
@@ -50,7 +51,7 @@ let tokenUrl: string;
 if (PRODUCTION) {
   tokenUrl = "/api/auth/token";
 } else {
-  tokenUrl = "http://192.168.0.102:3000/api/auth/token";
+  tokenUrl = `${HOST}api/auth/token`;
 }
 
 function refreshToken() {

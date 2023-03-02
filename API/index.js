@@ -49,6 +49,8 @@ app.listen(PORT, () => {
 
 import authRoutes from "./models/authModels/AuthRoutes.js";
 app.use("/api/auth", authRoutes);
+import topicRoutes from "./models/topicModels/TopicRoutes.js";
+app.use("/api/topic", topicRoutes);
 
 /*import bcrypt from "bcrypt";
 const saltRounds = 12;

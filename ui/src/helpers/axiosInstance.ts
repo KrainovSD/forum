@@ -1,3 +1,4 @@
+import { HOST } from "../devConst";
 import axios, { AxiosInstance } from "axios";
 
 const PRODUCTION = process.env.NODE_ENV === "production" ? true : false;
@@ -9,7 +10,7 @@ if (PRODUCTION) {
 } else {
   instance = axios.create({
     timeout: 5000,
-    baseURL: "http://192.168.0.102:3000/",
+    baseURL: HOST,
   });
 }
 

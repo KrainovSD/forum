@@ -68,9 +68,13 @@ export const Userbar: React.FC = () => {
     <div className="userBar">
       {isLoading && <Loader />}
       <div className="userBar__wrapper">
-        <div className="userBar__img-container" data-tooltip="Профиль">
+        <NavLink
+          to="/profile/my"
+          className="userBar__img-container"
+          data-tooltip="Профиль"
+        >
           <img src={user} alt="" className="userBar__img" />
-        </div>
+        </NavLink>
         <div className="userBar__nickNameWrapper">
           <div className="userBar__nickName" onClick={toggleSubMenuVisible}>
             <p>Serega_Krainov48</p>

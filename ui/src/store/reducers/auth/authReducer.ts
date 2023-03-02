@@ -44,17 +44,14 @@ export const authSlice = createSlice({
         state.error = "";
         state.isLoading = true;
       })
-      .addCase(
-        checkAuth.rejected,
-        (state, action: PayloadAction<checkAuthError | unknown>) => {
-          const payload = action.payload as checkAuthError;
-          state.auth = false;
-          state.role = "guest";
-          state.isLoading = false;
-          state.statusError = payload.status;
-          state.error = payload.message;
-        }
-      );
+      .addCase(checkAuth.rejected, (state, action) => {
+        const payload = action.payload as checkAuthError;
+        state.auth = false;
+        state.role = "guest";
+        state.isLoading = false;
+        state.statusError = payload.status;
+        state.error = payload.message;
+      });
   },
 });
 

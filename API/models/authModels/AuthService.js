@@ -84,23 +84,27 @@ class AuthServise {
     return { status: 200, message: "Вы успешно вышли из системы!" };
   }
   async token(refreshToken) {
-    const checkRefreshToken = await this.#compareToken(
-      refreshToken,
-      refreshTokenSecret
-    );
-    if (!checkRefreshToken)
-      return { status: 401, message: "Вы не авторизованы!" };
-    const { refreshTokenInBD, role } =
-      await authRepo.findRefreshTokenAndRoleByUserID(checkRefreshToken.id);
-    if (refreshToken !== refreshTokenInBD)
-      return { status: 401, message: "Вы не авторизованы!" };
+    try {
+      const checkRefreshToken = await this.#compareToken(
+        refreshToken,
+        refreshTokenSecret
+      );
+      if (!checkRefreshToken)
+        return { status: 401, message: "Вы не авторизованы!" };
+      const { refreshTokenInBD, role } =
+        await authRepo.findRefreshTokenAndRoleByUserID(checkRefreshToken.id);
+      if (refreshToken !== refreshTokenInBD)
+        return { status: 401, message: "Вы не авторизованы!" };
 
-    const accessToken = await this.#getToken(
-      checkRefreshToken.id,
-      accessTokenSecret,
-      acessTokenLiveTime
-    );
-    return { status: 200, accessToken, role };
+      const accessToken = await this.#getToken(
+        checkRefreshToken.id,
+        accessTokenSecret,
+        acessTokenLiveTime
+      );
+      return { status: 200, accessToken, role };
+    } catch (e) {
+      return { status: 401, message: "Вы не авторизованы!" };
+    }
   }
   async confirm(key) {
     let checkConfrimValid = await authRepo.isValidConfirm(key);
