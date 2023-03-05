@@ -1,20 +1,19 @@
 import { axiosInstance } from "./../../../helpers/axiosInstance";
 import { AxiosError } from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { topicType } from "./topicTypes";
+import { ITopicParentInfo, ItopicType } from "./topicTypes";
 
 export const getTopicByID = createAsyncThunk(
   "post/getAll",
   async (id: string | null, thunkApi) => {
     try {
       const response = await axiosInstance.get<{
-        topics: topicType[];
-        parentTitle: null | string;
-      }>(`/api/topic/${id}`);
+        topics: ItopicType[];
+        parentInfo: ITopicParentInfo | null;
+      }>(`/api/topic/getChildren/${id}`);
       return {
-        topic: response.data.topics,
-        parentID: id,
-        parentTitle: response.data.parentTitle,
+        topics: response.data.topics,
+        parentInfo: response.data.parentInfo,
       };
     } catch (e) {
       const error = e as AxiosError;

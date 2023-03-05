@@ -1,30 +1,35 @@
-export interface TopicInitialState {
-  topics: topicType[];
-  parentID: null | number;
-  parentTitle: null | string;
+export interface ITopicInitialState {
+  topics: ItopicType[];
+  parentInfo: ITopicParentInfo | null;
   isLoading: boolean;
   error: string;
   statusError: number;
 }
 
-export interface topicType {
+export interface ITopicParentInfo {
   id: number;
   title: string;
-  subTitleList: subTitleListType[];
   accessPost: boolean;
-  countComment: number;
-  lastComment: lastCommentType | null;
 }
 
-interface lastCommentType {
+export interface ItopicType {
+  id: number;
+  title: string;
+  subTitleList: IsubTitleListType[];
+  accessPost: boolean;
+  countComment: number;
+  lastComment: ITopicLastCommentType | null;
+}
+
+export interface ITopicLastCommentType {
   userID: number;
-  avatar: boolean;
+  avatar: string;
   nickName: string;
   postTitle: string;
   postID: number;
   date: string;
 }
-interface subTitleListType {
+interface IsubTitleListType {
   id: number;
   title: string;
 }

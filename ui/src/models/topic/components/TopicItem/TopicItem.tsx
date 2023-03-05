@@ -1,22 +1,14 @@
 import "./TopicItem.scss";
 import chatIcon from "../../../../assets/media/comment.png";
-import userAvatar from "../../../../assets/media/user.png";
-import { topicType } from "../../../../store/reducers/topic/topicTypes";
+import { ItopicType } from "../../../../store/reducers/topic/topicTypes";
 import { NavLink } from "react-router-dom";
-import { useDateFormat } from "../../../../hooks/useDateFormat";
+import { LastComment } from "../../../../components/LastComment/LastComment";
 
 interface TopicItemProps {
-  topic: topicType;
+  topic: ItopicType;
 }
 
 export const TopicItem: React.FC<TopicItemProps> = ({ topic }) => {
-  let date: string | undefined;
-  if (topic.lastComment) date = useDateFormat(topic.lastComment.date);
-  let avatar = userAvatar;
-  if (topic.lastComment?.avatar) {
-    avatar = `путь до картинки`;
-  }
-
   return (
     <div className="topic-item">
       <img src={chatIcon} alt="" className="topic-item__icon" />
@@ -41,31 +33,7 @@ export const TopicItem: React.FC<TopicItemProps> = ({ topic }) => {
         <h1>{topic.countComment}</h1>
         <p>сообщений</p>
       </div>
-      {topic.lastComment && (
-        <div className="topic-item__last-message">
-          <NavLink
-            to={`/profile/${topic.lastComment.userID}`}
-            className="topic-item__last-message-avatar"
-          >
-            <img src={avatar} alt="" />
-          </NavLink>
-          <div className="topic-item__last-message-info">
-            <NavLink to={`/post/${topic.lastComment.postID}`} className="_post">
-              {topic.lastComment.postTitle}
-            </NavLink>
-            <p className="_user">
-              {`От `}
-              <NavLink
-                to={`/profile/${topic.lastComment.userID}`}
-                className="_blue"
-              >
-                {topic.lastComment.nickName}
-              </NavLink>
-              , {date}
-            </p>
-          </div>
-        </div>
-      )}
+      <LastComment lastComment={topic.lastComment} />
     </div>
   );
 };

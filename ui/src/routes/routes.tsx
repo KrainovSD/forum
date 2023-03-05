@@ -6,11 +6,12 @@ import { ConfirmPage } from "../pages/ConfirmPage";
 import { ProfilePublicPage } from "../pages/ProfilePublicPage";
 import { ProfileOwnPage } from "../pages/ProfileOwnPage";
 import { TopicPage } from "../pages/TopicPage";
+import { PostPage } from "../pages/PostPage";
 
 export const publicRoutes = [
   { path: "/", element: <MainPage /> },
   { path: "/topic/:id", element: <TopicPage /> },
-
+  { path: "/post/:id", element: <PostPage /> },
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
   { path: "/confirm/:key", element: <ConfirmPage /> },
@@ -21,6 +22,7 @@ export const publicRoutes = [
 export const privateRoutes = [
   { path: "/", element: <MainPage /> },
   { path: "/topic/:id", element: <TopicPage /> },
+  { path: "/post/:id", element: <PostPage /> },
   { path: "/confirm/:key", element: <ConfirmPage /> },
   { path: "/profile/:id", element: <ProfilePublicPage /> },
   { path: "/profile/my", element: <ProfileOwnPage /> },

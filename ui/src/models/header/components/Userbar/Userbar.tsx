@@ -24,11 +24,11 @@ export const Userbar: React.FC = () => {
     ];
 
     const target: Element = ev.target as Element;
-    const targetClass: string | undefined = target.classList?.[0];
+    const targetClass: string | undefined = target?.classList?.[0];
     if (allowClasses.includes(targetClass)) return;
 
     const parentTarget: Element = (ev.target as Element)?.parentNode as Element;
-    const parentTargetClass: string | undefined = parentTarget.classList?.[0];
+    const parentTargetClass: string | undefined = parentTarget?.classList?.[0];
     if (allowClasses.includes(parentTargetClass)) return;
 
     setIsSubMenuVisible(false);

@@ -11,7 +11,7 @@ export const App: React.FC = () => {
   const { auth, role, error, isLoading, statusError } = useAppSelector(
     (state) => state.auth
   );
-  console.log(auth, role, isLoading, error, statusError);
+  //console.log(auth, role, isLoading, error, statusError);
 
   useEffect(() => {
     dispatch(checkAuth());

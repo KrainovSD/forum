@@ -1,0 +1,130 @@
+.comment-item {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(102, 102, 102, 0.315);
+  box-shadow: rgb(0 0 0 / 10%) 3px 3px 3px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  // .comment-item__content
+
+  &__content {
+    display: flex;
+  }
+
+  // .comment-item__user-info
+
+  &__user-info {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    & > ._header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      height: 40px;
+      font-weight: bold;
+
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
+      & > ._thumbtack {
+        background: #598f5b;
+        padding: 3px 3px;
+        margin-right: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        & > img {
+          width: 12px;
+          height: 12px;
+        }
+      }
+      & > ._nick {
+        cursor: pointer;
+      }
+    }
+
+    & > ._avatar {
+      background-color: #565555;
+      border: 1px solid #333333;
+      margin-top: 20px;
+      cursor: pointer;
+
+      & > img {
+        width: 110px;
+        height: 110px;
+      }
+    }
+    & > ._role {
+      margin-top: 10px;
+    }
+    & > ._reputation {
+      color: #598f5b;
+      margin-top: 5px;
+      font-weight: bold;
+    }
+    & > ._comment {
+      margin-top: 5px;
+    }
+  }
+
+  // .comment-item__body
+
+  &__body {
+    width: 100%;
+    & > ._header {
+      color: rgba(114, 114, 114, 0.662745098);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      height: 40px;
+      padding-left: 30px;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
+
+      & > ._date {
+      }
+      & > ._complain {
+        cursor: pointer;
+        margin-right: 10px;
+      }
+    }
+    & > ._comment {
+      padding-top: 20px;
+      padding-left: 30px;
+    }
+  }
+
+  // .comment-item__footer
+
+  &__footer {
+    margin-top: 20px;
+    display: flex;
+    padding: 5px 10px;
+    background-color: #cdcdcd;
+    justify-content: flex-end;
+    box-shadow: rgb(0 0 0 / 10%) 3px 3px 3px;
+    & > ._reputation {
+      background-color: #598f5b;
+      color: #ffffff;
+      padding: 5px 8px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    & > ._add-reputation {
+      background-color: #ffffff;
+      padding: 0px 5px;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: #598f5b;
+        color: #ffffff;
+      }
+    }
+  }
+}

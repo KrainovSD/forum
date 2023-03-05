@@ -8,9 +8,10 @@ class TopicControllers {
       if (result.status !== 200)
         return res.status(result.status).json(result.message || "");
 
-      res
-        .status(200)
-        .json({ topics: result.topics, parentTitle: result.parentTitle });
+      res.status(200).json({
+        topics: result.topics,
+        parentInfo: result.parentInfo,
+      });
     } catch (e) {
       req.err = e;
       return res.status(500).json();

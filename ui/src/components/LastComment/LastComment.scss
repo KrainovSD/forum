@@ -1,0 +1,48 @@
+.last-comment {
+  // .last-comment__last-message
+
+  &__last-message {
+    display: flex;
+    align-items: center;
+
+    min-width: 270px;
+    max-width: 270px;
+    overflow: hidden;
+  }
+
+  // .last-comment__last-message-avatar
+
+  &__last-message-avatar {
+    background-color: #565555;
+    border: 1px solid #333333;
+    margin-right: 10px;
+    cursor: pointer;
+    & img {
+      width: 34px;
+      height: 34px;
+    }
+  }
+
+  // .last-comment__last-message-info
+
+  &__last-message-info {
+    max-width: 224px;
+    & ._post {
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 1.5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; /* Многоточие */
+      cursor: pointer;
+    }
+    & ._user {
+      line-height: 1.5;
+      font-size: 14px;
+      & ._blue {
+        color: blue;
+        cursor: pointer;
+      }
+    }
+  }
+}

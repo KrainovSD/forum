@@ -31,7 +31,7 @@ class TopicPostgressRepo {
       LEFT JOIN person on comment.person_id = person.id
       ORDER BY temp1.PATH`);
     } else {
-      getParentTopic = await db.query("SELECT title FROM topic WHERE id = $1", [
+      getParentTopic = await db.query("SELECT * FROM topic WHERE id = $1", [
         id,
       ]);
 
@@ -63,29 +63,15 @@ class TopicPostgressRepo {
         [id]
       );
     }
-    /*
-export interface topicType {
-  id: number;
-  title: string;
-  accessPost: boolean;
-  subTitleList: string[];
-  countComment: number;
-  lastComment: lastComment;
-}
-
-interface lastComment {
-  userID: number;
-  avatar: boolean;
-  nickName: string;
-  postTitle: string;
-  postID: number;
-  date: Date;
-}*/
 
     const topics = [];
-    const parentTopicTitle =
-      getParentTopic && getParentTopic?.rows?.[0]?.title
-        ? getParentTopic.rows[0].title
+    const parentInfo =
+      getParentTopic && getParentTopic?.rows?.[0]
+        ? {
+            id: getParentTopic.rows[0].id,
+            title: getParentTopic.rows[0].title,
+            accessPost: getParentTopic.rows[0].access_post,
+          }
         : null;
 
     for (let topicItem of getTopics.rows) {
@@ -133,7 +119,7 @@ interface lastComment {
       topics.push(topic);
     }
 
-    return { topics, parentTitle: parentTopicTitle };
+    return { topics, parentInfo };
   }
 }
 

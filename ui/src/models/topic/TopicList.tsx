@@ -10,7 +10,7 @@ export const TopicList: React.FC = () => {
   const { id: topicID } = useParams();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { topics, parentTitle, statusError } = useAppSelector(
+  const { topics, parentInfo, statusError } = useAppSelector(
     (state) => state.topic
   );
   useEffect(() => {
@@ -20,15 +20,16 @@ export const TopicList: React.FC = () => {
   }, [topicID]);
 
   useEffect(() => {
-    console.log(statusError);
     if (statusError === 404) navigate("/", { replace: true });
   }, [statusError]);
 
   return (
     <div className="topic-list__wrapper">
-      {parentTitle && (
+      {parentInfo?.title && (
         <div className="topic-list__info-wrapper">
-          <div className="topic-list__parent-topic-title">{parentTitle}</div>
+          <div className="topic-list__parent-topic-title">
+            {parentInfo.title}
+          </div>
           {topics.length > 0 ? (
             <div className="topic-list__sub-topic">Подфорумы</div>
           ) : (
