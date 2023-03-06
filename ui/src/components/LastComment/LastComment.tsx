@@ -1,9 +1,9 @@
 import { useDateFormat } from "../../hooks/useDateFormat";
 import { NavLink } from "react-router-dom";
-import userAvatar from "../../assets/media/user.png";
 import "./LastComment.scss";
+import { getAvatar } from "../../helpers/getAvatar";
 
-interface lastCommet {
+interface ILastComment {
   userID: number;
   avatar: string;
   nickName: string;
@@ -13,15 +13,13 @@ interface lastCommet {
   postID?: number;
 }
 
-interface LastCommentProps {
-  lastComment: lastCommet | null;
+interface ILastCommentProps {
+  lastComment: ILastComment;
 }
 
-export const LastComment: React.FC<LastCommentProps> = ({ lastComment }) => {
-  let date: string | undefined;
-  if (lastComment) date = useDateFormat(lastComment.date);
-
-  const avatar = lastComment && lastComment?.avatar ? "путь" : userAvatar;
+export const LastComment: React.FC<ILastCommentProps> = ({ lastComment }) => {
+  const date = useDateFormat(lastComment.date);
+  const avatar = getAvatar(lastComment.avatar);
 
   return (
     <div>

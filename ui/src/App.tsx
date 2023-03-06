@@ -5,24 +5,31 @@ import { checkAuth } from "./store/reducers/auth/authActionCreator";
 import { Header } from "./models/header/Header";
 import { privateRoutes, publicRoutes } from "./routes/routes";
 import { Loader } from "./components/Loader/Loader";
+import { getMyUserInfo } from "./store/reducers/user/userActionCreator";
+import { userSlice } from "./store/reducers/user/userReducer";
 
 export const App: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { auth, role, error, isLoading, statusError } = useAppSelector(
+  const { auth, isLoading: isLoadingAuth } = useAppSelector(
     (state) => state.auth
   );
-  //console.log(auth, role, isLoading, error, statusError);
+  const { isLoading: isLoadingUser } = useAppSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(checkAuth());
   }, []);
+
+  useEffect(() => {
+    if (!auth) dispatch(userSlice.actions.clearUserInfo());
+    else dispatch(getMyUserInfo());
+  }, [auth]);
 
   const route = auth ? privateRoutes : publicRoutes;
   const routes = useRoutes(route);
 
   return (
     <div className="container">
-      {isLoading && <Loader />}
+      {(isLoadingAuth || isLoadingUser) && <Loader />}
       <Header />
       <div className="workplace">{routes}</div>
     </div>

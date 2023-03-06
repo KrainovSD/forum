@@ -7,29 +7,29 @@ export interface ITopicInitialState {
 }
 
 export interface ITopicParentInfo {
-  id: number;
+  id: string;
   title: string;
   accessPost: boolean;
 }
 
 export interface ItopicType {
-  id: number;
+  id: string;
   title: string;
   subTitleList: IsubTitleListType[];
   accessPost: boolean;
-  countComment: number;
+  countComment: string;
   lastComment: ITopicLastCommentType | null;
 }
 
 export interface ITopicLastCommentType {
-  userID: number;
+  userID: string;
   avatar: string;
   nickName: string;
   postTitle: string;
-  postID: number;
+  postID: string;
   date: string;
 }
 interface IsubTitleListType {
-  id: number;
+  id: string;
   title: string;
 }

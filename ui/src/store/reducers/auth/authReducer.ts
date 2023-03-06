@@ -1,10 +1,10 @@
 import { checkAuth } from "./authActionCreator";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { authState, checkAuthData, checkAuthError } from "./authTypes";
+import { createSlice } from "@reduxjs/toolkit";
+import { IAuthInitialState, ICheckAuthError } from "./authTypes";
+import { IActionError } from "../../../store/types";
 
-const initialState: authState = {
+const initialState: IAuthInitialState = {
   auth: false,
-  role: "guest",
   isLoading: false,
   statusError: 0,
   error: "",
@@ -16,38 +16,31 @@ export const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.auth = false;
-      state.role = "guest";
       state.statusError = 0;
       state.error = "";
     },
-    setAuth: (state, action: PayloadAction<string>) => {
+    setAuth: (state) => {
       state.statusError = 0;
       state.error = "";
       state.auth = true;
-      state.role = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(
-        checkAuth.fulfilled,
-        (state, action: PayloadAction<checkAuthData>) => {
-          state.isLoading = false;
-          state.statusError = 0;
-          state.error = "";
-          state.auth = true;
-          state.role = action.payload.role;
-        }
-      )
+      .addCase(checkAuth.fulfilled, (state) => {
+        state.isLoading = false;
+        state.statusError = 0;
+        state.error = "";
+        state.auth = true;
+      })
       .addCase(checkAuth.pending, (state) => {
         state.statusError = 0;
         state.error = "";
         state.isLoading = true;
       })
       .addCase(checkAuth.rejected, (state, action) => {
-        const payload = action.payload as checkAuthError;
+        const payload = action.payload as IActionError;
         state.auth = false;
-        state.role = "guest";
         state.isLoading = false;
         state.statusError = payload.status;
         state.error = payload.message;

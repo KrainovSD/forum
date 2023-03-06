@@ -6,18 +6,20 @@ export interface ICommentInitialState {
   statusError: number;
 }
 export interface IComment {
-  id: number;
+  id: string;
   body: string;
   main: boolean;
   authorNickName: string;
-  authorID: number;
+  authorID: string;
   authorAvatar: string;
+  authorRole: string;
+  authorReputation: string;
+  authorCountComment: string;
   date: string;
   updated: boolean;
-  dateUpdate: boolean | null;
+  dateUpdate: string | null;
   authorUpdateNickName: string | null;
-  authorUpdateID: number | null;
-  authorRole: string;
+  authorUpdateID: string | null;
   verified: boolean;
   fixed: boolean;
   likes: string[];

@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getPostByID, getPostByTopicID } from "./postActionCreator";
 import { postInitialState, IPostTypes } from "./postTypes";
+import { IActionError } from "../../../store/types";
 
 const initialState: postInitialState = {
   posts: [],
@@ -52,10 +53,7 @@ export const postSlice = createSlice({
         state.currentPost = null;
       })
       .addCase(getPostByID.rejected, (state, action) => {
-        const payload = action.payload as {
-          message: string;
-          status: number;
-        };
+        const payload = action.payload as IActionError;
         state.error = payload.message;
         state.statusError = payload.status;
         state.isLoading = false;

@@ -8,14 +8,14 @@ class AuthController {
   async register(req, res) {
     try {
       const { password, nickName, email, userName } = req.body;
-      const result = await authService.register(
+      const { status, message } = await authService.register(
         password,
         nickName,
         email,
         userName
       );
 
-      return res.status(result.status).json(result.message || "");
+      return res.status(status).json(message || "");
     } catch (e) {
       req.err = e;
       return res.status(500).json();
@@ -24,19 +24,16 @@ class AuthController {
   async login(req, res) {
     try {
       const { nickName, password } = req.body;
-      const result = await authService.login(nickName, password);
-      if (result.status !== 200)
-        return res.status(result.status).json(result.message || "");
+      const { status, message, refreshToken, accessToken } =
+        await authService.login(nickName, password);
+      if (status !== 200) return res.status(status).json(message || "");
 
-      await this.#setTokenInCookies(result.refreshToken, res);
+      await this.#setTokenInCookies(refreshToken, res);
 
-      return res
-        .status(result.status)
-        .json({
-          message: result.message || "",
-          token: result.accessToken,
-          role: result.role,
-        });
+      return res.status(200).json({
+        message: message || "",
+        token: accessToken,
+      });
     } catch (e) {
       req.err = e;
       return res.status(500).json();
@@ -46,12 +43,15 @@ class AuthController {
     try {
       const userID = req.userID;
       const { token: refreshToken } = req.cookies;
-      const result = await authService.logout(userID, refreshToken);
+      const { status, message } = await authService.logout(
+        userID,
+        refreshToken
+      );
 
       return res
         .clearCookie("token")
-        .status(result.status)
-        .json(result.message || "");
+        .status(status)
+        .json(message || "");
     } catch (e) {
       req.err = e;
       return res.clearCookie("token").status(500).json();
@@ -60,14 +60,13 @@ class AuthController {
   async token(req, res) {
     try {
       const { token: refreshToken } = req.cookies;
-      const result = await authService.token(refreshToken);
+      const { status, message, accessToken } = await authService.token(
+        refreshToken
+      );
 
-      if (result.status !== 200)
-        return res.status(result.status).json(result.message || "");
+      if (status !== 200) return res.status(status).json(message || "");
 
-      return res
-        .status(result.status)
-        .json({ token: result.accessToken, role: result.role });
+      return res.status(200).json({ token: accessToken });
     } catch (e) {
       req.err = e;
       return res.status(500).json();
@@ -76,9 +75,9 @@ class AuthController {
   async confirm(req, res) {
     try {
       const { key } = req.body;
-      const result = await authService.confirm(key);
+      const { status, message } = await authService.confirm(key);
 
-      return res.status(result.status).json(result.message || "");
+      return res.status(status).json(message || "");
     } catch (e) {
       req.err = e;
       return res.status(500).json();

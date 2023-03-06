@@ -50,6 +50,8 @@ export const Userbar: React.FC = () => {
     sendLogout();
   };
 
+  const { userInfo } = useAppSelector((state) => state.user);
+
   if (!auth)
     return (
       <div className="userBar">
@@ -69,7 +71,7 @@ export const Userbar: React.FC = () => {
       {isLoading && <Loader />}
       <div className="userBar__wrapper">
         <NavLink
-          to="/profile/my"
+          to={`/profile/${userInfo?.id}`}
           className="userBar__img-container"
           data-tooltip="Профиль"
         >

@@ -11,29 +11,27 @@ import { useValidation } from "../../hooks/useValidation";
 import { Loader } from "../../components/Loader/Loader";
 import { PasswordInputTooltip } from "../../components/UI/PasswordInputTooltip/PasswordInputTooltip";
 import useFetching from "../../hooks/useFetching";
-import { Popup } from "../../components/Popup/Popup";
-import { popupTypes } from "../../types/popupTypes";
+import { IPopup, Popup } from "../../components/Popup/Popup";
 import { axiosInstance } from "../../helpers/axiosInstance";
 import { useAppDispatch } from "../../hooks/redux";
 import { authSlice } from "../../store/reducers/auth/authReducer";
 
-interface loginForm {
+interface ILoginForm {
   [key: string]: string;
   nickName: string;
   password: string;
 }
-interface loginResponse {
+interface ILoginResponse {
   message: string;
   token: string;
-  role: string;
 }
 
 export const Login: React.FC = () => {
-  const [loginForm, setLoginForm] = useState<loginForm>({
+  const [loginForm, setLoginForm] = useState<ILoginForm>({
     nickName: "",
     password: "",
   });
-  const [errorLoginForm, setErrorLoginForm] = useState<loginForm>({
+  const [errorLoginForm, setErrorLoginForm] = useState<ILoginForm>({
     nickName: "",
     password: "",
   });
@@ -44,7 +42,7 @@ export const Login: React.FC = () => {
     setErrorLoginForm,
     authValidationField
   );
-  const [popupInfo, setPopupInfo] = useState<popupTypes>({
+  const [popupInfo, setPopupInfo] = useState<IPopup>({
     title: "Авторизация",
     body: "",
     isVisible: false,
@@ -54,11 +52,11 @@ export const Login: React.FC = () => {
 
   const [sendForm, isLoading, error, errorStatus] = useFetching(
     async () => {
-      const response = await axiosInstance.post<loginResponse>(
+      const response = await axiosInstance.post<ILoginResponse>(
         "/api/auth/login",
         loginForm
       );
-      dispatch(authSlice.actions.setAuth(response.data.role));
+      dispatch(authSlice.actions.setAuth());
       localStorage.setItem("token", response.data.token);
     },
     popupInfo,

@@ -15,12 +15,11 @@ import { sendEmailWithLink } from "../../mailer.js";
 
 class AuthServise {
   async register(password, nickName, email, userName) {
-    const checkSimilarNickAndEmail = await authRepo.isHasSimilarNickOrEmail(
+    const { status, message } = await authRepo.isHasSimilarNickOrEmail(
       nickName,
       email
     );
-    if (checkSimilarNickAndEmail.status)
-      return { status: 400, message: checkSimilarNickAndEmail.message };
+    if (status) return { status: 400, message };
 
     const hash = await bcrypt.hash(password, saltRounds);
     const confirmEmailKey = await bcrypt.genSalt(saltRounds);
@@ -42,10 +41,13 @@ class AuthServise {
     };
   }
   async login(nickName, password) {
-    const checkLoginValid = await authRepo.isValidLogin(nickName, password);
-    if (!checkLoginValid.status)
-      return { status: 400, message: checkLoginValid.message };
-    const { id: userID, token: oldRefreshToken, role } = checkLoginValid;
+    const {
+      status,
+      id: userID,
+      token: oldRefreshToken,
+      message,
+    } = await authRepo.isValidLogin(nickName, password);
+    if (!status) return { status: 400, message };
 
     let refreshToken;
     const checkOldToken = await this.#compareToken(
@@ -66,13 +68,12 @@ class AuthServise {
       accessTokenSecret,
       acessTokenLiveTime
     );
-    const saveLogin = await authRepo.saveLogin(refreshToken, userID);
+    await authRepo.saveToken(refreshToken, userID);
     return {
       status: 200,
       message: "Вход выполнен успешно!",
       refreshToken,
       accessToken,
-      role,
     };
   }
   async logout(userID, refreshToken) {
@@ -91,8 +92,9 @@ class AuthServise {
       );
       if (!checkRefreshToken)
         return { status: 401, message: "Вы не авторизованы!" };
-      const { refreshTokenInBD, role } =
-        await authRepo.findRefreshTokenAndRoleByUserID(checkRefreshToken.id);
+      const refreshTokenInBD = await authRepo.findRefreshTokenByUserID(
+        checkRefreshToken.id
+      );
       if (refreshToken !== refreshTokenInBD)
         return { status: 401, message: "Вы не авторизованы!" };
 
@@ -101,17 +103,19 @@ class AuthServise {
         accessTokenSecret,
         acessTokenLiveTime
       );
-      return { status: 200, accessToken, role };
+
+      return { status: 200, accessToken };
     } catch (e) {
+      console.log(e);
       return { status: 401, message: "Вы не авторизованы!" };
     }
   }
   async confirm(key) {
-    let checkConfrimValid = await authRepo.isValidConfirm(key);
-    if (!checkConfrimValid.status)
+    let { status, message } = await authRepo.isValidConfirm(key);
+    if (!status)
       return {
         status: 400,
-        message: checkConfrimValid.message,
+        message: message,
       };
     await authRepo.switchConfirm(key);
     return { status: 200, message: "Аккаунт успешно активирован!" };

@@ -1,12 +1,12 @@
-import "./PostSort.scss";
+import "./PageFilter.scss";
 import arrowDown from "../../../../assets/media/arrow-down.png";
 import checkMark from "../../../../assets/media/check-mark.png";
 import { CSSTransition } from "react-transition-group";
 import { useState } from "react";
 import { useCustomSearchParams } from "../../../../hooks/useCustomSearchParams";
-import { typePostSearch } from "../../../../models/post/types/types";
+import { typePostSearch } from "../../../post/types/types";
 
-export const PostSort: React.FC = () => {
+export const PageFilter: React.FC = () => {
   const [search, setSearch] = useCustomSearchParams() as typePostSearch;
 
   const filtersOption = [
@@ -28,21 +28,21 @@ export const PostSort: React.FC = () => {
   };
 
   return (
-    <div className="post-nav-bar__sort">
-      <div className="post-nav-bar__button _icon" onClick={toggleTooltip}>
+    <div className="page-nav-bar__sort">
+      <div className="page-nav-bar__button _icon" onClick={toggleTooltip}>
         <p>СОРТИРОВКА</p>
         <img src={arrowDown} alt="" />
       </div>
       <CSSTransition
         in={isVisibleTooltip}
         timeout={300}
-        classNames="post-sort-anim"
+        classNames="page-sort-anim"
         unmountOnExit
       >
-        <div className="post-nav-bar__sort-tooltip">
+        <div className="page-nav-bar__sort-tooltip">
           {filtersOption.map((filter) => (
             <div
-              className="post-nav-bar__sort-item"
+              className="page-nav-bar__sort-item"
               key={filter.tag}
               onClick={() => {
                 setFilter(filter.tag);

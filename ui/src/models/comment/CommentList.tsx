@@ -6,9 +6,13 @@ import { CommentItem } from "./components/CommentItem/CommentItem";
 import { useEffect } from "react";
 import { useCustomSearchParams } from "../../hooks/useCustomSearchParams";
 import { ICommentSearch } from "./types/CommentTypes";
+import { PageNavBar } from "../../models/pageNavBar/PageNavBar";
+import { SmallLoader } from "../../components/SmallLoader/SmallLoader";
 
 export const CommentList: React.FC = () => {
-  const { comments } = useAppSelector((state) => state.comment);
+  const { comments, maxPage, isLoading } = useAppSelector(
+    (state) => state.comment
+  );
   const [search, setSearch] = useCustomSearchParams() as ICommentSearch;
   const { id } = useParams();
   const dispatch = useAppDispatch();
@@ -25,9 +29,14 @@ export const CommentList: React.FC = () => {
 
   return (
     <div className="comment-list">
+      {isLoading && <SmallLoader />}
+      <PageNavBar page={true} maxPage={maxPage} />
+
       {comments.map((comment) => (
         <CommentItem comment={comment} key={comment.id} />
       ))}
+
+      <PageNavBar page={true} maxPage={maxPage} />
     </div>
   );
 };

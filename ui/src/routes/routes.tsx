@@ -3,8 +3,7 @@ import { MainPage } from "../pages/MainPage";
 import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
 import { ConfirmPage } from "../pages/ConfirmPage";
-import { ProfilePublicPage } from "../pages/ProfilePublicPage";
-import { ProfileOwnPage } from "../pages/ProfileOwnPage";
+import { ProfilePage } from "../pages/ProfilePage";
 import { TopicPage } from "../pages/TopicPage";
 import { PostPage } from "../pages/PostPage";
 
@@ -15,7 +14,7 @@ export const publicRoutes = [
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
   { path: "/confirm/:key", element: <ConfirmPage /> },
-  { path: "/profile/:id", element: <ProfilePublicPage /> },
+  { path: "/profile/:id", element: <ProfilePage /> },
   { path: "*", element: <Navigate to={"/"} replace /> },
 ];
 
@@ -24,7 +23,6 @@ export const privateRoutes = [
   { path: "/topic/:id", element: <TopicPage /> },
   { path: "/post/:id", element: <PostPage /> },
   { path: "/confirm/:key", element: <ConfirmPage /> },
-  { path: "/profile/:id", element: <ProfilePublicPage /> },
-  { path: "/profile/my", element: <ProfileOwnPage /> },
+  { path: "/profile/:id", element: <ProfilePage /> },
   { path: "*", element: <Navigate to={"/"} replace /> },
 ];

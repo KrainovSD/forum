@@ -11,8 +11,7 @@ import { PasswordInputTooltip } from "../../components/UI/PasswordInputTooltip/P
 import { Loader } from "../../components/Loader/Loader";
 import useFetching from "../../hooks/useFetching";
 import { axiosInstance } from "../../helpers/axiosInstance";
-import { Popup } from "../../components/Popup/Popup";
-import { popupTypes } from "../../types/popupTypes";
+import { IPopup, Popup } from "../../components/Popup/Popup";
 import { useNavigate } from "react-router-dom";
 
 interface RegisterForm {
@@ -47,7 +46,7 @@ export const Register: React.FC = () => {
     authValidationField
   );
 
-  const [popupInfo, setPopupInfo] = useState<popupTypes>({
+  const [popupInfo, setPopupInfo] = useState<IPopup>({
     title: "Регистрация",
     body: "",
     isVisible: false,

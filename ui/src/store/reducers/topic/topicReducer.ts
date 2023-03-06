@@ -1,6 +1,7 @@
 import { getTopicByID } from "./topicActionCreator";
 import { ITopicInitialState, ITopicParentInfo, ItopicType } from "./topicTypes";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import { IActionError } from "../../../store/types";
 
 const initialState: ITopicInitialState = {
   isLoading: false,
@@ -35,12 +36,9 @@ export const topicSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getTopicByID.rejected, (state, action) => {
-        const payload = action.payload as {
-          message: string;
-          statusError: number;
-        };
+        const payload = action.payload as IActionError;
         state.error = payload.message;
-        state.statusError = payload.statusError;
+        state.statusError = payload.status;
         state.isLoading = false;
       });
   },

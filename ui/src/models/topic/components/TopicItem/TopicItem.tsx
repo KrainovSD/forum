@@ -33,7 +33,7 @@ export const TopicItem: React.FC<TopicItemProps> = ({ topic }) => {
         <h1>{topic.countComment}</h1>
         <p>сообщений</p>
       </div>
-      <LastComment lastComment={topic.lastComment} />
+      {topic.lastComment && <LastComment lastComment={topic.lastComment} />}
     </div>
   );
 };

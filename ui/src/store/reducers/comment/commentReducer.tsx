@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getCommentByPostID } from "./commentCreateAction";
 import { IComment, ICommentInitialState } from "./commentTypes";
+import { IActionError } from "../../../store/types";
 
 const initialState: ICommentInitialState = {
   comments: [],
@@ -33,10 +34,7 @@ export const CommentSlice = createSlice({
         state.statusError = 0;
       })
       .addCase(getCommentByPostID.rejected, (state, action) => {
-        const payload = action.payload as {
-          message: string;
-          status: number;
-        };
+        const payload = action.payload as IActionError;
 
         state.comments = [];
         state.maxPage = 0;

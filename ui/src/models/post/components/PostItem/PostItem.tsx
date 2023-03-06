@@ -5,6 +5,10 @@ import { IPostsTypes } from "../../../../store/reducers/post/postTypes";
 import { NavLink } from "react-router-dom";
 import { useDateFormat } from "../../../../hooks/useDateFormat";
 import { LastComment } from "../../../../components/LastComment/LastComment";
+import {
+  getCountCommentAnswerCaption,
+  getViewCountCaption,
+} from "../../../../helpers/getCaption";
 
 interface IPostItemProps {
   post: IPostsTypes;
@@ -12,28 +16,6 @@ interface IPostItemProps {
 
 export const PostItem: React.FC<IPostItemProps> = ({ post }) => {
   const postDate = useDateFormat(post.date);
-  const countCommentCaption = (value: number) => {
-    value = +value;
-    if (value > 20) {
-      while (value > 20) {
-        value = value % 10;
-      }
-    }
-    if (value === 1) return "ответ";
-    else if (value >= 2 && value <= 4) return "ответа";
-    else return "ответов";
-  };
-  const viewCountCaption = (value: number) => {
-    value = +value;
-    if (value > 20) {
-      while (value > 20) {
-        value = value % 10;
-      }
-    }
-    if (value === 1) return "просмотр";
-    else if (value >= 2 && value <= 4) return "просмотра";
-    else return "просмотров";
-  };
 
   return (
     <div className="post-item">
@@ -57,13 +39,13 @@ export const PostItem: React.FC<IPostItemProps> = ({ post }) => {
       </div>
       <div className="post-item__statistics">
         <h1>
-          {post.countComment} {countCommentCaption(post.countComment)}
+          {post.countComment} {getCountCommentAnswerCaption(post.countComment)}
         </h1>
         <p>
-          {post.viewCount} {viewCountCaption(post.viewCount)}
+          {post.viewCount} {getViewCountCaption(post.viewCount)}
         </p>
       </div>
-      <LastComment lastComment={post.lastComment} />
+      {post.lastComment && <LastComment lastComment={post.lastComment} />}
     </div>
   );
 };

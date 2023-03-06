@@ -6,7 +6,13 @@
   box-shadow: rgb(0 0 0 / 10%) 3px 3px 3px;
   padding: 20px;
   display: flex;
+  margin-bottom: 20px;
+
   // .post-common-header__avatar
+
+  &__info {
+    display: flex;
+  }
 
   &__avatar {
     background-color: #565555;
@@ -19,9 +25,9 @@
     }
   }
 
-  // .post-common-header__info
+  // .post-common-header__info-wrapper
 
-  &__info {
+  &__info-wrapper {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -60,6 +66,47 @@
     & > ._topic {
       color: #000000;
       cursor: pointer;
+    }
+  }
+
+  // .post-common-header__tools
+
+  &__tools {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  // .post-common-header__create-new-post
+
+  &__create-new-post {
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  // .post-common-header__new-comment
+
+  &__new-comment {
+    padding: 10px;
+    background: rgb(51, 51, 51);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 40px;
+
+    & > img {
+      width: 16px;
+      height: 16px;
+      margin-right: 5px;
+    }
+    &:hover {
+      background: rgba(96, 95, 95, 0.747);
     }
   }
 }

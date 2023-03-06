@@ -1,13 +1,19 @@
 import { BlackButton } from "../../components/UI/BlackButton/BlackButton";
 import "./Popup.scss";
 
-interface PopupProps {
+export interface IPopup {
+  title: string;
+  body: string;
+  isVisible: boolean;
+}
+
+interface IPopupProps {
   title: string;
   body: string;
   action: () => void;
 }
 
-export const Popup: React.FC<PopupProps> = ({ title, body, action }) => {
+export const Popup: React.FC<IPopupProps> = ({ title, body, action }) => {
   const linesBody = body.split("\\n");
 
   return (

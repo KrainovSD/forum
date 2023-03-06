@@ -1,16 +1,27 @@
 import "./ProfileInfo.scss";
 import arrowRight from "../../../../assets/media/arrow-right.png";
-import avatarUser from "../../../../assets/media/user.png";
+import { getAvatar } from "../../../../helpers/getAvatar";
+import { IUserInfoProp } from "../../../../models/profile/types/UserInfo";
+import { getReputationCaption } from "../../../../helpers/getCaption";
 
-export const ProfileInfo: React.FC = () => {
-  //#a4a4a4
+interface IProfileInfoProps {
+  user: IUserInfoProp;
+  isOwnProfile: boolean;
+}
+export const ProfileInfo: React.FC<IProfileInfoProps> = ({
+  user,
+  isOwnProfile,
+}) => {
+  const avatar = getAvatar(user.avatar);
+  const reputationCaption = getReputationCaption(user.reputation);
+
   return (
     <div className="profile-info">
       <div className="profile-info__reputation">
         <div className="profile-info__reputation-back-ground">
           <h2>РЕПУТАЦИЯ</h2>
-          <h3>725</h3>
-          <p>Ангел</p>
+          <h3>{user.reputation}</h3>
+          <p>{reputationCaption}</p>
         </div>
         <div className="profile-info__reputation-tracker">
           <div>
@@ -19,35 +30,14 @@ export const ProfileInfo: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="profile-info__subscribers">
+      <div className="profile-info__subscribers" data-tooltip="В разработке">
         <div className="profile-info__subscribers-wrapper">
           <div className="profile-info__subscribers-header">
-            <p>65 Подписчиков</p>
+            <p>0 Подписчиков</p>
           </div>
           <div className="profile-info__subscribers-list">
             <div className="profile-info__subscribers-item">
-              <img src={avatarUser} alt="" />
-            </div>
-            <div className="profile-info__subscribers-item">
-              <img src={avatarUser} alt="" />
-            </div>
-            <div className="profile-info__subscribers-item">
-              <img src={avatarUser} alt="" />
-            </div>
-            <div className="profile-info__subscribers-item">
-              <img src={avatarUser} alt="" />
-            </div>
-            <div className="profile-info__subscribers-item">
-              <img src={avatarUser} alt="" />
-            </div>
-            <div className="profile-info__subscribers-item">
-              <img src={avatarUser} alt="" />
-            </div>
-            <div className="profile-info__subscribers-item">
-              <img src={avatarUser} alt="" />
-            </div>
-            <div className="profile-info__subscribers-item">
-              <img src={avatarUser} alt="" />
+              <img src={avatar} alt="" />
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import db from "../../db.js";
-const COUNT_COMMENT_PER_PAGE = 20;
+const COUNT_COMMENT_PER_PAGE = 3;
 
 class CommentPostgressRepo {
   async getAllByPostID(id, page) {
@@ -9,25 +9,48 @@ class CommentPostgressRepo {
       "SELECT id FROM comment WHERE comment.post_id = $1",
       [id]
     );
-    const maxPage = allComents.rows?.length || 0;
-    if (maxPage === 0 || maxPage < page) return { comments: [], maxPage };
+    const maxPage = allComents.rows?.length
+      ? Math.ceil(allComents.rows.length / COUNT_COMMENT_PER_PAGE)
+      : 0;
+    if (maxPage === 0 || maxPage < page) return { comments: [], maxPage: 0 };
 
     const commentsInfo = await db.query(
       `
-    WITH 
-    temp1 ("id", "body", "main", "date", "verified", "fixed", "author_id", "author_nick_name", 
-         "author_avatar", "author_role", "updated", "date_update", "author_update_id", "post_id" ) 
-         as (SELECT T1.id, T1.body, T1.main, T1.date, T1.verified, T1.fixed, t2.id, t2.nick, t2.avatar, 
-           t2.role, T1.updated, T1.date_update, T1.person_id_updated, T1.post_id
-           FROM comment as T1 
-           LEFT JOIN person as t2 ON t1.person_id = t2.id
-          )
-    SELECT temp1.*, person.nick as author_update_nick_name 
-    FROM temp1
-    LEFT JOIN person ON person.id = temp1.author_update_id
-    WHERE post_id = $1
-    ORDER BY temp1.main DESC, temp1.fixed DESC, temp1.date
-    LIMIT $2 OFFSET $3
+      WITH 
+      temp1("id", "reputation") as (
+      SELECT t1.id, count(t2.id)
+        FROM person as t1
+        LEFT JOIN likes as t2 ON t2.to = t1.id
+        GROUP BY t1.id
+      ),
+      temp2("id", "count_comment") as (
+      SELECT t1.id, count(t2.id)
+        FROM person as t1
+        LEFT JOIN comment as t2 ON t2.person_id = t1.id
+        GROUP BY t1.id
+      ),
+      temp3("id", "nick", "avatar", "role", "reputation", "count_comment") as (
+      SELECT t1.id, t1.nick, t1.avatar, t1.role, t2.reputation, t3.count_comment
+        FROM person as t1
+        LEFT JOIN temp1 as t2 ON t2.id = t1.id
+        LEFT JOIN temp2 as t3 ON t3.id = t1.id
+      ),
+        temp4 ("id", "body", "main", "date", "verified", "fixed", "author_id", "author_nick_name", 
+             "author_avatar", "author_role", "author_reputation", "author_count_comment", "updated", 
+           "date_update", "author_update_id", "post_id" ) 
+             as (SELECT t1.id, t1.body, t1.main, t1.date, t1.verified, t1.fixed, t2.id, t2.nick, t2.avatar, 
+               t2.role, t2.reputation, t2.count_comment, t1.updated, t1.date_update, t1.person_id_updated, 
+           t1.post_id
+               FROM comment as t1 
+               LEFT JOIN temp3 as t2 ON t1.person_id = t2.id
+              )
+          
+        SELECT t1.*, t2.nick as author_update_nick_name
+        FROM temp4 as t1
+        LEFT JOIN person as t2 ON t2.id = t1.author_update_id
+        WHERE post_id = $1
+        ORDER BY t1.main DESC, t1.fixed DESC, t1.date
+        LIMIT $2 OFFSET $3
     `,
       [id, COUNT_COMMENT_PER_PAGE, offset]
     );
@@ -61,6 +84,8 @@ class CommentPostgressRepo {
         authorNickName: commentInfo.author_nick_name,
         authorAvatar: commentInfo.author_avatar,
         authorRole: commentInfo.author_role,
+        authorReputation: commentInfo.author_reputation,
+        authorCountComment: commentInfo.author_count_comment,
         date: commentInfo.date,
         updated: commentInfo.updated,
         dateUpdate: commentInfo.date_update,

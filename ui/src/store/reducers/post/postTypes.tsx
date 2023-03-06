@@ -8,36 +8,36 @@ export interface postInitialState {
 }
 
 export interface IPostsTypes {
-  id: number;
+  id: string;
   title: string;
   fixed: boolean;
   closed: boolean;
   verified: boolean;
-  authorID: number;
+  authorID: string;
   authorNickName: string;
   date: string;
-  countComment: number;
-  viewCount: number;
-  lastComment: PostLastCommentType;
+  countComment: string;
+  viewCount: string;
+  lastComment: PostLastCommentType | null;
 }
 
 export interface IPostTypes {
-  id: number;
+  id: string;
   title: string;
   fixed: boolean;
   closed: boolean;
   verified: boolean;
-  authorID: number;
+  authorID: string;
   authorNickName: string;
   authorAvatar: string | null;
-  topicID: number;
+  topicID: string;
   topicTitle: string;
   date: string;
 }
 
 export interface PostLastCommentType {
   userID: number;
-  avatar: boolean;
+  avatar: string;
   nickName: string;
   date: string;
   commentID: number;

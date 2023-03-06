@@ -1,23 +1,35 @@
 import "./PostCommonFooter.scss";
-import userAvatar from "../../../../assets/media/user.png";
 import alert from "../../../../assets/media/alert.png";
 import arrowLeft from "../../../../assets/media/arrow-left.png";
 import { useAppSelector } from "../../../../hooks/redux";
 import { NavLink } from "react-router-dom";
+import { getAvatar } from "../../../../helpers/getAvatar";
 
 export const PostCommonFooter: React.FC = () => {
   const { currentPost } = useAppSelector((state) => state.post);
+  const { userInfo } = useAppSelector((state) => state.user);
+  const avatar = getAvatar(currentPost?.authorAvatar);
 
   return (
     <div className="post-common-footer">
       {currentPost && currentPost.closed && (
         <div className="post-common-footer__addComment">
           <div className="_avatar">
-            <img src={userAvatar} alt="" />
+            <img src={avatar} alt="" />
           </div>
-          <div className="_text-field-block">
+          <div className="_text-field-block _lock">
             <img src={alert} alt="" />
             <p>Эта тема закрыта для публикации ответов.</p>
+          </div>
+        </div>
+      )}
+      {userInfo && currentPost && !currentPost.closed && (
+        <div className="post-common-footer__addComment">
+          <div className="_avatar">
+            <img src={avatar} alt="" />
+          </div>
+          <div className="_text-field-block _open">
+            <textarea name="" id="comment"></textarea>
           </div>
         </div>
       )}

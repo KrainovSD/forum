@@ -16,6 +16,7 @@
 
   &__user-info {
     width: 200px;
+    min-width: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -24,7 +25,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 16px;
       height: 40px;
       font-weight: bold;
 
@@ -81,7 +82,7 @@
       justify-content: space-between;
       font-size: 14px;
       height: 40px;
-      padding-left: 30px;
+      padding-left: 10px;
       border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
 
       & > ._date {
@@ -93,7 +94,12 @@
     }
     & > ._comment {
       padding-top: 20px;
-      padding-left: 30px;
+      padding-left: 10px;
+    }
+    & > ._update {
+      color: rgba(114, 114, 114, 0.662745098);
+      padding-left: 10px;
+      margin-top: 10px;
     }
   }
 
@@ -110,7 +116,6 @@
       background-color: #598f5b;
       color: #ffffff;
       padding: 5px 8px;
-      margin-right: 10px;
       cursor: pointer;
     }
     & > ._add-reputation {
@@ -120,9 +125,24 @@
       cursor: pointer;
       border-radius: 15px;
       transition: all 0.3s ease;
+      margin-left: 10px;
 
       &:hover {
         background-color: #598f5b;
+        color: #ffffff;
+      }
+    }
+    & > ._remove-reputation {
+      background-color: #ffffff;
+      padding: 0px 7.5px;
+      font-size: 22px;
+      cursor: pointer;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      margin-left: 10px;
+
+      &:hover {
+        background-color: #8b4343;
         color: #ffffff;
       }
     }

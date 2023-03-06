@@ -1,5 +1,5 @@
-.post-nav-bar {
-  // .post-nav-bar__sort
+.page-nav-bar {
+  // .page-nav-bar__sort
 
   &__sort {
     display: flex;
@@ -8,7 +8,7 @@
     margin: 0 0 0 auto;
   }
 
-  // .post-nav-bar__sort-tooltip
+  // .page-nav-bar__sort-tooltip
 
   &__sort-tooltip {
     z-index: 2;
@@ -35,7 +35,7 @@
     }
   }
 
-  // .post-nav-bar__sort-item
+  // .page-nav-bar__sort-item
 
   &__sort-item {
     margin-top: 8px;
@@ -57,20 +57,20 @@
   }
 }
 
-.post-sort-anim-enter {
+.page-sort-anim-enter {
   opacity: 0;
   top: 35px;
   left: 50%;
   transform: translateX(-50%);
 }
-.post-sort-anim-enter-active {
+.page-sort-anim-enter-active {
   opacity: 1;
   transition: opacity 300ms, transform 300ms;
 }
-.post-sort-anim-exit {
+.page-sort-anim-exit {
   opacity: 1;
 }
-.post-sort-anim-exit-active {
+.page-sort-anim-exit-active {
   opacity: 0;
   top: 35px;
   left: 50%;

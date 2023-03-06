@@ -18,10 +18,10 @@ export const getTopicByID = createAsyncThunk(
     } catch (e) {
       const error = e as AxiosError;
       const message = error.response?.data || "Сервер не отвечает!";
-      const statusError = error.response?.status || 500;
+      const status = error.response?.status || 500;
       return thunkApi.rejectWithValue({
         message,
-        statusError,
+        status,
       });
     }
   }

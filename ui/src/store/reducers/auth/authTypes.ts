@@ -1,20 +1,13 @@
-export interface checkAuthData {
+export interface ICheckAuthData {
   token: string;
-  role: string;
 }
-export interface checkAuthError {
+export interface ICheckAuthError {
   status: number;
   message: string;
 }
-export interface loginData {
-  message: string;
-  token: string;
-  role: string;
-}
 
-export interface authState {
+export interface IAuthInitialState {
   auth: boolean;
-  role: string;
   isLoading: boolean;
   statusError: number;
   error: string;

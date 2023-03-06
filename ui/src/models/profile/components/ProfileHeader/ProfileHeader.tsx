@@ -2,12 +2,27 @@ import "./ProfileHeader.scss";
 import imgBlack from "../../../../assets/media/img-black.png";
 import imgWhite from "../../../../assets/media/img-white.png";
 import arrowDown from "../../../../assets/media/arrow-down.png";
-import backProfile from "../../../../assets/media/back-profile.png";
 import newsPaper from "../../../../assets/media/newspaper.png";
-import avatar from "../../../../assets/media/user.png";
+import { getBackImg } from "../../../../helpers/getBackImg";
+import { IUserInfoProp } from "../../../../models/profile/types/UserInfo";
+import { getAvatar } from "../../../../helpers/getAvatar";
+import { getRoleInfo } from "../../../../helpers/getRoleInfo";
+import { useDateFormat } from "../../../../hooks/useDateFormat";
 
-export const ProfileHeader: React.FC = () => {
-  const backProfileImg = backProfile;
+interface IProfileHeaderProps {
+  user: IUserInfoProp;
+  isOwnProfile: boolean;
+}
+
+export const ProfileHeader: React.FC<IProfileHeaderProps> = ({
+  user,
+  isOwnProfile,
+}) => {
+  const backProfileImg = getBackImg(user.backImg);
+  const avatar = getAvatar(user.avatar);
+  const { roleString, roleClass } = getRoleInfo(user.role);
+  const lastLoginDate = useDateFormat(user.lastLogin);
+  const dateRegistration = useDateFormat(user.dateRegistration);
 
   return (
     <div
@@ -27,24 +42,24 @@ export const ProfileHeader: React.FC = () => {
           </div>
         </div>
         <div className="profile-header__user-info-body">
-          <h1>Serega_Krainov47</h1>
-          <p className="_user">Продвинутый</p>
+          <h1>{user.nickName}</h1>
+          <p className={`_role ${roleClass}`}>{roleString}</p>
         </div>
       </div>
 
       <div className="profile-header__info-bar">
         <div className="profile-header__info-bar-item">
           <h1>ПУБЛИКАЦИЙ</h1>
-          <p>1647</p>
+          <p>{user.countComment}</p>
         </div>
         <div className="profile-header__info-bar-item">
           <h1>ЗАРЕГИСТРИРОВАН</h1>
-          <p>9 августа, 2012</p>
+          <p>{dateRegistration}</p>
         </div>
         <div className="profile-header__info-bar-item">
           <h1>ПОСЕЩЕНИЕ</h1>
           <p>
-            <div className="_cirle green"></div> Только что
+            <span className="_cirle green"></span> {lastLoginDate}
           </p>
         </div>
         <div className="profile-header__find-content-button">

@@ -1,23 +1,23 @@
 import { PostItem } from "./components/PostItem/PostItem";
 import messageWhite from "./../../assets/media/comment-white.png";
 import "./PostList.scss";
-import { PostNavBar } from "./components/PostNavBar/PostNavBar";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { useEffect } from "react";
 import { getPostByTopicID } from "../../store/reducers/post/postActionCreator";
 import { SmallLoader } from "../../components/SmallLoader/SmallLoader";
 import { useCustomSearchParams } from "../../hooks/useCustomSearchParams";
-import { typePostSearch } from "./types/types";
 import { useParams } from "react-router-dom";
+import { PageNavBar } from "../../models/pageNavBar/PageNavBar";
+import { typeSearch } from "../../models/pageNavBar/types";
 
 export const PostList: React.FC = () => {
-  const [search, setSearch] = useCustomSearchParams() as typePostSearch;
+  const [search, setSearch] = useCustomSearchParams() as typeSearch;
   const { id: topicID } = useParams();
 
   const { parentInfo: topicParentInfo } = useAppSelector(
     (state) => state.topic
   );
-  const { posts, isLoading } = useAppSelector((state) => state.post);
+  const { posts, isLoading, maxPage } = useAppSelector((state) => state.post);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -51,14 +51,14 @@ export const PostList: React.FC = () => {
       <div className="post-list__create-post-button">
         <img src={messageWhite} alt="" /> <p>Создать новую тему</p>
       </div>
-      <PostNavBar />
+      <PageNavBar page={true} filter={true} maxPage={maxPage} />
       <div className="post-list__wrapper">
         {isLoading && <SmallLoader />}
         {posts.map((post) => (
           <PostItem key={post.id} post={post} />
         ))}
       </div>
-      <PostNavBar />
+      <PageNavBar page={true} filter={true} maxPage={maxPage} />
     </div>
   );
 };
