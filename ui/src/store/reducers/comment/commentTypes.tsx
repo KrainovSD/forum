@@ -2,6 +2,7 @@ export interface ICommentInitialState {
   comments: IComment[];
   maxPage: number;
   isLoading: boolean;
+  isSmallLoading: boolean;
   error: string;
   statusError: number;
 }

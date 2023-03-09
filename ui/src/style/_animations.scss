@@ -1,0 +1,14 @@
+.appear-anim-enter {
+  opacity: 0;
+}
+.appear-anim-enter-active {
+  opacity: 1;
+  transition: opacity 300ms, transform 300ms;
+}
+.appear-anim-exit {
+  opacity: 1;
+}
+.appear-anim-exit-active {
+  opacity: 0;
+  transition: opacity 300ms, transform 300ms;
+}

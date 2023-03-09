@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getTopicByID } from "../../store/reducers/topic/topicActionCreator";
-import { Loader } from "../../components/Loader/Loader";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { TopicItem } from "./components/TopicItem/TopicItem";
 import "./TopicList.scss";

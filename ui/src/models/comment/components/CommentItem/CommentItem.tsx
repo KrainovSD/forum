@@ -8,6 +8,9 @@ import { useDateFormat } from "../../../../hooks/useDateFormat";
 import { getCountCommentMessageCaption } from "../../../../helpers/getCaption";
 import { getAvatar } from "../../../../helpers/getAvatar";
 import { useAppSelector } from "../../../../hooks/redux";
+import { useState } from "react";
+import { LikesPopup } from "../../../likes/LikesPopup";
+import { CSSTransition } from "react-transition-group";
 interface ICommentItemProps {
   comment: IComment;
 }
@@ -20,8 +23,29 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
 
   const { userInfo } = useAppSelector((state) => state.user);
 
+  const [isVisibleLikes, setIsVisibleLikes] = useState<boolean>(false);
+  const showLikes = () => {
+    if (comment.likes.length === 0) return;
+    const visible = isVisibleLikes ? false : true;
+    setIsVisibleLikes(visible);
+  };
+
   return (
     <div className="comment-item" id={`${comment.id}`}>
+      <CSSTransition
+        in={isVisibleLikes}
+        timeout={300}
+        classNames="appear-anim"
+        unmountOnExit
+      >
+        <LikesPopup
+          commentID={comment.id}
+          closePopup={() => {
+            setIsVisibleLikes(false);
+          }}
+        />
+      </CSSTransition>
+
       <div className="comment-item__content">
         <div className="comment-item__user-info">
           <div className="_header">
@@ -62,7 +86,9 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
         </div>
       </div>
       <div className="comment-item__footer">
-        <div className="_reputation">{comment.likes.length}</div>
+        <div className="_reputation" onClick={showLikes}>
+          {comment.likes.length}
+        </div>
         {userInfo &&
           userInfo.id !== comment.authorID &&
           !comment.likes.includes(userInfo.id) && (

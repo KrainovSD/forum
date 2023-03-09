@@ -8,6 +8,7 @@ const initialState: postInitialState = {
   currentPost: null,
   maxPage: 1,
   isLoading: false,
+  isSmallLoading: false,
   error: "",
   statusError: 0,
 };
@@ -21,10 +22,10 @@ export const postSlice = createSlice({
       .addCase(getPostByTopicID.fulfilled, (state, action) => {
         if (action.payload?.posts) state.posts = action.payload.posts;
         if (action.payload?.maxPage) state.maxPage = action.payload.maxPage;
-        state.isLoading = false;
+        state.isSmallLoading = false;
       })
       .addCase(getPostByTopicID.pending, (state) => {
-        state.isLoading = true;
+        state.isSmallLoading = true;
         state.error = "";
         state.statusError = 0;
         state.currentPost = null;
@@ -37,7 +38,7 @@ export const postSlice = createSlice({
         state.posts = [];
         state.error = payload.message;
         state.statusError = payload.status;
-        state.isLoading = false;
+        state.isSmallLoading = false;
       })
       .addCase(
         getPostByID.fulfilled,
@@ -49,6 +50,7 @@ export const postSlice = createSlice({
       .addCase(getPostByID.pending, (state) => {
         state.posts = [];
         state.error = "";
+        state.isLoading = true;
         state.statusError = 0;
         state.currentPost = null;
       })

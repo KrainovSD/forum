@@ -10,7 +10,9 @@ import { PageNavBar } from "../../models/pageNavBar/PageNavBar";
 import { SmallLoader } from "../../components/SmallLoader/SmallLoader";
 
 export const CommentList: React.FC = () => {
-  const { comments, maxPage, isLoading } = useAppSelector(
+  const { isLoading: isLoadingAuth } = useAppSelector((state) => state.auth);
+  const { isLoading: isLoadingUser } = useAppSelector((state) => state.user);
+  const { comments, maxPage, isSmallLoading } = useAppSelector(
     (state) => state.comment
   );
   const [search, setSearch] = useCustomSearchParams() as ICommentSearch;
@@ -29,7 +31,7 @@ export const CommentList: React.FC = () => {
 
   return (
     <div className="comment-list">
-      {isLoading && <SmallLoader />}
+      {!isLoadingAuth && !isLoadingUser && isSmallLoading && <SmallLoader />}
       <PageNavBar page={true} maxPage={maxPage} />
 
       {comments.map((comment) => (

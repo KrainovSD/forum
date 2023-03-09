@@ -2,7 +2,7 @@ import "./SmallLoader.scss";
 
 export const SmallLoader: React.FC = () => {
   return (
-    <div className="small-loader__back">
+    <div className="back-drop__small-loader">
       <div className="small-loader__wrapper">
         <div className="small-loader">
           <div className="small-loader__element one"></div>

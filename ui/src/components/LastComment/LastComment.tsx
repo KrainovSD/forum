@@ -4,13 +4,13 @@ import "./LastComment.scss";
 import { getAvatar } from "../../helpers/getAvatar";
 
 interface ILastComment {
-  userID: number;
+  userID: string;
   avatar: string;
   nickName: string;
   date: string;
-  commentID?: number;
+  commentID?: string;
   postTitle?: string;
-  postID?: number;
+  postID?: string;
 }
 
 interface ILastCommentProps {

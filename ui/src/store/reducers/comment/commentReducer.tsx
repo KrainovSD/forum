@@ -7,6 +7,7 @@ const initialState: ICommentInitialState = {
   comments: [],
   maxPage: 0,
   isLoading: false,
+  isSmallLoading: false,
   error: "",
   statusError: 0,
 };
@@ -25,11 +26,11 @@ export const CommentSlice = createSlice({
         ) => {
           state.comments = action.payload.comments;
           state.maxPage = action.payload.maxPage;
-          state.isLoading = false;
+          state.isSmallLoading = false;
         }
       )
       .addCase(getCommentByPostID.pending, (state) => {
-        state.isLoading = true;
+        state.isSmallLoading = true;
         state.error = "";
         state.statusError = 0;
       })
@@ -38,7 +39,7 @@ export const CommentSlice = createSlice({
 
         state.comments = [];
         state.maxPage = 0;
-        state.isLoading = false;
+        state.isSmallLoading = false;
         state.error = payload.message;
         state.statusError = payload.status;
       });

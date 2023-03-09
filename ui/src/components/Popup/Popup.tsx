@@ -17,7 +17,7 @@ export const Popup: React.FC<IPopupProps> = ({ title, body, action }) => {
   const linesBody = body.split("\\n");
 
   return (
-    <div className="backDrop">
+    <div className="back-drop__popup">
       <div className="popup">
         <h1 className="popup__title">{title}</h1>
         {linesBody.map((line, id) => (

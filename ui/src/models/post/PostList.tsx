@@ -17,7 +17,11 @@ export const PostList: React.FC = () => {
   const { parentInfo: topicParentInfo } = useAppSelector(
     (state) => state.topic
   );
-  const { posts, isLoading, maxPage } = useAppSelector((state) => state.post);
+  const { isLoading: isLoadingAuth } = useAppSelector((state) => state.auth);
+  const { isLoading: isLoadingUser } = useAppSelector((state) => state.user);
+  const { posts, isSmallLoading, maxPage } = useAppSelector(
+    (state) => state.post
+  );
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -53,7 +57,7 @@ export const PostList: React.FC = () => {
       </div>
       <PageNavBar page={true} filter={true} maxPage={maxPage} />
       <div className="post-list__wrapper">
-        {isLoading && <SmallLoader />}
+        {!isLoadingAuth && !isLoadingUser && isSmallLoading && <SmallLoader />}
         {posts.map((post) => (
           <PostItem key={post.id} post={post} />
         ))}

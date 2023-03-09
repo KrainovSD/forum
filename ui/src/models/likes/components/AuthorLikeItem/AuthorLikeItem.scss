@@ -1,0 +1,32 @@
+.author-like {
+  display: flex;
+  // .author-like__avatar
+
+  &__avatar {
+    cursor: pointer;
+    background-color: #565555;
+    border: 1px solid #333333;
+    & > img {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  // .author-like__info
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-left: 10px;
+    & > ._nick {
+      color: #000000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    & > ._date {
+      margin-top: 5px;
+      font-size: 14px;
+    }
+  }
+}

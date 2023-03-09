@@ -3,6 +3,7 @@ export interface postInitialState {
   currentPost: IPostTypes | null;
   maxPage: number;
   isLoading: boolean;
+  isSmallLoading: boolean;
   error: string;
   statusError: number;
 }

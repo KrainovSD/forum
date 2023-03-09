@@ -2,7 +2,7 @@ import "./Loader.scss";
 
 export const Loader: React.FC = () => {
   return (
-    <div className="backDrop">
+    <div className="back-drop__loader">
       <div className="loader__wrapper">
         <div className="loader">
           <div className="loader__element one"></div>

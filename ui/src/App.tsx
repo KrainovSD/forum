@@ -14,6 +14,12 @@ export const App: React.FC = () => {
     (state) => state.auth
   );
   const { isLoading: isLoadingUser } = useAppSelector((state) => state.user);
+  const { isLoading: isLoadingTopic } = useAppSelector((state) => state.topic);
+  const { isLoading: isLoadingPost } = useAppSelector((state) => state.post);
+  const { isLoading: isLoadingLike } = useAppSelector((state) => state.like);
+  const { isLoading: isLoadingComment } = useAppSelector(
+    (state) => state.comment
+  );
 
   useEffect(() => {
     dispatch(checkAuth());
@@ -29,7 +35,12 @@ export const App: React.FC = () => {
 
   return (
     <div className="container">
-      {(isLoadingAuth || isLoadingUser) && <Loader />}
+      {(isLoadingAuth ||
+        isLoadingUser ||
+        isLoadingTopic ||
+        isLoadingPost ||
+        isLoadingLike ||
+        isLoadingComment) && <Loader />}
       <Header />
       <div className="workplace">{routes}</div>
     </div>

@@ -51,6 +51,8 @@ import authRoutes from "./models/authModels/AuthRoutes.js";
 app.use("/api/auth", authRoutes);
 import userRoutes from "./models/userModels/UserRoutes.js";
 app.use("/api/user", userRoutes);
+import messageRoutes from "./models/messageModels/MessageRoutes.js";
+app.use("/api/message", messageRoutes);
 import topicRoutes from "./models/topicModels/TopicRoutes.js";
 app.use("/api/topic", topicRoutes);
 import postRoutes from "./models/postModels/PostRoutes.js";
