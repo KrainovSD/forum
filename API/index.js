@@ -61,3 +61,12 @@ import commentRoutes from "./models/commentModels/CommentRoutes.js";
 app.use("/api/comment", commentRoutes);
 import likeRoutes from "./models/likeModels/LikeRoutes.js";
 app.use("/api/like", likeRoutes);
+
+app.get("*", async (req, res) => {
+  try {
+    res.status(200).json("Страница");
+  } catch (e) {
+    req.err = e;
+    res.status(500).json();
+  }
+});

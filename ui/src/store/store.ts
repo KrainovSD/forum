@@ -1,3 +1,4 @@
+import messageSlice from "./reducers/message/messageReducer";
 import topicSlice from "./reducers/topic/topicReducer";
 import authSlice from "./reducers/auth/authReducer";
 import { configureStore } from "@reduxjs/toolkit";
@@ -14,6 +15,7 @@ export const store = configureStore({
     comment: commentSlice,
     user: userSlice,
     like: likeSlice,
+    message: messageSlice,
   },
 });
 

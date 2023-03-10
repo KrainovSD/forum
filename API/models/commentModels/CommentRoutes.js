@@ -7,7 +7,38 @@ import commentValidation from "./commentValidation.js";
 
 routes.get(
   "/byPost/:id",
-  CommentController.getAllByPostID.bind(CommentController)
+  untils.noStrictCheckAuth,
+  CommentController.getAllByPostID
 );
-
+routes.post(
+  "/",
+  untils.checkAuth,
+  commentValidation.create,
+  untils.checkValidation,
+  CommentController.createComment
+);
+routes.delete("/:id", untils.checkAuth, CommentController.deleteComment);
+routes.put(
+  "/body",
+  untils.checkAuth,
+  commentValidation.update,
+  untils.checkValidation,
+  CommentController.updateCommentBody
+);
+routes.put(
+  "/verified",
+  untils.checkAuth,
+  untils.checkModer,
+  commentValidation.update,
+  untils.checkValidation,
+  CommentController.updateCommentVerified
+);
+routes.put(
+  "/fixed",
+  untils.checkAuth,
+  untils.checkModer,
+  commentValidation.update,
+  untils.checkValidation,
+  CommentController.updateCommentFixed
+);
 export default routes;

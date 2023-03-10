@@ -6,6 +6,7 @@ import { IActionError } from "../../../store/types";
 const initialState: ICommentInitialState = {
   comments: [],
   maxPage: 0,
+  updated: false,
   isLoading: false,
   isSmallLoading: false,
   error: "",

@@ -20,6 +20,7 @@ if (PRODUCTION) {
 }
 
 instanceToken.interceptors.request.use(async (request) => {
+  await refreshToken();
   let accessToken: string = "";
   if (localStorage.getItem("token"))
     accessToken = localStorage.getItem("token") as string;
@@ -30,22 +31,7 @@ instanceToken.interceptors.request.use(async (request) => {
   return request;
 });
 
-instanceToken.interceptors.response.use(
-  (response) => response,
-  async (err) => {
-    try {
-      if (err.response?.status != 401) return Promise.reject(err);
-      await refreshToken();
-      const originalRequestConfig = err.config;
-      delete originalRequestConfig.headers[HEADER];
-      return instanceToken.request(originalRequestConfig);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-);
-
-export const axiosInstanceToken = instanceToken;
+export const axiosInstanceNoStrictToken = instanceToken;
 
 let tokenUrl: string;
 if (PRODUCTION) {
@@ -61,10 +47,10 @@ function refreshToken() {
       .then((res) => {
         const accessToken = res.data.token;
         localStorage.setItem("token", accessToken);
-        resolve(accessToken);
+        resolve(true);
       })
       .catch((err) => {
-        reject(err);
+        resolve(false);
       });
   });
 }

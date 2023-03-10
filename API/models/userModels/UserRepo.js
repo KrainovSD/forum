@@ -12,7 +12,7 @@ class UserPosgressRepo {
            t1.name, t1.email, t1.reset_password_last, t1.confirm_email_last, count(t2.id)
            FROM person as t1
            LEFT JOIN comment as t2 ON  t2.person_id = t1.id
-           WHERE t1.id = $1
+           WHERE t1.id = $1 AND t2.verified = true
            GROUP BY t1.id  
          ),
     temp2 ("id", "reputation") as (

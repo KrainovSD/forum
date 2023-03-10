@@ -11,6 +11,9 @@ import { useAppSelector } from "../../../../hooks/redux";
 import { useState } from "react";
 import { LikesPopup } from "../../../likes/LikesPopup";
 import { CSSTransition } from "react-transition-group";
+import { AddLike } from "../../../../models/likes/components/AddLike/AddLike";
+import { DeleteLike } from "../../../../models/likes/components/DeleteLike/DeleteLike";
+import { getDiffInHours } from "../../../../helpers/getDiffInHours";
 interface ICommentItemProps {
   comment: IComment;
 }
@@ -20,6 +23,7 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
   const { roleString, roleClass } = getRoleInfo(comment.authorRole);
   const date = useDateFormat(comment.date);
   const dateUpdate = useDateFormat(comment.dateUpdate || "");
+  const timePassed = getDiffInHours(comment.date);
 
   const { userInfo } = useAppSelector((state) => state.user);
 
@@ -32,6 +36,7 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
 
   return (
     <div className="comment-item" id={`${comment.id}`}>
+      {!comment.verified && <div className="comment-item__no-verify"></div>}
       <CSSTransition
         in={isVisibleLikes}
         timeout={300}
@@ -73,9 +78,11 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
             <div className="_date">
               Опубликовано {date} {comment.updated && `(изменено)`}
             </div>
-            <div className="_complain" data-tooltip="В разработке">
-              Жалоба
-            </div>
+            {userInfo && userInfo.id !== comment.authorID && (
+              <div className="_complain" data-tooltip="В разработке">
+                Жалоба
+              </div>
+            )}
           </div>
           <div className="_comment">{comment.body}</div>
           {comment.updated && (
@@ -86,18 +93,29 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
         </div>
       </div>
       <div className="comment-item__footer">
+        {userInfo &&
+          userInfo.id === comment.authorID &&
+          (timePassed <= 1 || !comment.verified) && (
+            <div className="_delete">Удалить</div>
+          )}
+        {userInfo && userInfo.id === comment.authorID && timePassed <= 24 && (
+          <div className="_change">Изменить</div>
+        )}
         <div className="_reputation" onClick={showLikes}>
           {comment.likes.length}
         </div>
         {userInfo &&
           userInfo.id !== comment.authorID &&
           !comment.likes.includes(userInfo.id) && (
-            <div className="_add-reputation">+</div>
+            <AddLike
+              authorCommentID={comment.authorID}
+              commentID={comment.id}
+            />
           )}
         {userInfo &&
           userInfo.id !== comment.authorID &&
           comment.likes.includes(userInfo.id) && (
-            <div className="_remove-reputation">-</div>
+            <DeleteLike commentID={comment.id} />
           )}
       </div>
     </div>

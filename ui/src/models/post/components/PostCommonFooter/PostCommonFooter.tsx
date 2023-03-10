@@ -5,6 +5,8 @@ import { useAppSelector } from "../../../../hooks/redux";
 import { NavLink } from "react-router-dom";
 import { getAvatar } from "../../../../helpers/getAvatar";
 
+import { AddComment } from "../../../../models/comment/components/AddComment/AddComment";
+
 export const PostCommonFooter: React.FC = () => {
   const { currentPost } = useAppSelector((state) => state.post);
   const { userInfo } = useAppSelector((state) => state.user);
@@ -29,10 +31,19 @@ export const PostCommonFooter: React.FC = () => {
             <img src={avatar} alt="" />
           </div>
           <div className="_text-field-block _open">
-            <textarea name="" id="comment"></textarea>
+            <AddComment />
           </div>
         </div>
       )}
+
+      <div className="post-common-footer__addComment">
+        <div className="_avatar">
+          <img src={avatar} alt="" />
+        </div>
+        <div className="_text-field-block _open">
+          <AddComment />
+        </div>
+      </div>
 
       <div className="post-common-footer__back">
         <NavLink to={`/topic/${currentPost?.topicID}`} className="_back-button">

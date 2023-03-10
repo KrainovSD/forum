@@ -32,12 +32,6 @@
         color: #c75050;
         align-items: center;
       }
-      &._open {
-        & > textarea {
-          width: 100%;
-          min-height: 50px;
-        }
-      }
 
       &::after {
         content: "";

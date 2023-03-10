@@ -20,8 +20,6 @@ export const LikesPopup: React.FC<ILikesPopupProps> = ({
     dispatch(getLikeByCommentID(commentID));
   }, []);
 
-  console.log(likes);
-
   const close = (e: MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLDivElement;
     if (target.classList.contains("back-drop__popup")) closePopup();

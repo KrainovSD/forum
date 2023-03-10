@@ -12,9 +12,13 @@ import { SmallLoader } from "../../components/SmallLoader/SmallLoader";
 export const CommentList: React.FC = () => {
   const { isLoading: isLoadingAuth } = useAppSelector((state) => state.auth);
   const { isLoading: isLoadingUser } = useAppSelector((state) => state.user);
-  const { comments, maxPage, isSmallLoading } = useAppSelector(
-    (state) => state.comment
-  );
+  const {
+    comments,
+    maxPage,
+    isSmallLoading,
+    updated: updatedComment,
+  } = useAppSelector((state) => state.comment);
+  const { updated: updatedLike } = useAppSelector((state) => state.like);
   const [search, setSearch] = useCustomSearchParams() as ICommentSearch;
   const { id } = useParams();
   const dispatch = useAppDispatch();
@@ -24,10 +28,20 @@ export const CommentList: React.FC = () => {
     setSearch({ page }, { replace: true });
   }, [id]);
 
-  useEffect(() => {
+  const getComments = () => {
     if (id && search.page)
       dispatch(getCommentByPostID({ id, page: search.page }));
+  };
+
+  useEffect(() => {
+    getComments();
   }, [id, search.page]);
+  useEffect(() => {
+    if (updatedLike) getComments();
+  }, [updatedLike]);
+  useEffect(() => {
+    if (updatedComment) getComments();
+  }, [updatedComment]);
 
   return (
     <div className="comment-list">

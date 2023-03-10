@@ -56,25 +56,25 @@ const login = [
     .trim()
     .not()
     .isEmpty({ ignore_whitespace: true })
-    .withMessage("Поле nickName не должно быть пустым!")
+    .withMessage("Поле не должно быть пустым!")
     .isString()
-    .withMessage("У поля nickName неверный тип данных!")
+    .withMessage("У поля неверный тип данных!")
     .isLength({ min: 3, max: 16 })
     .withMessage(
-      "Длина NickName не должна превышать 16 символов или быть меньше, чем 3 символа!"
+      "Длина не должна превышать 16 символов или быть меньше, чем 3 символа!"
     )
     .matches(/^([A-Za-z0-9_]+)$/)
     .withMessage(
-      "NickName должнен состоять только из латинских букв, цифр или символа нижнего подчеркивания!"
+      "Полу должно состоять только из латинских букв, цифр или символа нижнего подчеркивания!"
     ),
 
   body("password")
     .trim()
     .not()
     .isEmpty({ ignore_whitespace: true })
-    .withMessage("Поле password не должно быть пустым!")
+    .withMessage("Поле не должно быть пустым!")
     .isString()
-    .withMessage("У поля password неверный тип данных!")
+    .withMessage("У поля неверный тип данных!")
     .isLength({ min: 8 })
     .withMessage("Минимальная длина пароля 8 символов!")
     .isLength({ max: 30 })

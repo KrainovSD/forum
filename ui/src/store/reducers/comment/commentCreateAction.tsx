@@ -1,13 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { axiosInstance } from "../../../helpers/axiosInstance";
+import { axiosInstanceNoStrictToken } from "../../../helpers/axiosInstanceNoStrictToken";
 import { IComment, IReqGetCommentByPost } from "./commentTypes";
 
 export const getCommentByPostID = createAsyncThunk(
   "comment/getByPost",
   async (req: IReqGetCommentByPost, thunkApi) => {
     try {
-      const response = await axiosInstance.get<{
+      const response = await axiosInstanceNoStrictToken.get<{
         maxPage: number;
         comments: IComment[];
       }>(`/api/comment/byPost/${req.id}`, {

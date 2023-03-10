@@ -44,6 +44,7 @@ class AuthServise {
     const {
       status,
       id: userID,
+      role,
       token: oldRefreshToken,
       message,
     } = await authRepo.isValidLogin(nickName, password);
@@ -59,12 +60,14 @@ class AuthServise {
     } else {
       refreshToken = await this.#getToken(
         userID,
+        role,
         refreshTokenSecret,
         refreshTokenLiveTime
       );
     }
     const accessToken = await this.#getToken(
       userID,
+      role,
       accessTokenSecret,
       acessTokenLiveTime
     );
@@ -100,6 +103,7 @@ class AuthServise {
 
       const accessToken = await this.#getToken(
         checkRefreshToken.id,
+        checkRefreshToken.role,
         accessTokenSecret,
         acessTokenLiveTime
       );
@@ -121,12 +125,17 @@ class AuthServise {
     return { status: 200, message: "Аккаунт успешно активирован!" };
   }
 
-  async #getToken(id, secret, liveTime) {
+  async #getToken(id, role, secret, liveTime) {
     return new Promise((resolve, reject) => {
-      jwt.sign({ id }, secret, { expiresIn: liveTime }, function (err, token) {
-        if (err) resolve(false);
-        resolve(token);
-      });
+      jwt.sign(
+        { id, role },
+        secret,
+        { expiresIn: liveTime },
+        function (err, token) {
+          if (err) resolve(false);
+          resolve(token);
+        }
+      );
     });
   }
   async #compareToken(token, secret) {

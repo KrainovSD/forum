@@ -20,6 +20,9 @@ export const App: React.FC = () => {
   const { isLoading: isLoadingComment } = useAppSelector(
     (state) => state.comment
   );
+  const { isLoading: isLoadingMessage } = useAppSelector(
+    (state) => state.message
+  );
 
   useEffect(() => {
     dispatch(checkAuth());
@@ -40,7 +43,8 @@ export const App: React.FC = () => {
         isLoadingTopic ||
         isLoadingPost ||
         isLoadingLike ||
-        isLoadingComment) && <Loader />}
+        isLoadingComment ||
+        isLoadingMessage) && <Loader />}
       <Header />
       <div className="workplace">{routes}</div>
     </div>

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { getDiffInHours } from "../helpers/getDiffInHours";
 
 export const useDateFormat = (dateString: string) => {
   const dateFormatted: string = useMemo(() => {
@@ -11,13 +12,11 @@ export const useDateFormat = (dateString: string) => {
     if (dayDiff >= 1 && dayDiff < 7) {
       formatted = findWeeklyDate(date);
     } else if (dayDiff < 1) {
-      const hours = date.getHours();
-      const nowHours = now.getHours();
-      const hoursDiff = nowHours - hours;
+      const hoursDiff = getDiffInHours(dateString);
       if (hoursDiff === 0) {
         formatted = findMinutesAgo(date, now);
       } else {
-        formatted = findHoursAgo(date, now);
+        formatted = findHoursAgo(hoursDiff);
       }
     } else {
       formatted = findFullDate(date);
@@ -47,10 +46,7 @@ function findMinutesAgo(date: Date, now: Date) {
   return result;
 }
 
-function findHoursAgo(date: Date, now: Date) {
-  const hours = date.getHours();
-  const nowHours = now.getHours();
-  let diff = nowHours - hours;
+function findHoursAgo(diff: number) {
   let result = `${diff}`;
   if (diff > 20) diff = diff % 10;
 

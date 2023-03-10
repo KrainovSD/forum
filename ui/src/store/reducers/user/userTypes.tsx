@@ -18,8 +18,8 @@ export interface IUserInfo {
   email: string;
   resetPasswordLast: string;
   confirmEmailLast: string;
-  countComment: number;
-  reputation: number;
+  countComment: string;
+  reputation: string;
 }
 
 export interface ISelectedUserInfo {

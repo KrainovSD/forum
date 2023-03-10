@@ -9,5 +9,13 @@ router.get(
   "/byComment/:id",
   LikeController.getAllByCommentID.bind(LikeController)
 );
+router.post(
+  "/",
+  untils.checkAuth,
+  likeValidation.create,
+  untils.checkValidation,
+  LikeController.createLikeByCommentID.bind(LikeController)
+);
+router.delete("/:id", untils.checkAuth, LikeController.deleteLikeByCommentID);
 
 export default router;

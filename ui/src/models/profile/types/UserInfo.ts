@@ -1,5 +1,5 @@
 export interface IUserInfoProp {
-  id: number;
+  id: string;
   nickName: string;
   role: string;
   avatar: string;
@@ -10,6 +10,6 @@ export interface IUserInfoProp {
   email?: string;
   resetPasswordLast?: string;
   confirmEmailLast?: string;
-  countComment: number;
-  reputation: number;
+  countComment: string;
+  reputation: string;
 }

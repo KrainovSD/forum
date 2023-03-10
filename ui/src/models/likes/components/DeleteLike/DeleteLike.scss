@@ -1,0 +1,14 @@
+.delete-like {
+  background-color: #ffffff;
+  padding: 0px 7.5px;
+  font-size: 22px;
+  cursor: pointer;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+
+  &:hover {
+    background-color: #8b4343;
+    color: #ffffff;
+  }
+}
