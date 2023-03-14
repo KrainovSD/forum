@@ -1,6 +1,14 @@
 import express from "express";
 const app = express();
 app.use(express.json());
+
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+app.use(express.static(path.join(__dirname, "dist")));
+
 import cookieParser from "cookie-parser";
 app.use(cookieParser());
 
@@ -64,9 +72,23 @@ app.use("/api/like", likeRoutes);
 
 app.get("*", async (req, res) => {
   try {
-    res.status(200).json("Страница");
+    res.sendFile(path.join(__dirname, "dist", "app", "index.html"));
   } catch (e) {
     req.err = e;
     res.status(500).json();
+  }
+});
+
+import db from "./db.js";
+app.post("/test", async (req, res) => {
+  try {
+    const { id } = req.body;
+    const result = await db.query(`SELECT * FROM person WHERE id = ANY($1)`, [
+      id,
+    ]);
+    console.log(result.rows);
+    res.status(200).json();
+  } catch (e) {
+    console.log(e);
   }
 });

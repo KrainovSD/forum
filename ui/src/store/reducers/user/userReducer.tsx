@@ -35,6 +35,7 @@ export const userSlice = createSlice({
         state.error = payload.message;
         state.statusError = payload.status;
         state.selectedUserInfo = null;
+        state.isLoading = false;
       })
       .addCase(getMyUserInfo.fulfilled, (state, action) => {
         state.userInfo = action.payload;
@@ -50,6 +51,7 @@ export const userSlice = createSlice({
         state.error = payload.message;
         state.statusError = payload.status;
         state.userInfo = null;
+        state.isLoading = false;
       });
   },
 });

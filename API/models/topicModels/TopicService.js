@@ -11,5 +11,35 @@ class TopicService {
       parentInfo: topicsInfo.parentInfo,
     };
   }
+  async updateTopicTitle(topicID, title) {
+    const topic = await TopicRepo.getTopicByID(topicID);
+    if (topic.length === 0)
+      return { status: 400, message: "Топика не существует!" };
+    await TopicRepo.updateTopicTitle(topicID, title);
+    return { status: 200, message: "Успешно!" };
+  }
+  async updateTopicAccess(topicID, value) {
+    const topic = await TopicRepo.getTopicByID(topicID);
+    if (topic.length === 0)
+      return { status: 400, message: "Топика не существует!" };
+    await TopicRepo.updateTopicAccess(topicID, value);
+    return { status: 200, message: "Успешно!" };
+  }
+  async createTopic(title, access, parentID) {
+    if (parentID !== "null") {
+      const topic = await TopicRepo.getTopicByID(parentID);
+      if (topic.length === 0)
+        return { status: 400, message: "Родительского топика не существует!" };
+    }
+    await TopicRepo.createTopic(title, access, parentID);
+    return { status: 200, message: "Успешно!" };
+  }
+  async deleteTopic(topicID) {
+    const topic = await TopicRepo.getTopicByID(topicID);
+    if (topic.length === 0)
+      return { status: 400, message: "Топика не существует!" };
+    await TopicRepo.deleteTopic(topicID, topic[0].parent_id);
+    return { status: 200, message: "Успешно!" };
+  }
 }
 export default new TopicService();

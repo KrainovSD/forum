@@ -1,10 +1,11 @@
 import MessageService from "./MessageService.js";
 
 class MessageController {
-  async getLastMessages(req, res) {
+  async getSessionInfo(req, res) {
     try {
-      const { status, message, messages } =
-        await MessageService.getLastMessages(req.userID);
+      const { status, message, messages } = await MessageService.getSessionInfo(
+        req.userID
+      );
       if (status !== 200) return res.status(status).json(message);
 
       return res.status(200).json(messages);
@@ -30,10 +31,57 @@ class MessageController {
   }
   async createMessage(req, res) {
     try {
-      const { body } = req.body;
+      const { body, members } = req.body;
+      const allMembers = [...members, req.userID];
+      const { status, message } = await MessageService.createMessage(
+        body,
+        allMembers,
+        req.userID
+      );
+      return res.status(status).json(message);
     } catch (e) {
       req.err = e;
       return res.status(500).json();
+    }
+  }
+  async deleteMessage(req, res) {
+    try {
+      const { id: messageID } = req.params;
+      const { status, message } = await MessageService.deleteMessage(
+        messageID,
+        req.userID
+      );
+      res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
+    }
+  }
+  async deleteSession(req, res) {
+    try {
+      const { id: sessionID } = req.params;
+      const { status, message } = await MessageService.deleteSession(
+        sessionID,
+        req.userID
+      );
+      res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
+    }
+  }
+  async updateMessage(req, res) {
+    try {
+      const { messageID, body } = req.body;
+      const { status, message } = await MessageService.updateMessage(
+        messageID,
+        body,
+        req.userID
+      );
+      res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
     }
   }
 }

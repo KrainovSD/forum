@@ -62,7 +62,8 @@ class CommentPostgressRepo {
   }
   async getLikesInfoByCommentID(commentList) {
     const likesInfo = await db.query(
-      `SELECT * FROM likes WHERE comment_id IN (${commentList.join(", ")}) `
+      `SELECT * FROM likes WHERE comment_id = ANY($1)`,
+      [commentList]
     );
     return likesInfo.rows;
   }

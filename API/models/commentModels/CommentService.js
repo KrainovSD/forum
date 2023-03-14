@@ -68,14 +68,12 @@ class CommentService {
     return now - dateFirst;
   }
   #isHasAccessToComment(comment, userID, userRole, accessDiff) {
+    const commentInfo = comment[0];
     if (userRole !== "admin" && userRole !== "moder") {
-      const diffInHours = this.#getDiffInHours(comment[0]?.date);
-      if (
-        comment[0]?.person_id !== userID ||
-        !diffInHours ||
-        (diffInHours > accessDiff && comment[0]?.verified)
-      )
-        return false;
+      const diffInHours = this.#getDiffInHours(commentInfo?.date);
+      if (commentInfo?.person_id !== userID) return false;
+      else if (userRole === "noob" && commentInfo?.verified) return false;
+      else if (diffInHours > accessDiff && commentInfo?.verified) return false;
     }
     return true;
   }

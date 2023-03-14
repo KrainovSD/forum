@@ -19,7 +19,7 @@ export const ProfileHeader: React.FC<IProfileHeaderProps> = ({
   isOwnProfile,
 }) => {
   const backProfileImg = getBackImg(user.backImg);
-  const avatar = getAvatar(user.avatar);
+  const avatar = getAvatar(user.avatar, user.id);
   const { roleString, roleClass } = getRoleInfo(user.role);
   const lastLoginDate = useDateFormat(user.lastLogin);
   const dateRegistration = useDateFormat(user.dateRegistration);

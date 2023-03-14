@@ -17,8 +17,51 @@ class TopicControllers {
       return res.status(500).json();
     }
   }
-  async get(req, res) {
+  async updateTopicTitle(req, res) {
     try {
+      const { topicID, title } = req.body;
+      const { status, message } = await TopicService.updateTopicTitle(
+        topicID,
+        title
+      );
+      return res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
+    }
+  }
+  async updateTopicAccess(req, res) {
+    try {
+      const { topicID, value } = req.body;
+      const { status, message } = await TopicService.updateTopicAccess(
+        topicID,
+        value
+      );
+      return res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
+    }
+  }
+  async createTopic(req, res) {
+    try {
+      const { title, access, parentID } = req.body;
+      const { status, message } = await TopicService.createTopic(
+        title,
+        access,
+        parentID
+      );
+      return res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      return res.status(500).json();
+    }
+  }
+  async deleteTopic(req, res) {
+    try {
+      const { id: topicID } = req.params;
+      const { status, message } = await TopicService.deleteTopic(topicID);
+      return res.status(status).json(message);
     } catch (e) {
       req.err = e;
       return res.status(500).json();

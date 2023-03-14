@@ -13,7 +13,7 @@ const create = [
     .not()
     .isEmpty({ ignore_whitespace: true })
     .withMessage("Поле не должно быть пустым!")
-    .isString()
+    .isNumeric()
     .withMessage("У поля неверный тип данных!"),
   body("main")
     .trim()
@@ -37,7 +37,7 @@ const update = [
     .not()
     .isEmpty({ ignore_whitespace: true })
     .withMessage("Поле не должно быть пустым!")
-    .isString()
+    .isNumeric()
     .withMessage("У поля неверный тип данных!"),
   body("verified")
     .optional()

@@ -2,18 +2,22 @@ import "./PostCommonHeader.scss";
 import thumbtack from "../../../../assets/media/thumbtack.png";
 import message from "../../../../assets/media/message.png";
 import { useAppSelector } from "../../../../hooks/redux";
-
 import { NavLink } from "react-router-dom";
-
 import { useDateFormat } from "../../../../hooks/useDateFormat";
 import { getAvatar } from "../../../../helpers/getAvatar";
+import { IPostTypes } from "store/reducers/post/postTypes";
 
-export const PostCommonHeader: React.FC = () => {
-  const { currentPost } = useAppSelector((state) => state.post);
+interface IPostCommonHeaderProps {
+  currentPost: IPostTypes;
+}
+
+export const PostCommonHeader: React.FC<IPostCommonHeaderProps> = ({
+  currentPost,
+}) => {
   const { userInfo } = useAppSelector((state) => state.user);
 
-  const avatar = getAvatar(currentPost?.authorAvatar);
-  const dateString = currentPost?.date as string;
+  const avatar = getAvatar(currentPost.authorAvatar, currentPost.authorID);
+  const dateString = currentPost.date as string;
   const date = useDateFormat(dateString);
 
   return (

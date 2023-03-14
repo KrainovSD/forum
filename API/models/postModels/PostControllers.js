@@ -27,11 +27,93 @@ class PostController {
       res.status(500).json();
     }
   }
-  async get(req, res) {
+  async getLastPosts(req, res) {
     try {
+      const { status, message, posts } = await PostService.getLastPosts();
+      if (status !== 200) return res.status(status).json(message);
+      return res.status(200).json(posts);
     } catch (e) {
       req.err = e;
       res.status(500).json();
+    }
+  }
+  async updatePostTitle(req, res) {
+    try {
+      const { postID, title } = req.body;
+      const { status, message } = await PostService.updatePostTitle(
+        postID,
+        title,
+        req.userID,
+        req.role
+      );
+      return res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
+    }
+  }
+  async updatePostClosed(req, res) {
+    try {
+      const { postID, value } = req.body;
+      const { status, message } = await PostService.updatePostClosed(
+        postID,
+        value
+      );
+      return res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
+    }
+  }
+  async updatePostVerified(req, res) {
+    try {
+      const { postID, value } = req.body;
+      const { status, message } = await PostService.updatePostVerified(
+        postID,
+        value
+      );
+      return res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
+    }
+  }
+  async updatePostFixed(req, res) {
+    try {
+      const { postID, value } = req.body;
+      const { status, message } = await PostService.updatePostFixed(
+        postID,
+        value
+      );
+      return res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
+    }
+  }
+  async deletePost(req, res) {
+    try {
+      const { id: postID } = req.params;
+      const { status, message } = await PostService.deletePost(postID);
+      return res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      return res.status(500).json();
+    }
+  }
+  async createPost(req, res) {
+    try {
+      const { title, topicID } = req.body;
+      const { status, message } = await PostService.createPost(
+        title,
+        topicID,
+        req.userID,
+        req.role
+      );
+      return res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      return res.status(500).json();
     }
   }
 }

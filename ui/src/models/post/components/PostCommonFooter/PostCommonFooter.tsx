@@ -6,42 +6,37 @@ import { NavLink } from "react-router-dom";
 import { getAvatar } from "../../../../helpers/getAvatar";
 
 import { AddComment } from "../../../../models/comment/components/AddComment/AddComment";
+import { IPostTypes } from "store/reducers/post/postTypes";
 
-export const PostCommonFooter: React.FC = () => {
-  const { currentPost } = useAppSelector((state) => state.post);
+interface IPostCommonFooterProps {
+  currentPost: IPostTypes;
+}
+
+export const PostCommonFooter: React.FC<IPostCommonFooterProps> = ({
+  currentPost,
+}) => {
   const { userInfo } = useAppSelector((state) => state.user);
-  const avatar = getAvatar(currentPost?.authorAvatar);
+
+  const avatar = getAvatar(userInfo?.avatar, userInfo?.id as string);
 
   return (
     <div className="post-common-footer">
-      {currentPost && currentPost.closed && (
-        <div className="post-common-footer__addComment">
-          <div className="_avatar">
-            <img src={avatar} alt="" />
-          </div>
-          <div className="_text-field-block _lock">
-            <img src={alert} alt="" />
-            <p>Эта тема закрыта для публикации ответов.</p>
-          </div>
-        </div>
-      )}
-      {userInfo && currentPost && !currentPost.closed && (
-        <div className="post-common-footer__addComment">
-          <div className="_avatar">
-            <img src={avatar} alt="" />
-          </div>
-          <div className="_text-field-block _open">
-            <AddComment />
-          </div>
-        </div>
-      )}
-
       <div className="post-common-footer__addComment">
         <div className="_avatar">
           <img src={avatar} alt="" />
         </div>
-        <div className="_text-field-block _open">
-          <AddComment />
+        <div
+          className={`_text-field-block ${
+            currentPost.closed ? "_lock" : "_open"
+          }`}
+        >
+          {!currentPost.closed && <AddComment />}
+          {currentPost.closed && (
+            <div>
+              <img src={alert} alt="" />
+              <p>Эта тема закрыта для публикации ответов.</p>
+            </div>
+          )}
         </div>
       </div>
 

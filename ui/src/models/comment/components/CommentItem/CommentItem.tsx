@@ -19,7 +19,7 @@ interface ICommentItemProps {
 }
 
 export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
-  const avatar = getAvatar(comment.authorAvatar);
+  const avatar = getAvatar(comment.authorAvatar, comment.authorID);
   const { roleString, roleClass } = getRoleInfo(comment.authorRole);
   const date = useDateFormat(comment.date);
   const dateUpdate = useDateFormat(comment.dateUpdate || "");

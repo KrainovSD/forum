@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 const saltRounds = 12;
 
 class AuthPostgressRepo {
+  /* Регистрация */
   async getSimilarNickAndEmail(nickName, email) {
     const similarNickNameAndEmail = await db.query(
       "SELECT nick, email, id, confirmed FROM person WHERE nick=$1 OR email=$2",
@@ -16,13 +17,12 @@ class AuthPostgressRepo {
     ]);
     if (result.rows.length === 0) throw new Error();
   }
-
   async createUser(userName, nickName, email, hash, confirmEmailKey) {
     const now = new Date();
     const future = new Date();
-    future.setFullYear(future.getFullYear() + 1);
+    future.setFullYear(future.getFullYear() - 10);
     const past = new Date();
-    past.setFullYear(past.getFullYear() - 1);
+    past.setFullYear(past.getFullYear() - 10);
 
     const result = await db.query(
       "INSERT INTO person (name, nick, email_to_confirm, hash, date_registration, confirm_email_key, reset_password_time, confirm_email_time, reset_password_last, confirm_email_last) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
@@ -41,7 +41,7 @@ class AuthPostgressRepo {
     );
     if (result.rows.length === 0) throw new Error();
   }
-
+  /* Вход в систему */
   async getUserByNickName(nickName) {
     const user = await db.query(
       "SELECT id, nick, hash, confirmed, token, role FROM person WHERE nick=$1",
@@ -57,7 +57,7 @@ class AuthPostgressRepo {
     );
     if (result.rows.length === 0) throw new Error();
   }
-
+  /* Получение токена */
   async getRefreshTokenByUserID(userID) {
     const refreshToken = await db.query(
       "SELECT token FROM person WHERE id=$1",
@@ -65,7 +65,7 @@ class AuthPostgressRepo {
     );
     return refreshToken.rows;
   }
-
+  /* Выход из системы */
   async removeTokenByID(userID) {
     const result = await db.query(
       "UPDATE person set token=$1 WHERE id=$2 RETURNING*",
@@ -73,7 +73,7 @@ class AuthPostgressRepo {
     );
     if (result.rows.length === 0) throw new Error();
   }
-
+  /* Активация электронной почты */
   async getUserInfoByConfirmKey(key) {
     const checkValidConfirm = await db.query(
       "SELECT confirm_email_key, confirm_email_time, confirm_email_last, email_to_confirm FROM person WHERE confirm_email_key=$1",
@@ -91,7 +91,7 @@ class AuthPostgressRepo {
   async switchConfirm(email, key) {
     const now = new Date();
     const future = new Date();
-    future.setFullYear(future.getFullYear() + 1);
+    future.setFullYear(future.getFullYear() - 10);
 
     const result = await db.query(
       "UPDATE person set confirmed=$1, confirm_email_key=$2, confirm_email_time=$3, confirm_email_last=$4, email_to_confirm=$5, email=$6 WHERE confirm_email_key=$7 RETURNING *",
@@ -107,7 +107,7 @@ class AuthRepo {
   constructor(repo) {
     this.repo = repo;
   }
-
+  /* Регистрация */
   async isHasSimilarNickOrEmail(nickName, email) {
     const similarNickNameAndEmail = await this.repo.getSimilarNickAndEmail(
       nickName,
@@ -165,7 +165,7 @@ class AuthRepo {
       confirmEmailKey
     );
   }
-
+  /* Вход в систему */
   async isValidLogin(nickName, password) {
     const user = await this.repo.getUserByNickName(nickName);
     if (user?.length === 0)
@@ -188,52 +188,24 @@ class AuthRepo {
   async saveToken(token, userID) {
     await this.repo.saveToken(token, userID);
   }
-
+  /* Получение токена */
   async findRefreshTokenByUserID(userID) {
     const refreshToken = await this.repo.getRefreshTokenByUserID(userID);
     if (!refreshToken?.[0]?.token) throw new Error();
     return refreshToken[0].token;
   }
-
+  /* Выход из системы */
   async removeTokenByID(userID) {
     await this.repo.removeTokenByID(userID);
   }
-
-  async isValidConfirm(key) {
+  /* Активация электронной почты */
+  async getUserInfoByConfirmKey(key) {
     const userInfo = await this.repo.getUserInfoByConfirmKey(key);
-
-    if (userInfo.length === 0)
-      return { status: false, message: "Указанный ключ не существует!" };
-
-    if (!userInfo?.[0]?.confirm_email_time) throw new Error();
-    const confirmTime = new Date(userInfo[0].confirm_email_time);
-    if (new Date() > confirmTime)
-      return { status: false, message: "Время операции истекло!" };
-
-    if (!userInfo?.[0]?.confirm_email_last) throw new Error();
-    const confirmLast = new Date(userInfo[0].confirm_email_last);
-    confirmLast.setDate(confirmLast.getDate() + 1);
-    if (new Date() < confirmLast)
-      return {
-        status: false,
-        message:
-          "Интервал между сменой электронной почты должен составлять не менее 24 часов!",
-      };
-
-    if (!userInfo?.[0].email_to_confirm)
-      return {
-        status: false,
-        message:
-          "Нет записи о новой электронной почте, попробуйте повторить операцию с самого начала через некоторое время!",
-      };
-
-    return {
-      status: true,
-    };
+    return userInfo;
   }
   async switchConfirm(key) {
     const emailToConfirm = await this.repo.getEmailToConfirmByConfirmKey(key);
-    const email = emailToConfirm.rows?.[0]?.email_to_confirm;
+    const email = emailToConfirm?.[0]?.email_to_confirm;
     if (!email) throw new Error();
 
     await this.repo.switchConfirm(email, key);

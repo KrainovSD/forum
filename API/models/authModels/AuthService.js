@@ -12,6 +12,7 @@ const saltRounds = 12;
 
 import authRepo from "./AuthRepo.js";
 import { sendEmailWithLink } from "../../mailer.js";
+import AuthRepo from "./AuthRepo.js";
 
 class AuthServise {
   async register(password, nickName, email, userName) {
@@ -115,16 +116,33 @@ class AuthServise {
     }
   }
   async confirm(key) {
-    let { status, message } = await authRepo.isValidConfirm(key);
-    if (!status)
+    const userInfo = await AuthRepo.getUserInfoByConfirmKey(key);
+    if (userInfo.length === 0)
       return {
         status: 400,
-        message: message,
+        message:
+          "Указанный ключ не существует или вреия проведения операции истекло!",
       };
+    const user = userInfo[0];
+
+    const confirmTime = user.confirm_email_time;
+    const emailToConfirm = user.email_to_confirm;
+    if (new Date(confirmTime) < new Date())
+      return {
+        status: 400,
+        message:
+          "Указанный ключ не существует или вреия проведения операции истекло!",
+      };
+    if (emailToConfirm === null || emailToConfirm === "")
+      return {
+        status: 400,
+        message:
+          "Нет записи о новой электронной почте, попробуйте повторить операцию с самого начала через некоторое время!",
+      };
+
     await authRepo.switchConfirm(key);
     return { status: 200, message: "Аккаунт успешно активирован!" };
   }
-
   async #getToken(id, role, secret, liveTime) {
     return new Promise((resolve, reject) => {
       jwt.sign(
