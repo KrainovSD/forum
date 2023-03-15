@@ -2,6 +2,7 @@ export interface ICommentInitialState {
   comments: IComment[];
   maxPage: number;
   updated: boolean;
+  response: string;
   isLoading: boolean;
   isSmallLoading: boolean;
   error: string;
@@ -30,4 +31,25 @@ export interface IComment {
 export interface IReqGetCommentByPost {
   page: string;
   id: string;
+}
+
+export interface ICreateComment {
+  body: string;
+  postID: string;
+  main: boolean;
+}
+
+export interface IUpdateComment {
+  commentID: string;
+  body: string;
+}
+
+export interface IUpdateCommentVerified {
+  commentID: string;
+  verified: boolean;
+}
+
+export interface IUpdateCommentFixed {
+  commentID: string;
+  fixed: boolean;
 }

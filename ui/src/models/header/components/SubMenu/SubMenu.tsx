@@ -2,13 +2,31 @@ import out from "../../../../assets/media/out.png";
 import setting from "../../../../assets/media/setting.png";
 import { CSSTransition } from "react-transition-group";
 import "./SubMenu.scss";
+import { useAppDispatch } from "../../../../hooks/redux";
+import useFetching from "../../../../hooks/useFetching";
+import { authSlice } from "../../../../store/reducers/auth/authReducer";
+import { axiosInstanceToken } from "../../../../helpers/axiosInstanceToken";
+import { useEffect } from "react";
 
 interface SubMenuProps {
   isVisible: boolean;
-  logout: () => void;
+  setLoading: (v: boolean) => void;
 }
 
-export const SubMenu: React.FC<SubMenuProps> = ({ isVisible, logout }) => {
+export const SubMenu: React.FC<SubMenuProps> = ({ isVisible, setLoading }) => {
+  const dispatch = useAppDispatch();
+  const [sendLogout, isLoading] = useFetching(async () => {
+    await axiosInstanceToken.post("/api/auth/logout");
+    dispatch(authSlice.actions.logout());
+  });
+
+  const logout = () => {
+    sendLogout();
+  };
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading]);
+
   return (
     <CSSTransition
       in={isVisible}

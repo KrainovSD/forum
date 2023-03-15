@@ -17,6 +17,16 @@ class TopicControllers {
       return res.status(500).json();
     }
   }
+  async getAllForPost(req, res) {
+    try {
+      const { status, message, topics } = await TopicService.getAllForPost();
+      if (status !== 200) return res.status(status).json(message);
+      res.status(200).json(topics);
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
+    }
+  }
   async updateTopicTitle(req, res) {
     try {
       const { topicID, title } = req.body;

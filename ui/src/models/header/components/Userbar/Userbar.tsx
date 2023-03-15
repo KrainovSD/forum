@@ -2,15 +2,11 @@ import arrowDown from "../../../../assets/media/arrow-down.png";
 import plus from "../../../../assets/media/plus.png";
 import user from "../../../../assets/media/user.png";
 import "./Userbar.scss";
-import { useState, useEffect, useMemo } from "react";
+import { useState } from "react";
 import { SubMenu } from "../SubMenu/SubMenu";
 import { useEvent } from "../../../../hooks/useEvent";
 import { NavLink } from "react-router-dom";
 import { useAppSelector } from "../../../../hooks/redux";
-import useFetching from "../../../../hooks/useFetching";
-import { axiosInstanceToken } from "../../../../helpers/axiosInstanceToken";
-import { useAppDispatch } from "../../../../hooks/redux";
-import { authSlice } from "../../../../store/reducers/auth/authReducer";
 import { Loader } from "../../../../components/Loader/Loader";
 
 export const Userbar: React.FC = () => {
@@ -39,18 +35,8 @@ export const Userbar: React.FC = () => {
   };
   useEvent("click", offSubMenuVisible);
   const { auth } = useAppSelector((state) => state.auth);
-
-  const dispatch = useAppDispatch();
-  const [sendLogout, isLoading] = useFetching(async () => {
-    await axiosInstanceToken.post("/api/auth/logout");
-    dispatch(authSlice.actions.logout());
-  });
-
-  const logout = () => {
-    sendLogout();
-  };
-
   const { userInfo } = useAppSelector((state) => state.user);
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!auth)
     return (
@@ -84,18 +70,17 @@ export const Userbar: React.FC = () => {
           </div>
           <SubMenu
             isVisible={isSubMenuVisible}
-            logout={() => {
-              logout();
-            }}
+            setLoading={(v: boolean) => setIsLoading(v)}
           />
         </div>
-        <div
+        <NavLink
+          to={"/create/post"}
           className="userBar__newContent"
           data-tooltip="Создать новый контент"
         >
           <img src={plus} alt="" className="userBar__plus" />
           <p>Создать</p>
-        </div>
+        </NavLink>
         <div className="userBar__notice" data-tooltip="Уведомления">
           <div className="userBar__noticeImg"></div>
         </div>

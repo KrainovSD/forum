@@ -14,7 +14,7 @@ export const PageNavBar: React.FC<IPageNavBarProps> = ({
   page = false,
   maxPage = 0,
 }) => {
-  if (!filter && (!page || maxPage === 0)) return <div></div>;
+  if (!filter && (!page || maxPage <= 1)) return <div></div>;
   return (
     <div className="page-nav-bar">
       {page && maxPage > 0 && <PageList maxPage={maxPage} />}

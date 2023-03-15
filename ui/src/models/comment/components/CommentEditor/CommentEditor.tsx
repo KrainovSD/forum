@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BlackButton } from "../../../../components/UI/BlackButton/BlackButton";
 import "./CommentEditor.scss";
 
@@ -10,21 +11,22 @@ export const CommentEditor: React.FC<ICommentEditorProps> = ({
   value,
   setValue,
 }) => {
-  const createComment = () => {
-    console.log(value);
-  };
+  const [isFocus, setIsFocus] = useState(false);
+
   return (
     <div className="comment-editor">
       <textarea
         name=""
-        id="comment"
-        className="comment-editor__field"
+        className={`comment-editor__field ${isFocus ? "_open" : ""}`}
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        onFocus={() => {
+          setIsFocus(true);
+        }}
+        onBlur={() => {
+          setIsFocus(false);
+        }}
       ></textarea>
-      <div className="comment-editor__button-wrapper">
-        <BlackButton onClick={createComment}>Отправить</BlackButton>
-      </div>
     </div>
   );
 };

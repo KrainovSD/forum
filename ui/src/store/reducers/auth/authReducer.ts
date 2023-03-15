@@ -18,6 +18,7 @@ export const authSlice = createSlice({
       state.auth = false;
       state.statusError = 0;
       state.error = "";
+      localStorage.removeItem("token");
     },
     setAuth: (state) => {
       state.statusError = 0;

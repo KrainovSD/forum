@@ -1,0 +1,9 @@
+.delete-comment {
+  border-left: 1px solid #86858556;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  &__button {
+    cursor: pointer;
+  }
+}

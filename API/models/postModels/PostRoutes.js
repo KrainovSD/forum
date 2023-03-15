@@ -5,8 +5,12 @@ import untils from "../../untils/index.js";
 import PostControllers from "./PostControllers.js";
 import postValidation from "./postValidation.js";
 
-router.get("/byTopic/:topicID", PostControllers.getAllByTopicID);
-router.get("/byID/:id", PostControllers.getOneByID);
+router.get(
+  "/byTopic/:topicID",
+  untils.noStrictCheckAuth,
+  PostControllers.getAllByTopicID
+);
+router.get("/byID/:id", untils.noStrictCheckAuth, PostControllers.getOneByID);
 router.get("/last", PostControllers.getLastPosts);
 router.put(
   "/title",

@@ -2,8 +2,16 @@
   width: 100%;
   padding: 15px 40px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   border-bottom: 1px solid rgba(170, 169, 169, 0.385);
+  &._no-verify {
+    background-color: rgb(225, 225, 225);
+  }
+
+  &__content {
+    display: flex;
+    align-items: center;
+  }
 
   // .post-item__main-info
 

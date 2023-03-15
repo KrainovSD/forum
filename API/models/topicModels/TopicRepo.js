@@ -71,6 +71,20 @@ class TopicPostgressRepo {
     ]);
     return parentTopic.rows;
   }
+  async getAllForPost() {
+    const topics =
+      await db.query(`WITH RECURSIVE temp1 ( "id","parent_id","title", "access_post", LEAD, LEVEL) 
+    AS (SELECT T1."id",T1."parent_id", T1."title", T1."access_post",
+        cast (T1."id" as integer), 1
+        FROM topic T1 WHERE parent_id is NULL
+    union
+    select T2."id", T2."parent_id", T2."title", T2."access_post",
+        cast( temp1.LEAD as integer),LEVEL + 1
+        FROM topic T2 INNER JOIN temp1 ON( temp1."id"= T2."parent_id"))
+        
+    select * FROM temp1`);
+    return topics.rows;
+  }
   /* Обновление топиков */
   async getTopicByID(topicID) {
     const topic = await db.query(`SELECT * FROM topic WHERE id = $1`, [
@@ -231,6 +245,28 @@ class TopicRepo {
     }
 
     return { topics, parentInfo };
+  }
+  async getAllForPost() {
+    const topics = await this.repo.getAllForPost();
+    if (topics.length === 0) return [];
+    return this.#recursiveCreateArray(topics, 1);
+  }
+  #recursiveCreateArray(topics, level, parentID = null) {
+    const newArray = [];
+    const filteredTopics = topics.filter((item) => item.level >= level);
+    for (const topic of filteredTopics) {
+      if (parentID !== topic.parent_id) continue;
+      const newTopic = {
+        id: topic.id,
+        title: topic.title,
+        access: topic.access_post,
+        children: [
+          ...this.#recursiveCreateArray(filteredTopics, level + 1, topic.id),
+        ],
+      };
+      newArray.push(newTopic);
+    }
+    return newArray;
   }
   /* Обновление топиков */
   async getTopicByID(topicID) {

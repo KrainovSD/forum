@@ -1,11 +1,26 @@
-export interface postInitialState {
+export interface IPostInitialState {
   posts: IPostsTypes[];
   currentPost: IPostTypes | null;
+  lastPosts: ILastPost[];
   maxPage: number;
+  response: string;
+  updated: boolean;
   isLoading: boolean;
   isSmallLoading: boolean;
   error: string;
   statusError: number;
+}
+
+export interface ILastPost {
+  postID: string;
+  postTitle: string;
+  postDate: string;
+  authorID: string;
+  authorAvatar: string;
+  authorNickName: string;
+  topicID: string;
+  topicTitle: string;
+  countComent: string;
 }
 
 export interface IPostsTypes {
@@ -37,9 +52,25 @@ export interface IPostTypes {
 }
 
 export interface PostLastCommentType {
-  userID: number;
+  userID: string;
   avatar: string;
   nickName: string;
   date: string;
-  commentID: number;
+  commentID: string;
+}
+
+export interface IUpdatePost {
+  postID: string;
+  title: string;
+}
+
+export interface IAdminUpdatePost {
+  postID: string;
+  value: boolean;
+}
+
+export interface ICreatePost {
+  topicID: string;
+  title: string;
+  comment: string;
 }

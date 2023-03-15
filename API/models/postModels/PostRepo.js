@@ -3,52 +3,27 @@ const COUNT_POST_PER_PAGE = 3;
 
 class PostPostgressRepo {
   /* Отображение постов в топике */
-  async getAllPostByTopicID(topicID) {
-    const allPost = await db.query("SELECT * FROM post WHERE topic_id = $1", [
-      topicID,
-    ]);
+  async getAllPostByTopicID(topicID, userID, userRole) {
+    const condition = userID
+      ? userRole === "admin" || userRole === "moder"
+        ? `(verified = true OR verified = false)`
+        : `(verified = true OR (verified = false AND person_id = ${userID}))`
+      : `verified = true`;
+    const allPost = await db.query(
+      `SELECT * FROM post WHERE topic_id = $1 AND ${condition}`,
+      [topicID]
+    );
     return allPost.rows;
   }
-  async getSortedPostInfoByTopicID(topicID, offset, filter) {
-    const query = this.#getSortedPostQuery(filter);
-    const postsInfo = await db.query(query, [
-      topicID,
-      COUNT_POST_PER_PAGE,
-      offset,
-    ]);
-    return postsInfo.rows;
-  }
-  #getSortedPostQuery(filter) {
-    let filterString;
-    switch (filter) {
-      case "last-update": {
-        filterString =
-          "temp4.last_comment_date DESC NULLS LAST, temp1.date DESC";
-        break;
-      }
-      case "title": {
-        filterString = "temp1.title, temp1.date DESC";
-        break;
-      }
-      case "last-date-create": {
-        filterString = "temp1.date DESC";
-        break;
-      }
-      case "most-view": {
-        filterString = "temp2.count_view DESC, temp1.date DESC";
-        break;
-      }
-      case "most-comment": {
-        filterString = "temp4.count_comment DESC, temp1.date DESC";
-        break;
-      }
-      default: {
-        filterString = "temp1.date DESC";
-        break;
-      }
-    }
-
-    const query = `
+  async getSortedPostInfoByTopicID(topicID, offset, filter, userID, userRole) {
+    const verifyCondition = userID
+      ? userRole === "admin" || userRole === "moder"
+        ? `(temp1.verified = true OR temp1.verified = false)`
+        : `(temp1.verified = true OR (temp1.verified = false AND temp1.author_post_id = ${userID}))`
+      : `temp1.verified = true`;
+    const sortCondition = this.#getSortedPostQuery(filter);
+    const postsInfo = await db.query(
+      `
     WITH 
     temp1 ("post_id", "parent_id", "title", "fixed", "closed", "verified",  "date", 
            "author_post_id", "author_post_nick_name") 
@@ -90,11 +65,43 @@ class PostPostgressRepo {
     FROM temp1
     LEFT JOIN temp2 ON temp2.post_id = temp1.post_id
     LEFT JOIN temp4 ON temp4.post_id = temp1.post_id
-    WHERE temp1.parent_id = $1 ORDER BY temp1.fixed DESC, ${filterString} LIMIT $2 OFFSET $3`;
-    return query;
+    WHERE temp1.parent_id = $1 AND ${verifyCondition}
+    ORDER BY temp1.fixed DESC, ${sortCondition} 
+    LIMIT $2 OFFSET $3`,
+      [topicID, COUNT_POST_PER_PAGE, offset]
+    );
+    return postsInfo.rows;
+  }
+  #getSortedPostQuery(filter) {
+    switch (filter) {
+      case "last-update": {
+        return "temp4.last_comment_date DESC NULLS LAST, temp1.date DESC";
+      }
+      case "title": {
+        return "temp1.title, temp1.date DESC";
+      }
+      case "last-date-create": {
+        return "temp1.date DESC";
+      }
+      case "most-view": {
+        return "temp2.count_view DESC, temp1.date DESC";
+      }
+      case "most-comment": {
+        return "temp4.count_comment DESC, temp1.date DESC";
+      }
+      default: {
+        return "temp1.date DESC";
+      }
+    }
   }
   /* Отображение поста */
-  async getPostInfoByID(postID) {
+  async getPostInfoByID(postID, userID, userRole) {
+    const condition = userID
+      ? userRole === "admin" || userRole === "moder"
+        ? `(post.verified = true OR post.verified = false)`
+        : `(post.verified = true OR (post.verified = false AND post.person_id = ${userID}))`
+      : `post.verified = true`;
+
     const postInfo = await db.query(
       `
     SELECT post.id, post.title, post.fixed, post.closed, post.verified, person.id as author_id, 
@@ -103,7 +110,7 @@ class PostPostgressRepo {
     FROM post
     LEFT JOIN person ON person.id = post.person_id
     LEFT JOIN topic ON topic.id = post.topic_id
-    WHERE post.id = $1
+    WHERE post.id = $1 AND ${condition}
     `,
       [postID]
     );
@@ -117,6 +124,7 @@ class PostPostgressRepo {
     SELECT t1.id, count(t2.id)
     FROM post as t1
     LEFT JOIN comment as t2 ON t2.post_id = t1.id
+    WHERE t1.verified = true
     GROUP BY t1.id
     ORDER BY t1.date DESC 
     LIMIT 5
@@ -246,17 +254,23 @@ class PostRepo {
     this.repo = repo;
   }
   /* Отображение постов в топике */
-  async getAllByTopicID(topicID, page, filter) {
+  async getAllByTopicID(topicID, page, filter, userID, userRole) {
     page = page ? page : 1;
     const offset = (page - 1) * COUNT_POST_PER_PAGE;
-    const allPost = await this.repo.getAllPostByTopicID(topicID);
+    const allPost = await this.repo.getAllPostByTopicID(
+      topicID,
+      userID,
+      userRole
+    );
     const maxPage = Math.ceil(allPost.length / COUNT_POST_PER_PAGE);
     if (maxPage === 0 || page > maxPage) return { maxPage, posts: [] };
 
     const sortedPostsInfo = await this.repo.getSortedPostInfoByTopicID(
       topicID,
       offset,
-      filter
+      filter,
+      userID,
+      userRole
     );
     const posts = [];
 
@@ -290,8 +304,8 @@ class PostRepo {
     return { posts, maxPage };
   }
   /* Отображение поста */
-  async getOneByID(id) {
-    const postInfo = await this.repo.getPostInfoByID(id);
+  async getOneByID(id, userID, userRole) {
+    const postInfo = await this.repo.getPostInfoByID(id, userID, userRole);
     const post =
       postInfo?.length === 0
         ? null

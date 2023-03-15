@@ -1,18 +1,23 @@
 import CommentRepo from "./CommentRepo.js";
 
 class CommentService {
-  async getAllByPostID(postID, page, userID) {
+  async getAllByPostID(postID, page, userID, userRole) {
+    console.log(userRole);
+    if (userRole !== "admin" && userRole !== "moder")
+      if (!(await CommentRepo.isHasPostAndVerify(postID, userID)))
+        return { status: 404, message: "Комментарии не найдены!" };
     const { comments, maxPage } = await CommentRepo.getAllByPostID(
       postID,
       page,
-      userID
+      userID,
+      userRole
     );
     if (comments.length === 0 || maxPage === 0)
       return { status: 404, message: "Комментарии не найдены" };
     return { status: 200, comments, maxPage };
   }
   async createComment(body, postID, main, userID, role) {
-    if (!(await CommentRepo.isHasPost(postID)))
+    if (!(await CommentRepo.isHasPostAndOpen(postID)))
       return { status: 400, message: "Темы не существует или она закрыта!" };
     await CommentRepo.createComment(body, postID, main, userID, role);
     return { status: 200, message: "Успешно!" };

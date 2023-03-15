@@ -14,16 +14,16 @@ export const authValidation = (
 ) => {
   for (let field in authForm) {
     const fieldData: string = authForm[field];
-    authValidationField(field, fieldData, authForm, error, setError);
+    authValidationField(field, fieldData, error, setError, authForm);
   }
 };
 
 export const authValidationField = (
   field: string,
   fieldData: string,
-  authForm: authForm,
   error: authForm,
-  setError: React.Dispatch<React.SetStateAction<authForm>>
+  setError: React.Dispatch<React.SetStateAction<authForm>>,
+  authForm: authForm
 ) => {
   if (fieldData.length === 0) {
     error[field] = "Поле обязяательно для заполнения!";

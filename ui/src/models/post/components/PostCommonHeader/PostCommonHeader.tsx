@@ -56,9 +56,12 @@ export const PostCommonHeader: React.FC<IPostCommonHeaderProps> = ({
 
       {userInfo && (
         <div className="post-common-header__tools">
-          <div className="post-common-header__create-new-post">
+          <NavLink
+            to={`/create/post/${currentPost.topicID}`}
+            className="post-common-header__create-new-post"
+          >
             Создать новую тему
-          </div>
+          </NavLink>
           {!currentPost?.closed && (
             <a href="#comment" className="post-common-header__new-comment">
               <img src={message} alt="" /> Ответить

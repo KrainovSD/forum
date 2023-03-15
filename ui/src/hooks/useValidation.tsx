@@ -11,9 +11,9 @@ export const useValidation = (
   validation: (
     field: string,
     fieldData: string,
-    authForm: form,
     error: form,
-    setError: React.Dispatch<React.SetStateAction<form>>
+    setError: React.Dispatch<React.SetStateAction<form>>,
+    form: form
   ) => void
 ) => {
   for (let key in form) {
@@ -21,7 +21,7 @@ export const useValidation = (
       const field = key;
       const fieldData = form[key];
       if (error[key].length > 0)
-        validation(field, fieldData, form, error, setError);
+        validation(field, fieldData, error, setError, form);
     }, [form[key]]);
   }
 };

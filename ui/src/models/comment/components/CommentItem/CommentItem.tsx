@@ -14,6 +14,10 @@ import { CSSTransition } from "react-transition-group";
 import { AddLike } from "../../../../models/likes/components/AddLike/AddLike";
 import { DeleteLike } from "../../../../models/likes/components/DeleteLike/DeleteLike";
 import { getDiffInHours } from "../../../../helpers/getDiffInHours";
+import { useConfirm } from "../../../../hooks/useConfirm";
+import { UpdateComment } from "../UpdateComment/UpdateComment";
+import { DeleteComment } from "../DeleteComment/DeleteComment";
+import { CommentAdminPanel } from "../CommentAdminPanel/CommentAdminPanel";
 interface ICommentItemProps {
   comment: IComment;
 }
@@ -24,7 +28,6 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
   const date = useDateFormat(comment.date);
   const dateUpdate = useDateFormat(comment.dateUpdate || "");
   const timePassed = getDiffInHours(comment.date);
-
   const { userInfo } = useAppSelector((state) => state.user);
 
   const [isVisibleLikes, setIsVisibleLikes] = useState<boolean>(false);
@@ -34,9 +37,34 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
     setIsVisibleLikes(visible);
   };
 
+  const conditionToUpdate =
+    (userInfo && userInfo.id === comment.authorID && timePassed <= 24) ||
+    (userInfo && (userInfo.role === "admin" || userInfo.role == "moder"));
+  const conditionToDelete =
+    (userInfo &&
+      userInfo.id === comment.authorID &&
+      (timePassed <= 1 || !comment.verified)) ||
+    (userInfo && (userInfo.role === "admin" || userInfo.role == "moder"));
+
+  const [isVisibleCommentUpdate, setIsVisibleCommentUpdate] = useState(false);
+  const { checkConfirm: checkCancelUpdate, confirm: confirmCancelUpdate } =
+    useConfirm(() => {
+      setIsVisibleCommentUpdate(false);
+    });
+  const toggleUpdate = () => {
+    if (isVisibleCommentUpdate)
+      return checkCancelUpdate(
+        "Закрыть редактор",
+        "Не сохраненные изменения будут сброшены! Вы уверены что хотите закрыть редактор?"
+      );
+    return setIsVisibleCommentUpdate(true);
+  };
+
   return (
     <div className="comment-item" id={`${comment.id}`}>
-      {!comment.verified && <div className="comment-item__no-verify"></div>}
+      {!comment.verified && !isVisibleCommentUpdate && (
+        <div className="comment-item__no-verify"></div>
+      )}
       <CSSTransition
         in={isVisibleLikes}
         timeout={300}
@@ -50,6 +78,7 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
           }}
         />
       </CSSTransition>
+      {confirmCancelUpdate}
 
       <div className="comment-item__content">
         <div className="comment-item__user-info">
@@ -73,6 +102,7 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
             {getCountCommentMessageCaption(comment.authorCountComment)}
           </p>
         </div>
+
         <div className="comment-item__body">
           <div className="_header">
             <div className="_date">
@@ -84,23 +114,54 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
               </div>
             )}
           </div>
-          <div className="_comment">{comment.body}</div>
-          {comment.updated && (
-            <div className="_update">
-              Изменено {dateUpdate} пользователем {comment.authorUpdateNickName}
+          {!isVisibleCommentUpdate && (
+            <div className="_content">
+              <div className="_comment">{comment.body}</div>
+              {comment.updated && (
+                <div className="_update">
+                  Изменено {dateUpdate} пользователем{" "}
+                  {comment.authorUpdateNickName}
+                </div>
+              )}
+            </div>
+          )}
+          {isVisibleCommentUpdate && (
+            <div className="_update-comment">
+              <UpdateComment
+                commentBody={comment.body}
+                commentID={comment.id}
+                close={() => {
+                  setIsVisibleCommentUpdate(false);
+                }}
+              />
             </div>
           )}
         </div>
       </div>
+
       <div className="comment-item__footer">
-        {userInfo &&
-          userInfo.id === comment.authorID &&
-          (timePassed <= 1 || !comment.verified) && (
-            <div className="_delete">Удалить</div>
-          )}
-        {userInfo && userInfo.id === comment.authorID && timePassed <= 24 && (
-          <div className="_change">Изменить</div>
+        {conditionToDelete && !comment.main && (
+          <DeleteComment commentID={comment.id} />
         )}
+        {conditionToUpdate && !isVisibleCommentUpdate && (
+          <div className="_change" onClick={toggleUpdate}>
+            Изменить
+          </div>
+        )}
+        {isVisibleCommentUpdate && (
+          <div className="_change" onClick={toggleUpdate}>
+            Отменить
+          </div>
+        )}
+
+        {userInfo && (userInfo.role == "admin" || userInfo.role == "moder") && (
+          <CommentAdminPanel
+            commentID={comment.id}
+            verified={comment.verified}
+            fixed={comment.fixed}
+          />
+        )}
+
         <div className="_reputation" onClick={showLikes}>
           {comment.likes.length}
         </div>

@@ -1,5 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { getCommentByPostID } from "./commentCreateAction";
+import {
+  createComment,
+  deleteComment,
+  getCommentByPostID,
+  updateComment,
+  updateCommentFixed,
+  updateCommentVerified,
+} from "./commentCreateAction";
 import { IComment, ICommentInitialState } from "./commentTypes";
 import { IActionError } from "../../../store/types";
 
@@ -7,6 +14,7 @@ const initialState: ICommentInitialState = {
   comments: [],
   maxPage: 0,
   updated: false,
+  response: "",
   isLoading: false,
   isSmallLoading: false,
   error: "",
@@ -19,20 +27,16 @@ export const CommentSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(
-        getCommentByPostID.fulfilled,
-        (
-          state,
-          action: PayloadAction<{ comments: IComment[]; maxPage: number }>
-        ) => {
-          state.comments = action.payload.comments;
-          state.maxPage = action.payload.maxPage;
-          state.isSmallLoading = false;
-        }
-      )
+      .addCase(getCommentByPostID.fulfilled, (state, action) => {
+        state.comments = action.payload.comments;
+        state.maxPage = action.payload.maxPage;
+        state.isSmallLoading = false;
+      })
       .addCase(getCommentByPostID.pending, (state) => {
         state.isSmallLoading = true;
         state.error = "";
+        state.response = "";
+        state.updated = false;
         state.statusError = 0;
       })
       .addCase(getCommentByPostID.rejected, (state, action) => {
@@ -43,8 +47,47 @@ export const CommentSlice = createSlice({
         state.isSmallLoading = false;
         state.error = payload.message;
         state.statusError = payload.status;
-      });
+      })
+      .addCase(createComment.fulfilled, fulfilledAction)
+      .addCase(createComment.pending, pendingAction)
+      .addCase(createComment.rejected, rejectedAction)
+      .addCase(updateComment.fulfilled, fulfilledAction)
+      .addCase(updateComment.pending, pendingAction)
+      .addCase(updateComment.rejected, rejectedAction)
+      .addCase(updateCommentVerified.fulfilled, fulfilledAction)
+      .addCase(updateCommentVerified.pending, pendingAction)
+      .addCase(updateCommentVerified.rejected, rejectedAction)
+      .addCase(updateCommentFixed.fulfilled, fulfilledAction)
+      .addCase(updateCommentFixed.pending, pendingAction)
+      .addCase(updateCommentFixed.rejected, rejectedAction)
+      .addCase(deleteComment.fulfilled, fulfilledAction)
+      .addCase(deleteComment.pending, pendingAction)
+      .addCase(deleteComment.rejected, rejectedAction);
   },
 });
+
+const fulfilledAction = (
+  state: ICommentInitialState,
+  action: { payload: string }
+) => {
+  state.isLoading = false;
+  state.response = action.payload;
+  state.updated = true;
+};
+const pendingAction = (state: ICommentInitialState) => {
+  state.response = "";
+  state.isLoading = true;
+  state.statusError = 0;
+  state.updated = false;
+};
+const rejectedAction = (
+  state: ICommentInitialState,
+  action: PayloadAction<unknown>
+) => {
+  const payload = action.payload as IActionError;
+  state.isLoading = false;
+  state.statusError = payload.status;
+  state.response = payload.message;
+};
 
 export default CommentSlice.reducer;

@@ -11,6 +11,12 @@ class TopicService {
       parentInfo: topicsInfo.parentInfo,
     };
   }
+  async getAllForPost() {
+    const topics = await TopicRepo.getAllForPost();
+    if (topics.length === 0)
+      return { status: 404, message: "Список топиков не найден!" };
+    return { status: 200, topics };
+  }
   async updateTopicTitle(topicID, title) {
     const topic = await TopicRepo.getTopicByID(topicID);
     if (topic.length === 0)

@@ -5,8 +5,17 @@ class PostController {
     try {
       const { topicID } = req.params;
       const { page, filter } = req.query;
+      const userID = req?.userID ? req.userID : null;
+      const userRole = req?.role ? req.role : null;
+      console.log(userID);
       const { status, message, posts, maxPage } =
-        await PostService.getAllByTopicID(topicID, page, filter);
+        await PostService.getAllByTopicID(
+          topicID,
+          page,
+          filter,
+          userID,
+          userRole
+        );
       if (status !== 200) return res.status(status).json(message);
 
       return res.status(200).json({ posts, maxPage });
@@ -18,7 +27,14 @@ class PostController {
   async getOneByID(req, res) {
     try {
       const { id } = req.params;
-      const { status, message, post } = await PostService.getOneByID(id);
+      const userID = req?.userID ? req.userID : null;
+      const userRole = req?.role ? req.role : null;
+
+      const { status, message, post } = await PostService.getOneByID(
+        id,
+        userID,
+        userRole
+      );
       if (status !== 200) return res.status(status).json(message);
 
       res.status(200).json(post);

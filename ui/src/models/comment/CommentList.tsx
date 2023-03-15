@@ -8,34 +8,44 @@ import { useCustomSearchParams } from "../../hooks/useCustomSearchParams";
 import { ICommentSearch } from "./types/CommentTypes";
 import { PageNavBar } from "../../models/pageNavBar/PageNavBar";
 import { SmallLoader } from "../../components/SmallLoader/SmallLoader";
+import { CommentListFooter } from "./components/CommentListFooter/CommentListFooter";
+import { usePopup } from "../../hooks/usePopup";
 
 export const CommentList: React.FC = () => {
+  const dispatch = useAppDispatch();
   const { isLoading: isLoadingAuth } = useAppSelector((state) => state.auth);
-  const { isLoading: isLoadingUser } = useAppSelector((state) => state.user);
+  const { isLoading: isLoadingUser, userInfo } = useAppSelector(
+    (state) => state.user
+  );
+  const { updated: updatedLike } = useAppSelector((state) => state.like);
   const {
     comments,
     maxPage,
     isSmallLoading,
     updated: updatedComment,
+    response,
+    statusError,
   } = useAppSelector((state) => state.comment);
-  const { updated: updatedLike } = useAppSelector((state) => state.like);
+
   const [search, setSearch] = useCustomSearchParams() as ICommentSearch;
-  const { id } = useParams();
-  const dispatch = useAppDispatch();
+  const { id: postID } = useParams();
 
   useEffect(() => {
     const page = search.page ? search.page : "1";
     setSearch({ page }, { replace: true });
-  }, [id]);
+  }, [postID]);
+  useEffect(() => {
+    if (statusError === 404 && search.page !== "1")
+      setSearch({ page: "1" }, { replace: true });
+  }, [statusError]);
 
   const getComments = () => {
-    if (id && search.page)
-      dispatch(getCommentByPostID({ id, page: search.page }));
+    if (postID && search.page)
+      dispatch(getCommentByPostID({ id: postID, page: search.page }));
   };
-
   useEffect(() => {
     getComments();
-  }, [id, search.page]);
+  }, [postID, search.page]);
   useEffect(() => {
     if (updatedLike) getComments();
   }, [updatedLike]);
@@ -43,16 +53,23 @@ export const CommentList: React.FC = () => {
     if (updatedComment) getComments();
   }, [updatedComment]);
 
+  const { popup, setPopup } = usePopup(() => {});
+  useEffect(() => {
+    if (response.length > 0) setPopup("Комментарии", response);
+  }, [response]);
+
   return (
     <div className="comment-list">
+      {popup}
       {!isLoadingAuth && !isLoadingUser && isSmallLoading && <SmallLoader />}
       <PageNavBar page={true} maxPage={maxPage} />
-
       {comments.map((comment) => (
         <CommentItem comment={comment} key={comment.id} />
       ))}
-
       <PageNavBar page={true} maxPage={maxPage} />
+      {userInfo && postID && (
+        <CommentListFooter userInfo={userInfo} postID={postID} />
+      )}
     </div>
   );
 };

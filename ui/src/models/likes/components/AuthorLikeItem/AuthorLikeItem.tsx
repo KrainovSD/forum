@@ -9,7 +9,7 @@ interface IAuthorLikeProps {
 }
 
 export const AuthorLikeItem: React.FC<IAuthorLikeProps> = ({ like }) => {
-  const avatar = getAvatar(like.fromAvatar);
+  const avatar = getAvatar(like.fromAvatar, like.fromID);
   const date = useDateFormat(like.date);
   return (
     <div className="author-like">

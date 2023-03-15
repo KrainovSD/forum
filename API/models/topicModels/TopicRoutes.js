@@ -6,6 +6,7 @@ import TopicControllers from "./TopicControllers.js";
 import topicValidation from "./topicValidation.js";
 
 router.get("/getChildren/:id", TopicControllers.getAllByID);
+router.get("/access", TopicControllers.getAllForPost);
 router.put(
   "/title",
   untils.checkAuth,

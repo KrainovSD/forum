@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useRoutes } from "react-router-dom";
 import { checkAuth } from "./store/reducers/auth/authActionCreator";
 import { Header } from "./models/header/Header";
-import { privateRoutes, publicRoutes } from "./routes/routes";
+import { privateRoutes, publicRoutes, moderRoutes } from "./routes/routes";
 import { Loader } from "./components/Loader/Loader";
 import { getMyUserInfo } from "./store/reducers/user/userActionCreator";
 import { userSlice } from "./store/reducers/user/userReducer";
@@ -13,7 +13,9 @@ export const App: React.FC = () => {
   const { auth, isLoading: isLoadingAuth } = useAppSelector(
     (state) => state.auth
   );
-  const { isLoading: isLoadingUser } = useAppSelector((state) => state.user);
+  const { isLoading: isLoadingUser, userInfo } = useAppSelector(
+    (state) => state.user
+  );
   const { isLoading: isLoadingTopic } = useAppSelector((state) => state.topic);
   const { isLoading: isLoadingPost } = useAppSelector((state) => state.post);
   const { isLoading: isLoadingLike } = useAppSelector((state) => state.like);
@@ -33,7 +35,11 @@ export const App: React.FC = () => {
     else dispatch(getMyUserInfo());
   }, [auth]);
 
-  const route = auth ? privateRoutes : publicRoutes;
+  const route = auth
+    ? userInfo && (userInfo.role === "moder" || userInfo.role === "admin")
+      ? moderRoutes
+      : privateRoutes
+    : publicRoutes;
   const routes = useRoutes(route);
 
   return (

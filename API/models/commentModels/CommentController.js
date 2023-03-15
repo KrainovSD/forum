@@ -6,9 +6,15 @@ class CommentController {
       const { id } = req.params;
       const { page } = req.query;
       const userID = req?.userID || null;
+      const userRole = req?.role || null;
 
       const { status, message, comments, maxPage } =
-        await CommentService.getAllByPostID(id, page ? page : 1, userID);
+        await CommentService.getAllByPostID(
+          id,
+          page ? page : 1,
+          userID,
+          userRole
+        );
       if (status !== 200) return res.status(status).json(message);
       return res.status(200).json({ comments, maxPage });
     } catch (e) {

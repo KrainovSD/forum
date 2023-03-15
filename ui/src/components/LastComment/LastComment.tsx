@@ -19,7 +19,7 @@ interface ILastCommentProps {
 
 export const LastComment: React.FC<ILastCommentProps> = ({ lastComment }) => {
   const date = useDateFormat(lastComment.date);
-  const avatar = getAvatar(lastComment.avatar);
+  const avatar = getAvatar(lastComment.avatar, lastComment.userID);
 
   return (
     <div>

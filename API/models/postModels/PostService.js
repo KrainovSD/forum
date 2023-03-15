@@ -1,17 +1,19 @@
 import PostRepo from "./PostRepo.js";
 class PostService {
-  async getAllByTopicID(topicID, page, filter) {
+  async getAllByTopicID(topicID, page, filter, userID, userRole) {
     const { posts, maxPage } = await PostRepo.getAllByTopicID(
       topicID,
       page,
-      filter
+      filter,
+      userID,
+      userRole
     );
     if ((posts.length === 0 && maxPage == 0) || maxPage < page)
       return { status: 404, message: "Посты не найдены!" };
     return { status: 200, posts, maxPage };
   }
-  async getOneByID(id) {
-    const post = await PostRepo.getOneByID(id);
+  async getOneByID(id, userID, userRole) {
+    const post = await PostRepo.getOneByID(id, userID, userRole);
     if (!post) return { status: 404, message: "Пост не найден" };
     return { status: 200, post };
   }

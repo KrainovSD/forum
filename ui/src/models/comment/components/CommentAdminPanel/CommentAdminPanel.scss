@@ -1,0 +1,19 @@
+.comment-admin-panel {
+  display: flex;
+
+  // .comment-admin-panel__item
+
+  &__item {
+    padding: 0 5px;
+    border-left: 1px solid rgba(134, 133, 133, 0.337254902);
+    display: flex;
+    align-items: center;
+    &._last {
+      border-right: 1px solid rgba(134, 133, 133, 0.337254902);
+    }
+    & > input {
+      margin-left: 5px;
+      cursor: pointer;
+    }
+  }
+}

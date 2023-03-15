@@ -1,11 +1,12 @@
-import { verify } from "jsonwebtoken";
 import db from "../../db.js";
 const COUNT_COMMENT_PER_PAGE = 3;
 
 class CommentPostgressRepo {
-  async getAllowComments(id, userID) {
+  async getAllowComments(id, userID, userRole) {
     const verifySortAllComents = userID
-      ? `(verified = true OR (verified = false AND person_id = ${userID}))`
+      ? userRole == "moder" || userRole == "admin"
+        ? `(verified = true OR verified = false)`
+        : `(verified = true OR (verified = false AND person_id = ${userID}))`
       : `verified = true`;
     const allComents = await db.query(
       `SELECT id FROM comment WHERE comment.post_id = $1 AND ${verifySortAllComents}`,
@@ -13,9 +14,11 @@ class CommentPostgressRepo {
     );
     return allComents.rows;
   }
-  async getCommentsInfoWithOffset(id, userID, offset) {
+  async getCommentsInfoWithOffset(id, userID, userRole, offset) {
     const verifySortCommentInfo = userID
-      ? `(t1.verified = true OR (t1.verified = false AND t1.author_id = ${userID}))`
+      ? userRole == "moder" || userRole == "admin"
+        ? `(t1.verified = true OR t1.verified = false)`
+        : `(t1.verified = true OR (t1.verified = false AND t1.author_id = ${userID}))`
       : `t1.verified = true`;
     const commentsInfo = await db.query(
       `
@@ -68,7 +71,7 @@ class CommentPostgressRepo {
     return likesInfo.rows;
   }
   async getPostByID(id) {
-    const post = await db.query("SELECT closed FROM post WHERE id = $1", [id]);
+    const post = await db.query("SELECT * FROM post WHERE id = $1", [id]);
     return post.rows;
   }
   async createComment(comment) {
@@ -128,10 +131,14 @@ class CommentRepo {
   constructor(repo) {
     this.repo = repo;
   }
-  async getAllByPostID(id, page, userID) {
+  async getAllByPostID(id, page, userID, userRole) {
     /* find max page */
     const offset = (page - 1) * COUNT_COMMENT_PER_PAGE;
-    const allowComments = await this.repo.getAllowComments(id, userID);
+    const allowComments = await this.repo.getAllowComments(
+      id,
+      userID,
+      userRole
+    );
     const maxPage = allowComments?.length
       ? Math.ceil(allowComments.length / COUNT_COMMENT_PER_PAGE)
       : 0;
@@ -140,6 +147,7 @@ class CommentRepo {
     const commentsInfo = await this.repo.getCommentsInfoWithOffset(
       id,
       userID,
+      userRole,
       offset
     );
     const commentListID = [];
@@ -164,7 +172,7 @@ class CommentRepo {
       const comment = {
         id: commentInfo.id,
         body: commentInfo.body,
-        main: commentInfo.body,
+        main: commentInfo.main,
         authorID: commentInfo.author_id,
         authorNickName: commentInfo.author_nick_name,
         authorAvatar: commentInfo.author_avatar,
@@ -185,7 +193,13 @@ class CommentRepo {
 
     return { comments, maxPage };
   }
-  async isHasPost(postID) {
+  async isHasPostAndVerify(postID, userID) {
+    const post = await this.repo.getPostByID(postID);
+    if (post?.length === 0) return false;
+    else if (!post[0]?.verified && post[0]?.person_id !== userID) return false;
+    return true;
+  }
+  async isHasPostAndOpen(postID) {
     const post = await this.repo.getPostByID(postID);
     if (post?.length === 0 || post?.[0]?.closed) return false;
     return true;

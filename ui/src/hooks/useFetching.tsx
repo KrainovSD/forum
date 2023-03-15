@@ -1,13 +1,13 @@
 import { AxiosError } from "axios";
 import { useState } from "react";
-import { popupTypes } from "../types/popupTypes";
+import { IPopup } from "../components/Popup/Popup";
 
 type fetching = [() => Promise<void>, boolean, string, number];
 
 export default function useFetching(
   callback: (...args: any[]) => any,
-  popupInfo: popupTypes | null = null,
-  setPopupInfo: React.Dispatch<React.SetStateAction<popupTypes>> | null = null
+  popupInfo: IPopup | null = null,
+  setPopupInfo: React.Dispatch<React.SetStateAction<IPopup>> | null = null
 ): fetching {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
