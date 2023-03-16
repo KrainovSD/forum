@@ -11,6 +11,7 @@ import {
 } from "../../../../helpers/getCaption";
 import { useAppSelector } from "../../../../hooks/redux";
 import { PostAdmitPanel } from "../PostAdminPanel/PostAdminPanel";
+import { getDiffInHours } from "../../../../helpers/getDiffInHours";
 
 interface IPostItemProps {
   post: IPostsTypes;
@@ -19,6 +20,16 @@ interface IPostItemProps {
 export const PostItem: React.FC<IPostItemProps> = ({ post }) => {
   const { userInfo } = useAppSelector((state) => state.user);
   const postDate = useDateFormat(post.date);
+  const conditionToVisibleAdminPanel = () => {
+    if (!userInfo) return false;
+    if (userInfo.role !== "admin" && userInfo.role !== "moder") {
+      const diffInHours = getDiffInHours(post.date);
+      if (post.authorID !== userInfo.id) return false;
+      else if (userInfo.role === "noob" && post.verified) return false;
+      else if (diffInHours > 1 && post.verified) return false;
+    }
+    return true;
+  };
 
   return (
     <div className={`post-item ${post.verified ? "" : "_no-verify"}`}>
@@ -52,7 +63,7 @@ export const PostItem: React.FC<IPostItemProps> = ({ post }) => {
         </div>
         {post.lastComment && <LastComment lastComment={post.lastComment} />}
       </div>
-      {userInfo && (userInfo.role === "admin" || userInfo.role === "moder") && (
+      {conditionToVisibleAdminPanel() && (
         <PostAdmitPanel
           postID={post.id}
           closed={post.closed}

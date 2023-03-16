@@ -28,29 +28,21 @@ export const CommentAdminPanel: React.FC<ICommentAdminPanelProps> = ({
     dispatch(updateCommentFixed({ commentID, fixed: value }));
   };
 
-  const { checkConfirm: checkConfirmVerify, confirm: confirmVerify } =
-    useConfirm(() => {
-      changeVerify();
-    });
-  const { checkConfirm: checkConfirmFixed, confirm: confirmFixed } = useConfirm(
-    () => {
-      changeFixed();
-    }
-  );
+  const { checkConfirm, confirm } = useConfirm();
 
   return (
     <div className="comment-admin-panel">
-      {confirmFixed}
-      {confirmVerify}
+      {confirm}
       <div className="comment-admin-panel__item">
         <p>Утвердить</p>
         <input
           type="checkbox"
           checked={verified ? true : false}
           onClick={() => {
-            checkConfirmVerify(
+            checkConfirm(
               "Изменить статус комментария",
-              "Вы  уверены, что хотите изменить статус утверждения?"
+              "Вы  уверены, что хотите изменить статус утверждения?",
+              changeVerify
             );
           }}
           readOnly
@@ -62,9 +54,10 @@ export const CommentAdminPanel: React.FC<ICommentAdminPanelProps> = ({
           type="checkbox"
           checked={fixed ? true : false}
           onClick={() => {
-            checkConfirmFixed(
+            checkConfirm(
               "Изменить статус комментария",
-              "Вы  уверены, что хотите изменить статус закрепления?"
+              "Вы  уверены, что хотите изменить статус закрепления?",
+              changeFixed
             );
           }}
           readOnly

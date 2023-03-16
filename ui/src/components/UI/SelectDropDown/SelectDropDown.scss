@@ -28,8 +28,10 @@
 
   &__caption {
     color: rgba(102, 102, 102, 0.5);
+    font-size: 12px;
     &._selected {
       color: #000000;
+      font-size: 16px;
     }
   }
 

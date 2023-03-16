@@ -23,8 +23,23 @@ class PostService {
       return { status: 404, message: "Посты не найдены!" };
     return { status: 200, posts };
   }
+  async getPostAccessByID(postID, userID, userRole) {
+    const post = await PostRepo.getPostByID(postID);
+    if (post.length === 0)
+      return { status: 400, message: "Поста не существует!" };
+    if (!this.#isHasAccessToPost(post, userID, userRole, 1))
+      return {
+        status: 400,
+        message:
+          "Пост не пренадлежит пользователю или вышло время, когда он может быть изменен!",
+      };
+    const postInfo = await PostRepo.getOneByID(postID, userID, userRole);
+    if (!postInfo) return { status: 400, message: "Поста не существует!" };
+
+    return { status: 200, post: postInfo };
+  }
   async updatePostTitle(postID, title, userID, userRole) {
-    const post = PostRepo.getPostByID(postID);
+    const post = await PostRepo.getPostByID(postID);
     if (post.length === 0)
       return { status: 400, message: "Поста не существует!" };
     if (!this.#isHasAccessToPost(post, userID, userRole, 1))
@@ -37,14 +52,14 @@ class PostService {
     return { status: 200, message: "Успешно!" };
   }
   async updatePostClosed(postID, value) {
-    const post = PostRepo.getPostByID(postID);
+    const post = await PostRepo.getPostByID(postID);
     if (post.length === 0)
       return { status: 400, message: "Поста не существует!" };
     await PostRepo.updatePostClosed(postID, value);
     return { status: 200, message: "Успешно!" };
   }
   async updatePostVerified(postID, value) {
-    const post = PostRepo.getPostByID(postID);
+    const post = await PostRepo.getPostByID(postID);
     const mainComment = PostRepo.getMainCommentByPostID(postID);
     if (post.length === 0 || mainComment.length === 0)
       return { status: 400, message: "Поста не существует!" };
@@ -52,26 +67,34 @@ class PostService {
     return { status: 200, message: "Успешно!" };
   }
   async updatePostFixed(postID, value) {
-    const post = PostRepo.getPostByID(postID);
+    const post = await PostRepo.getPostByID(postID);
     if (post.length === 0)
       return { status: 400, message: "Поста не существует!" };
     await PostRepo.updatePostFixed(postID, value);
     return { status: 200, message: "Успешно!" };
   }
   async deletePost(postID) {
-    const post = PostRepo.getPostByID(postID);
+    const post = await PostRepo.getPostByID(postID);
     if (post.length === 0)
       return { status: 400, message: "Поста не существует!" };
     await PostRepo.deletePost(postID);
     return { status: 200, message: "Успешно!" };
   }
-  async createPost(title, topicID, userID, userRole) {
-    if (!(await PostRepo.isHasTopic(topicID)))
+  async createPost(body, title, topicID, userID, userRole) {
+    const topic = await PostRepo.getTopicByID(topicID);
+    if (topic.length === 0)
       return {
         status: 400,
         message: "Топика не существует или создание постов в нем запрещено!",
       };
-    await PostRepo.createPost(title, topicID, userID, userRole);
+    if (!topic[0].access_post && userRole !== "admin" && userRole !== "moder")
+      return {
+        status: 400,
+        message: "Топика не существует или создание постов в нем запрещено!",
+      };
+
+    const post = await PostRepo.createPost(title, topicID, userID, userRole);
+    await PostRepo.createComment(body, post.id, userID, userRole);
     return { status: 200, message: "Успешно!" };
   }
 

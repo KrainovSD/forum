@@ -1,11 +1,13 @@
 import { useConfirm } from "../../../../hooks/useConfirm";
-import { useAppDispatch } from "../../../../hooks/redux";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import "./PostAdmitPanel.scss";
 import {
   updatePostClosed,
   updatePostFixed,
   updatePostVerify,
 } from "../../../../store/reducers/post/postActionCreator";
+import { DeletePost } from "../DeletePost/DeletePost";
+import { NavLink } from "react-router-dom";
 
 interface IPostAdminPanelProps {
   postID: string;
@@ -20,6 +22,8 @@ export const PostAdmitPanel: React.FC<IPostAdminPanelProps> = ({
   fixed,
   verified,
 }) => {
+  const { userInfo } = useAppSelector((state) => state.user);
+  const titleConfirm = "Изменить статус поста";
   const dispatch = useAppDispatch();
   const changeClosed = () => {
     const value = closed ? false : true;
@@ -34,64 +38,63 @@ export const PostAdmitPanel: React.FC<IPostAdminPanelProps> = ({
     dispatch(updatePostVerify({ postID, value }));
   };
 
-  const { checkConfirm: checkConfirmClosed, confirm: confirmClosed } =
-    useConfirm(() => {
-      changeClosed();
-    });
-  const { checkConfirm: checkConfirmFixed, confirm: confirmFixed } = useConfirm(
-    () => {
-      changeFixed();
-    }
-  );
-  const { checkConfirm: checkConfirmVerify, confirm: confirmVerify } =
-    useConfirm(() => {
-      changeVerified();
-    });
-  const title = "Изменить статус поста";
+  const { confirm, checkConfirm } = useConfirm();
+
+  const conditionToVisibleAdminTools =
+    userInfo && (userInfo.role === "admin" || userInfo.role === "moder");
 
   return (
     <div className="post-admin-panel">
-      {confirmClosed}
-      {confirmFixed}
-      {confirmVerify}
-      <div className="post-admin-panel__item">Удалить</div>
-      <div className="post-admin-panel__item">Изменить</div>
-      <div
-        className="post-admin-panel__item"
-        onClick={() => {
-          checkConfirmClosed(
-            title,
-            "Вы уверены, что хотите изменить статус закрытия?"
-          );
-        }}
-      >
-        <p>Закрыть</p>
-        <input type="checkbox" checked={closed ? true : false} readOnly />
-      </div>
-      <div
-        className="post-admin-panel__item"
-        onClick={() => {
-          checkConfirmFixed(
-            title,
-            "Вы уверены, что хотите изменить статус закрепления?"
-          );
-        }}
-      >
-        <p>Закрепить</p>
-        <input type="checkbox" checked={fixed ? true : false} readOnly />
-      </div>
-      <div
-        className="post-admin-panel__item"
-        onClick={() => {
-          checkConfirmVerify(
-            title,
-            "Вы уверены, что хотите изменить статус утверждения?"
-          );
-        }}
-      >
-        <p>Утвердить</p>
-        <input type="checkbox" checked={verified ? true : false} readOnly />
-      </div>
+      {confirm}
+      {conditionToVisibleAdminTools && <DeletePost postID={postID} />}
+      <NavLink to={`/update/post/${postID}`} className="post-admin-panel__item">
+        Изменить
+      </NavLink>
+      {conditionToVisibleAdminTools && (
+        <div
+          className="post-admin-panel__item"
+          onClick={() => {
+            checkConfirm(
+              titleConfirm,
+              "Вы уверены, что хотите изменить статус закрытия?",
+              changeClosed
+            );
+          }}
+        >
+          <p>Закрыть</p>
+          <input type="checkbox" checked={closed ? true : false} readOnly />
+        </div>
+      )}
+      {conditionToVisibleAdminTools && (
+        <div
+          className="post-admin-panel__item"
+          onClick={() => {
+            checkConfirm(
+              titleConfirm,
+              "Вы уверены, что хотите изменить статус закрепления?",
+              changeFixed
+            );
+          }}
+        >
+          <p>Закрепить</p>
+          <input type="checkbox" checked={fixed ? true : false} readOnly />
+        </div>
+      )}
+      {conditionToVisibleAdminTools && (
+        <div
+          className="post-admin-panel__item"
+          onClick={() => {
+            checkConfirm(
+              titleConfirm,
+              "Вы уверены, что хотите изменить статус утверждения?",
+              changeVerified
+            );
+          }}
+        >
+          <p>Утвердить</p>
+          <input type="checkbox" checked={verified ? true : false} readOnly />
+        </div>
+      )}
     </div>
   );
 };

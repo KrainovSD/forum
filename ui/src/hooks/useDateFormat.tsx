@@ -71,10 +71,11 @@ function findFullDate(date: Date) {
     "ноября",
     "декабря",
   ];
-  const day = date.getDate();
+  let day: string | number = date.getDate();
   const month = date.getMonth();
   const monthString = monthList[month];
   const year = date.getFullYear();
+  if (day < 10) day = `0${day}`;
 
   return `${day} ${monthString} ${year}`;
 }
@@ -90,8 +91,10 @@ function findWeeklyDate(date: Date) {
   ];
   const weeklyDay = date.getDay();
   const weeklyDayString = days[weeklyDay];
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
+  let hours: string | number = date.getHours();
+  let minutes: string | number = date.getMinutes();
+  if (minutes < 10) minutes = `0${minutes}`;
+  if (hours < 10) hours = `0${hours}`;
 
   return `${weeklyDayString} в ${hours}:${minutes}`;
 }

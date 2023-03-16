@@ -3,6 +3,7 @@ import { AxiosError } from "axios";
 import { axiosInstanceToken } from "../../../helpers/axiosInstanceToken";
 import { axiosInstance } from "../../../helpers/axiosInstance";
 import { ISelectedUserInfo, IUserInfo } from "./userTypes";
+import { getRequestError } from "../../../store/helpers/getRequestError";
 
 export const getUserByID = createAsyncThunk(
   "user/getByID",
@@ -13,13 +14,8 @@ export const getUserByID = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const message = error.response?.data || "";
-      const status = error.response?.status || 0;
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -31,13 +27,8 @@ export const getMyUserInfo = createAsyncThunk(
       const response = await axiosInstanceToken.get<IUserInfo>(`/api/user/me`);
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const message = error.response?.data || "";
-      const status = error.response?.status || 0;
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );

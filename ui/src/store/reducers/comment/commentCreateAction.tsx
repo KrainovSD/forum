@@ -10,6 +10,7 @@ import {
   IUpdateCommentFixed,
   IUpdateCommentVerified,
 } from "./commentTypes";
+import { getRequestError } from "../../helpers/getRequestError";
 
 export const getCommentByPostID = createAsyncThunk(
   "comment/getByPost",
@@ -25,13 +26,8 @@ export const getCommentByPostID = createAsyncThunk(
       });
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const message = error.response?.data || "";
-      const status = error.response?.status || 0;
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -46,13 +42,8 @@ export const createComment = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const message = error.response?.data || "";
-      const status = error.response?.status || 0;
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -67,13 +58,8 @@ export const updateComment = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const message = error.response?.data || "";
-      const status = error.response?.status || 0;
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -88,13 +74,8 @@ export const updateCommentVerified = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const message = error.response?.data || "";
-      const status = error.response?.status || 0;
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -109,13 +90,8 @@ export const updateCommentFixed = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const message = error.response?.data || "";
-      const status = error.response?.status || 0;
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -129,13 +105,8 @@ export const deleteComment = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const message = error.response?.data || "";
-      const status = error.response?.status || 0;
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );

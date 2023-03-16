@@ -1,37 +1,50 @@
 import { AxiosError } from "axios";
 import { useState } from "react";
-import { IPopup } from "../components/Popup/Popup";
 
-type fetching = [() => Promise<void>, boolean, string, number];
-
-export default function useFetching(
+type IFetching = (
   callback: (...args: any[]) => any,
-  popupInfo: IPopup | null = null,
-  setPopupInfo: React.Dispatch<React.SetStateAction<IPopup>> | null = null
-): fetching {
+  setPopup?:
+    | ((title: string, body: string, newCallback?: (() => void) | null) => void)
+    | null,
+  titlePopup?: string | null,
+  callbackPopup?: (() => void) | null
+) => {
+  fetching: () => Promise<void>;
+  isLoading: boolean;
+  error: string;
+  status: number;
+};
+
+const useFetching: IFetching = (
+  callback,
+  setPopup = null,
+  titlePopup = null,
+  callbackPopup = null
+) => {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [errorStatus, setErrorStatus] = useState<number>(0);
+  const [status, setStatus] = useState<number>(0);
 
   const fetching = async () => {
     try {
       setIsLoading(true);
       await callback();
-      setErrorStatus(0);
+      setStatus(200);
       setError("");
       setIsLoading(false);
     } catch (e) {
       setIsLoading(false);
-      const error = e as AxiosError;
-      const status = error.response?.status || 0;
-      const message = (error.response?.data as string) || "Сервер не отвечает!";
-
-      if (popupInfo && setPopupInfo) {
-        setPopupInfo({ ...popupInfo, isVisible: true, body: message });
-      }
-      setErrorStatus(status);
+      console.log(e);
+      const reqError = e as AxiosError;
+      const reqStatus = reqError.response?.status || 500;
+      const message =
+        (reqError.response?.data as string) || "Сервер не отвечает!";
+      setStatus(reqStatus);
       setError(message);
+      if (setPopup && titlePopup) setPopup(titlePopup, message, callbackPopup);
     }
   };
-  return [fetching, isLoading, error, errorStatus];
-}
+  return { fetching, isLoading, error, status };
+};
+
+export default useFetching;

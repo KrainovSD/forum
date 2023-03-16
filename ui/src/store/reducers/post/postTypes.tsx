@@ -70,7 +70,7 @@ export interface IAdminUpdatePost {
 }
 
 export interface ICreatePost {
+  body: string;
   topicID: string;
   title: string;
-  comment: string;
 }

@@ -11,6 +11,7 @@ import {
   IPostTypes,
   IUpdatePost,
 } from "./postTypes";
+import { getRequestError } from "../../../store/helpers/getRequestError";
 
 interface reqGetPostByTopicID {
   topicID: number;
@@ -36,13 +37,8 @@ export const getPostByTopicID = createAsyncThunk(
         maxPage: response.data.maxPage,
       };
     } catch (e) {
-      const error = e as AxiosError;
-      const status: number = error.response?.status || 0;
-      const message: string = (error.response?.data as string) || "";
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -56,13 +52,8 @@ export const getPostByID = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const status: number = error.response?.status || 0;
-      const message: string = (error.response?.data as string) || "";
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -74,13 +65,8 @@ export const getLastPosts = createAsyncThunk(
       const response = await axiosInstance.get<ILastPost[]>(`/api/post/last`);
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const status: number = error.response?.status || 0;
-      const message: string = (error.response?.data as string) || "";
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -95,13 +81,8 @@ export const updatePost = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const status: number = error.response?.status || 0;
-      const message: string = (error.response?.data as string) || "";
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -116,13 +97,8 @@ export const updatePostClosed = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const status: number = error.response?.status || 0;
-      const message: string = (error.response?.data as string) || "";
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -136,13 +112,8 @@ export const updatePostFixed = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const status: number = error.response?.status || 0;
-      const message: string = (error.response?.data as string) || "";
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -156,13 +127,8 @@ export const updatePostVerify = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const status: number = error.response?.status || 0;
-      const message: string = (error.response?.data as string) || "";
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -173,13 +139,8 @@ export const createPost = createAsyncThunk(
       const response = await axiosInstanceToken.post<string>(`/api/post`, req);
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const status: number = error.response?.status || 0;
-      const message: string = (error.response?.data as string) || "";
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -192,13 +153,8 @@ export const deletePost = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      const error = e as AxiosError;
-      const status: number = error.response?.status || 0;
-      const message: string = (error.response?.data as string) || "";
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );

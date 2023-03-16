@@ -75,7 +75,7 @@ export const ItemSelectRender: React.FC<IItemSelectRenderProps> = ({
                 <span
                   className="_select"
                   onClick={() => {
-                    value === "" ? setValue(item.id) : setValue("");
+                    value == item.id ? setValue("") : setValue(item.id);
                   }}
                 >
                   Выбрать

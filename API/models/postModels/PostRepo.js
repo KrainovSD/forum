@@ -9,6 +9,7 @@ class PostPostgressRepo {
         ? `(verified = true OR verified = false)`
         : `(verified = true OR (verified = false AND person_id = ${userID}))`
       : `verified = true`;
+
     const allPost = await db.query(
       `SELECT * FROM post WHERE topic_id = $1 AND ${condition}`,
       [topicID]
@@ -173,14 +174,15 @@ class PostPostgressRepo {
     if (result.rows.length === 0) throw new Error();
   }
   async updatePostVerified(postID, value) {
+    const date = new Date();
     const result = await db.query(
       `
     UPDATE post
-    SET verified = $2
+    SET verified = $2, date = $3
     WHERE id = $1
     RETURNING*
     `,
-      [postID, value]
+      [postID, value, date]
     );
     if (result.rows.length === 0) throw new Error();
   }
@@ -194,14 +196,15 @@ class PostPostgressRepo {
     return mainComment.rows;
   }
   async updateMainCommentVerified(postID, value) {
+    const date = new Date();
     const result = await db.query(
       `
     UPDATE comment
-    SET verified = $2
+    SET verified = $2, date = $3, updated = false
     WHERE post_id = $1 AND main = true
     RETURNING*
     `,
-      [postID, value]
+      [postID, value, date]
     );
     if (result.rows.length === 0) throw new Error();
   }
@@ -245,6 +248,18 @@ class PostPostgressRepo {
     `,
       [title, userID, topicID, date, false, verified, false]
     );
+    return result.rows;
+  }
+  async createComment(body, postID, userID, verified) {
+    const date = new Date();
+    const result = await db.query(
+      `
+    INSERT INTO comment ("body", "person_id", "post_id", "date", "updated", "verified", "fixed", "main")
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    RETURNING*
+    `,
+      [body, userID, postID, date, false, verified, false, true]
+    );
     if (result.rows.length === 0) throw new Error();
   }
 }
@@ -262,6 +277,7 @@ class PostRepo {
       userID,
       userRole
     );
+
     const maxPage = Math.ceil(allPost.length / COUNT_POST_PER_PAGE);
     if (maxPage === 0 || page > maxPage) return { maxPage, posts: [] };
 
@@ -272,6 +288,7 @@ class PostRepo {
       userID,
       userRole
     );
+    console.log(sortedPostsInfo);
     const posts = [];
 
     for (const sortedPostInfo of sortedPostsInfo) {
@@ -372,15 +389,19 @@ class PostRepo {
     await this.repo.deletePost(postID);
   }
   /* Создание поста */
-  async isHasTopic(topicID) {
+  async getTopicByID(topicID) {
     const topic = await this.repo.getTopicByID(topicID);
-    if (topic.length === 0) return false;
-    else if (!topic[0]?.access_post) return false;
-    return true;
+    return topic;
   }
   async createPost(title, topicID, userID, userRole) {
     const verified = userRole === "noob" ? false : true;
-    await this.repo.createPost(topicID, userID, title, verified);
+    const post = await this.repo.createPost(topicID, userID, title, verified);
+    if (post.length !== 1) throw new Error();
+    return post[0];
+  }
+  async createComment(body, postID, userID, userRole) {
+    const verified = userRole === "noob" ? false : true;
+    await this.repo.createComment(body, postID, userID, verified);
   }
 }
 

@@ -6,9 +6,12 @@ import { usePopup } from "../../../hooks/usePopup";
 import { useState, useEffect } from "react";
 
 interface ISelectDropDownProps {
+  error: string;
   value: string;
   items: IItemSelect[];
   setValue: (v: string) => void;
+  title: string;
+  setTitle: (v: string) => void;
 }
 export interface IItemSelect {
   id: string;
@@ -31,17 +34,16 @@ export const SelectDropDown: React.FC<ISelectDropDownProps> = ({
   value,
   items,
   setValue,
+  error,
+  title,
+  setTitle,
 }) => {
-  const [title, setTitle] = useState("");
   /* Переключение открывающегося меню */
   const [isVisibleSubMenu, setIsVisibleSubMenu] = useState(false);
   const toggleVisible = () => {
-    if (items.length === 0)
-      setPopup("Список топиков", "Доступные топики не найдены!");
     const visible = isVisibleSubMenu ? false : true;
     setIsVisibleSubMenu(visible);
   };
-  const { popup, setPopup } = usePopup(() => {});
   /* Обработка массива */
   const recursiveGetItem = (
     array: IItemSelect[],
@@ -85,7 +87,11 @@ export const SelectDropDown: React.FC<ISelectDropDownProps> = ({
       return;
     }
     const index = renderArray.findIndex((item) => item.id == id);
-    if (index === -1) setValue("");
+    if (index === -1 || !renderArray?.[index]?.access) {
+      setValue("");
+      return;
+    }
+
     const title = renderArray[index].title;
     setTitle(title);
   };
@@ -97,6 +103,8 @@ export const SelectDropDown: React.FC<ISelectDropDownProps> = ({
     setRenderArray([...oldArray]);
   };
   const openSelectedItem = (id: string) => {
+    console.log(id);
+    if (id === "") return;
     const index = renderArray.findIndex((item) => item.id == id);
     if (index === -1) return;
     const parent = renderArray[index].parent;
@@ -116,13 +124,16 @@ export const SelectDropDown: React.FC<ISelectDropDownProps> = ({
 
   return (
     <div className="select-drop-down">
-      {popup}
       <div className="select-drop-down__info" onClick={toggleVisible}>
         <p
           className={`select-drop-down__caption ${
             title === "" ? "" : "_selected"
           }`}
-        >{`${title === "" ? "Выбрать" : title}`}</p>
+        >
+          {title !== "" && title}
+          {title === "" && error.length === 0 && "Выбрать"}
+          {title === "" && error.length > 0 && error}
+        </p>
         <img src={arrowDown} alt="" />
       </div>
       {renderArray.length > 0 && (

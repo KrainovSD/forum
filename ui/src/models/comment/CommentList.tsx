@@ -10,6 +10,7 @@ import { PageNavBar } from "../../models/pageNavBar/PageNavBar";
 import { SmallLoader } from "../../components/SmallLoader/SmallLoader";
 import { CommentListFooter } from "./components/CommentListFooter/CommentListFooter";
 import { usePopup } from "../../hooks/usePopup";
+import { useEffectOnlyUpdate } from "../../hooks/useResponse";
 
 export const CommentList: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -53,8 +54,8 @@ export const CommentList: React.FC = () => {
     if (updatedComment) getComments();
   }, [updatedComment]);
 
-  const { popup, setPopup } = usePopup(() => {});
-  useEffect(() => {
+  const { popup, setPopup } = usePopup();
+  useEffectOnlyUpdate(() => {
     if (response.length > 0) setPopup("Комментарии", response);
   }, [response]);
 

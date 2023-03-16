@@ -1,9 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { AxiosError } from "axios";
 import { axiosInstanceToken } from "../../../helpers/axiosInstanceToken";
 import { axiosInstance } from "../../../helpers/axiosInstance";
 import { ILike } from "./likeTypes";
-import { handlerErrorReducer } from "../../../helpers/handlerErrorReducer";
+import { getRequestError } from "../../helpers/getRequestError";
 
 export const getLikeByCommentID = createAsyncThunk(
   "like/getByComment",
@@ -14,7 +13,8 @@ export const getLikeByCommentID = createAsyncThunk(
       );
       return response.data;
     } catch (e) {
-      return handlerErrorReducer(e, thunkApi);
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -34,7 +34,8 @@ export const createLike = createAsyncThunk(
       });
       return true;
     } catch (e) {
-      return handlerErrorReducer(e, thunkApi);
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );
@@ -46,7 +47,8 @@ export const deleteLike = createAsyncThunk(
       const response = await axiosInstanceToken.delete(`/api/like/${id}`);
       return true;
     } catch (e) {
-      return handlerErrorReducer(e, thunkApi);
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );

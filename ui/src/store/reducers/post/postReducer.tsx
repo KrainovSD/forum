@@ -12,6 +12,11 @@ import {
 } from "./postActionCreator";
 import { IPostInitialState, IPostTypes } from "./postTypes";
 import { IActionError } from "../../../store/types";
+import {
+  fulfilledAction,
+  pendingAction,
+  rejectedAction,
+} from "../../../store/helpers/typeActions";
 
 const initialState: IPostInitialState = {
   posts: [],
@@ -115,29 +120,5 @@ export const postSlice = createSlice({
       .addCase(deletePost.rejected, rejectedAction);
   },
 });
-
-const fulfilledAction = (
-  state: IPostInitialState,
-  action: { payload: string }
-) => {
-  state.isLoading = false;
-  state.response = action.payload;
-  state.updated = true;
-};
-const pendingAction = (state: IPostInitialState) => {
-  state.response = "";
-  state.isLoading = true;
-  state.statusError = 0;
-  state.updated = false;
-};
-const rejectedAction = (
-  state: IPostInitialState,
-  action: PayloadAction<unknown>
-) => {
-  const payload = action.payload as IActionError;
-  state.isLoading = false;
-  state.statusError = payload.status;
-  state.response = payload.message;
-};
 
 export default postSlice.reducer;

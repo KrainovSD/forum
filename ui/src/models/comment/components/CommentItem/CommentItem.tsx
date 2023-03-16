@@ -38,12 +38,24 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
   };
 
   const conditionToUpdate =
-    (userInfo && userInfo.id === comment.authorID && timePassed <= 24) ||
+    (userInfo &&
+      userInfo.role !== "noob" &&
+      userInfo.id === comment.authorID &&
+      (timePassed <= 24 || !comment.verified)) ||
+    (userInfo &&
+      userInfo.role === "noob" &&
+      userInfo.id === comment.authorID &&
+      !comment.verified) ||
     (userInfo && (userInfo.role === "admin" || userInfo.role == "moder"));
   const conditionToDelete =
     (userInfo &&
+      userInfo.role !== "noob" &&
       userInfo.id === comment.authorID &&
       (timePassed <= 1 || !comment.verified)) ||
+    (userInfo &&
+      userInfo.role === "noob" &&
+      userInfo.id === comment.authorID &&
+      !comment.verified) ||
     (userInfo && (userInfo.role === "admin" || userInfo.role == "moder"));
 
   const [isVisibleCommentUpdate, setIsVisibleCommentUpdate] = useState(false);

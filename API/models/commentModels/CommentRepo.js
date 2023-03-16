@@ -112,9 +112,25 @@ class CommentPostgressRepo {
     if (result.rows.length === 0) throw new Error();
   }
   async updateCommentVerified(commentID, verified) {
+    const date = new Date();
     const result = await db.query(
-      `UPDATE comment SET verified = $1 WHERE id = $2 RETURNING*`,
-      [verified, commentID]
+      `UPDATE comment SET verified = $1, date = $3, updated = false 
+      WHERE id = $2 RETURNING*`,
+      [verified, commentID, date]
+    );
+    console.log(result.rows);
+    if (result.rows.length === 0) throw new Error();
+  }
+  async updatePostVerified(postID, verified) {
+    const date = new Date();
+    const result = await db.query(
+      `
+    UPDATE post
+    SET verified = $2, date = $3
+    WHERE id = $1
+    RETURNING*
+    `,
+      [postID, verified, date]
     );
     if (result.rows.length === 0) throw new Error();
   }
@@ -204,7 +220,7 @@ class CommentRepo {
     if (post?.length === 0 || post?.[0]?.closed) return false;
     return true;
   }
-  async createComment(body, postID, main, userID, role) {
+  async createComment(body, postID, userID, role) {
     const newComment = {
       body,
       personID: userID,
@@ -213,7 +229,7 @@ class CommentRepo {
       updated: false,
       verified: role === "noob" ? false : true,
       fixed: false,
-      main,
+      main: false,
     };
     await this.repo.createComment(newComment);
   }
@@ -228,6 +244,9 @@ class CommentRepo {
   }
   async updateCommentVerified(commentID, verified) {
     await this.repo.updateCommentVerified(commentID, verified);
+  }
+  async updatePostVerified(postID, verified) {
+    await this.repo.updatePostVerified(postID, verified);
   }
   async updateCommentFixed(commentID, fixed) {
     await this.repo.updateCommentFixed(commentID, fixed);

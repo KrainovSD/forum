@@ -12,10 +12,11 @@ router.get(
 );
 router.get("/byID/:id", untils.noStrictCheckAuth, PostControllers.getOneByID);
 router.get("/last", PostControllers.getLastPosts);
+router.get("/access/:id", untils.checkAuth, PostControllers.getPostAccessByID);
 router.put(
   "/title",
   untils.checkAuth,
-  postValidation.update,
+  postValidation.updateTitle,
   untils.checkValidation,
   PostControllers.updatePostTitle
 );
@@ -23,7 +24,7 @@ router.put(
   "/closed",
   untils.checkAuth,
   untils.checkModer,
-  postValidation.update,
+  postValidation.updateValue,
   untils.checkValidation,
   PostControllers.updatePostClosed
 );
@@ -31,7 +32,7 @@ router.put(
   "/verified",
   untils.checkAuth,
   untils.checkModer,
-  postValidation.update,
+  postValidation.updateValue,
   untils.checkValidation,
   PostControllers.updatePostVerified
 );
@@ -39,7 +40,7 @@ router.put(
   "/fixed",
   untils.checkAuth,
   untils.checkModer,
-  postValidation.update,
+  postValidation.updateValue,
   untils.checkValidation,
   PostControllers.updatePostFixed
 );

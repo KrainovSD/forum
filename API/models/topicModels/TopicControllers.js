@@ -19,7 +19,9 @@ class TopicControllers {
   }
   async getAllForPost(req, res) {
     try {
-      const { status, message, topics } = await TopicService.getAllForPost();
+      const { status, message, topics } = await TopicService.getAllForPost(
+        req.role
+      );
       if (status !== 200) return res.status(status).json(message);
       res.status(200).json(topics);
     } catch (e) {

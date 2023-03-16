@@ -246,12 +246,12 @@ class TopicRepo {
 
     return { topics, parentInfo };
   }
-  async getAllForPost() {
+  async getAllForPost(userRole) {
     const topics = await this.repo.getAllForPost();
     if (topics.length === 0) return [];
-    return this.#recursiveCreateArray(topics, 1);
+    return this.#recursiveCreateArray(topics, 1, userRole);
   }
-  #recursiveCreateArray(topics, level, parentID = null) {
+  #recursiveCreateArray(topics, level, userRole, parentID = null) {
     const newArray = [];
     const filteredTopics = topics.filter((item) => item.level >= level);
     for (const topic of filteredTopics) {
@@ -259,9 +259,17 @@ class TopicRepo {
       const newTopic = {
         id: topic.id,
         title: topic.title,
-        access: topic.access_post,
+        access:
+          userRole === "admin" || userRole == "moder"
+            ? true
+            : topic.access_post,
         children: [
-          ...this.#recursiveCreateArray(filteredTopics, level + 1, topic.id),
+          ...this.#recursiveCreateArray(
+            filteredTopics,
+            level + 1,
+            userRole,
+            topic.id
+          ),
         ],
       };
       newArray.push(newTopic);

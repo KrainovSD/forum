@@ -1,7 +1,7 @@
 interface IPostFormValidation {
   [key: string]: any;
   title: string;
-  comment: string;
+  comment?: string;
   topicID?: string;
 }
 

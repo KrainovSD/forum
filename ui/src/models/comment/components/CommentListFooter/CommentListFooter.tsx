@@ -28,9 +28,7 @@ export const CommentListFooter: React.FC<ICommentListFooterProps> = ({
           currentPost.closed ? "_lock" : "_open"
         }`}
       >
-        {!currentPost.closed && postID && (
-          <AddComment main={false} postID={postID} />
-        )}
+        {!currentPost.closed && postID && <AddComment postID={postID} />}
         {currentPost.closed && (
           <div>
             <img src={alert} alt="" />

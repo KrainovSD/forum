@@ -16,10 +16,10 @@ class CommentService {
       return { status: 404, message: "Комментарии не найдены" };
     return { status: 200, comments, maxPage };
   }
-  async createComment(body, postID, main, userID, role) {
+  async createComment(body, postID, userID, role) {
     if (!(await CommentRepo.isHasPostAndOpen(postID)))
       return { status: 400, message: "Темы не существует или она закрыта!" };
-    await CommentRepo.createComment(body, postID, main, userID, role);
+    await CommentRepo.createComment(body, postID, userID, role);
     return { status: 200, message: "Успешно!" };
   }
   async deleteComment(commentID, userID, userRole) {
@@ -56,6 +56,9 @@ class CommentService {
     if (comment.length === 0)
       return { status: 400, message: "Комметария не существует!" };
     await CommentRepo.updateCommentVerified(commentID, verified);
+    if (comment[0].main) {
+      await CommentRepo.updatePostVerified(comment[0].post_id, verified);
+    }
     return { status: 200, message: "Успешно" };
   }
   async updateCommentFixed(commentID, fixed) {

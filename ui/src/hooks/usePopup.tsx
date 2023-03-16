@@ -1,21 +1,29 @@
 import { Popup } from "../components/Popup/Popup";
 import { CSSTransition } from "react-transition-group";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
-export const usePopup = (customCallback: () => void) => {
+type IusePopup = (customCallback?: () => void) => {
+  popup: JSX.Element;
+  setPopup: IsetPopup;
+};
+type IsetPopup = (
+  title: string,
+  body: string,
+  newCallback?: (() => void) | null
+) => void;
+
+export const usePopup: IusePopup = (customCallback = () => {}) => {
   const [isVisible, setIsVisible] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [callback, setCallback] = useState(() => customCallback);
 
-  const clearData = () => {
-    setIsVisible(false);
-    setTitle("");
-    setBody("");
-  };
-  const setPopup = (title: string, body: string) => {
+  const setPopup: IsetPopup = (title, body, newCallback = null) => {
     setIsVisible(true);
     setTitle(title);
     setBody(body);
+    if (newCallback) setCallback(() => newCallback);
+    else if (!newCallback) setCallback(() => customCallback);
   };
 
   const popup = (
@@ -30,11 +38,11 @@ export const usePopup = (customCallback: () => void) => {
         body={body}
         action={() => {
           setIsVisible(false);
-          customCallback();
+          callback();
         }}
       />
     </CSSTransition>
   );
 
-  return { setBody, setTitle, setIsVisible, popup, setPopup };
+  return { popup, setPopup };
 };

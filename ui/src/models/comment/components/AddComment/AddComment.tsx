@@ -7,16 +7,15 @@ import { useConfirm } from "../../../../hooks/useConfirm";
 import { BlackButton } from "../../../../components/UI/BlackButton/BlackButton";
 
 interface IAddCommentProps {
-  main: boolean;
   postID: string;
 }
 
-export const AddComment: React.FC<IAddCommentProps> = ({ main, postID }) => {
+export const AddComment: React.FC<IAddCommentProps> = ({ postID }) => {
   const dispatch = useAppDispatch();
   const [commentBody, setCommentBody] = useState<string>("");
 
   const addComment = () => {
-    dispatch(createComment({ body: commentBody, main, postID }));
+    dispatch(createComment({ body: commentBody, postID }));
     setCommentBody("");
   };
 

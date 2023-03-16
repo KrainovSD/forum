@@ -1,7 +1,7 @@
 import { axiosInstance } from "./../../../helpers/axiosInstance";
-import { AxiosError } from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ITopicParentInfo, ItopicType } from "./topicTypes";
+import { getRequestError } from "../../../store/helpers/getRequestError";
 
 export const getTopicByID = createAsyncThunk(
   "post/getAll",
@@ -16,13 +16,8 @@ export const getTopicByID = createAsyncThunk(
         parentInfo: response.data.parentInfo,
       };
     } catch (e) {
-      const error = e as AxiosError;
-      const message = error.response?.data || "Сервер не отвечает!";
-      const status = error.response?.status || 500;
-      return thunkApi.rejectWithValue({
-        message,
-        status,
-      });
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
     }
   }
 );

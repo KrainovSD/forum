@@ -24,11 +24,10 @@ class CommentController {
   }
   async createComment(req, res) {
     try {
-      const { body, postID, main } = req.body;
+      const { body, postID } = req.body;
       const { status, message } = await CommentService.createComment(
         body,
         postID,
-        main,
         req.userID,
         req.role
       );

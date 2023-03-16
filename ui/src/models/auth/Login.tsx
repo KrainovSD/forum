@@ -2,7 +2,7 @@ import { BlackButton } from "../../components/UI/BlackButton/BlackButton";
 import { InputTooltip } from "../../components/UI/InputTooltip/InputTooltip";
 import { NavLink, useNavigate } from "react-router-dom";
 import "./Auth.scss";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   authValidation,
   authValidationField,
@@ -11,10 +11,10 @@ import { useValidation } from "../../hooks/useValidation";
 import { Loader } from "../../components/Loader/Loader";
 import { PasswordInputTooltip } from "../../components/UI/PasswordInputTooltip/PasswordInputTooltip";
 import useFetching from "../../hooks/useFetching";
-import { IPopup, Popup } from "../../components/Popup/Popup";
 import { axiosInstance } from "../../helpers/axiosInstance";
 import { useAppDispatch } from "../../hooks/redux";
 import { authSlice } from "../../store/reducers/auth/authReducer";
+import { usePopup } from "../../hooks/usePopup";
 
 interface ILoginForm {
   [key: string]: string;
@@ -27,6 +27,8 @@ interface ILoginResponse {
 }
 
 export const Login: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [loginForm, setLoginForm] = useState<ILoginForm>({
     nickName: "",
     password: "",
@@ -35,60 +37,44 @@ export const Login: React.FC = () => {
     nickName: "",
     password: "",
   });
-
   useValidation(
     loginForm,
     errorLoginForm,
     setErrorLoginForm,
     authValidationField
   );
-  const [popupInfo, setPopupInfo] = useState<IPopup>({
-    title: "Авторизация",
-    body: "",
-    isVisible: false,
-  });
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
-  const [sendForm, isLoading, error, errorStatus] = useFetching(
-    async () => {
-      const response = await axiosInstance.post<ILoginResponse>(
-        "/api/auth/login",
-        loginForm
-      );
-      dispatch(authSlice.actions.setAuth());
-      localStorage.setItem("token", response.data.token);
-    },
-    popupInfo,
-    setPopupInfo
+  const { setPopup, popup } = usePopup(() => {});
+  const sendForm = async () => {
+    const response = await axiosInstance.post<ILoginResponse>(
+      "/api/auth/login",
+      loginForm
+    );
+    dispatch(authSlice.actions.setAuth());
+    localStorage.setItem("token", response.data.token);
+    navigate("/", {
+      replace: true,
+    });
+  };
+  const { fetching, isLoading } = useFetching(
+    sendForm,
+    setPopup,
+    "Авторизация"
   );
-
-  const sendLoginForm = () => {
+  const checkLoginForm = () => {
     if (isLoading) return;
     authValidation(loginForm, errorLoginForm, setErrorLoginForm);
     for (let field in errorLoginForm) {
       const fieldData = errorLoginForm[field];
       if (fieldData.length > 0) return;
     }
-    sendForm();
+    fetching();
   };
 
   return (
     <div className="auth__wrapper">
       {isLoading && <Loader />}
-      {popupInfo.isVisible && (
-        <Popup
-          title={popupInfo.title}
-          body={popupInfo.body}
-          action={() => {
-            if (errorStatus !== 0)
-              return setPopupInfo({ ...popupInfo, isVisible: false, body: "" });
-            navigate("/", {
-              replace: true,
-            });
-          }}
-        />
-      )}
+      {popup}
 
       <div className="auth">
         <div className="auth__contentWapper">
@@ -114,7 +100,7 @@ export const Login: React.FC = () => {
               setLoginForm({ ...loginForm, password: value })
             }
           />
-          <BlackButton onClick={() => sendLoginForm()}>Войти</BlackButton>
+          <BlackButton onClick={() => checkLoginForm()}>Войти</BlackButton>
 
           <NavLink to="/forgot" className="auth__forgot">
             Забыли пароль?

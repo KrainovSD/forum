@@ -20,7 +20,7 @@ class AuthPostgressRepo {
   async createUser(userName, nickName, email, hash, confirmEmailKey) {
     const now = new Date();
     const future = new Date();
-    future.setFullYear(future.getFullYear() - 10);
+    future.setFullYear(future.getFullYear() + 10);
     const past = new Date();
     past.setFullYear(past.getFullYear() - 10);
 
@@ -33,7 +33,7 @@ class AuthPostgressRepo {
         hash,
         now,
         confirmEmailKey,
-        future,
+        past,
         future,
         past,
         past,
@@ -109,10 +109,12 @@ class AuthRepo {
   }
   /* Регистрация */
   async isHasSimilarNickOrEmail(nickName, email) {
+    console.log(email);
     const similarNickNameAndEmail = await this.repo.getSimilarNickAndEmail(
       nickName,
       email
     );
+    console.log(similarNickNameAndEmail);
 
     if (similarNickNameAndEmail.length === 0) return { status: false };
     const firstSimilar = similarNickNameAndEmail[0];
@@ -120,7 +122,8 @@ class AuthRepo {
       ? similarNickNameAndEmail[1]
       : null;
 
-    if (!firstSimilar.confirmed) await this.deleteInActiveUser(firstSimilar.id);
+    if (!firstSimilar.confirmed)
+      await this.repo.deleteInActiveUser(firstSimilar.id);
     else {
       if (firstSimilar.email === email && firstSimilar.nick === nickName)
         return {
@@ -140,7 +143,7 @@ class AuthRepo {
     }
 
     if (secondSimilar && !secondSimilar?.confirmed)
-      await this.deleteInActiveUser(secondSimilar.id);
+      await this.repo.deleteInActiveUser(secondSimilar.id);
     else if (secondSimilar && secondSimilar?.confirmed) {
       if (secondSimilar.email === email)
         return {

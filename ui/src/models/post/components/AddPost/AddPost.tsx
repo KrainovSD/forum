@@ -1,6 +1,6 @@
 import { InputTooltip } from "../../../../components/UI/InputTooltip/InputTooltip";
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import "./AddPost.scss";
 import { CommentEditor } from "../../../../models/comment/components/CommentEditor/CommentEditor";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
@@ -9,10 +9,12 @@ import {
   postValidationField,
 } from "../../../../models/post/validation/postValidation";
 import { useValidation } from "../../../../hooks/useValidation";
-import { SelectTopic } from "../../../../components/UI/SelectTopic/SelectTopic";
+import { SelectTopic } from "../../../../components/SelectTopic/SelectTopic";
 import { BlackButton } from "../../../../components/UI/BlackButton/BlackButton";
 import { createPost } from "../../../../store/reducers/post/postActionCreator";
 import { useConfirm } from "../../../../hooks/useConfirm";
+import { usePopup } from "../../../../hooks/usePopup";
+import { useEffectOnlyUpdate } from "../../../../hooks/useResponse";
 
 interface IPostForm {
   [key: string]: string;
@@ -23,8 +25,10 @@ interface IPostForm {
 
 export const AddPost: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { topicID } = useParams();
-  const { isLoading } = useAppSelector((state) => state.post);
+  const { response, isLoading } = useAppSelector((state) => state.post);
+
   const [postForm, setPostForm] = useState<IPostForm>({
     title: "",
     comment: "",
@@ -44,20 +48,22 @@ export const AddPost: React.FC = () => {
   const setTopicID = (v: string) => {
     setPostForm({ ...postForm, topicID: v });
   };
+  const [topicTitle, setTopicTitle] = useState("");
+
   useValidation(postForm, errorPostForm, setErrorPostForm, postValidationField);
 
-  const addPost = () => {
+  const sendForm = () => {
     dispatch(
       createPost({
         title: postForm.title,
-        comment: postForm.comment,
+        body: postForm.comment,
         topicID: postForm.topicID,
       })
     );
   };
-  const { checkConfirm, confirm } = useConfirm(addPost);
+  const { checkConfirm, confirm } = useConfirm(sendForm);
 
-  const sendForm = () => {
+  const checkForm = () => {
     if (isLoading) return;
     postValidation(postForm, errorPostForm, setErrorPostForm);
     for (let field in errorPostForm) {
@@ -66,19 +72,35 @@ export const AddPost: React.FC = () => {
     }
     checkConfirm(
       "Создание новой темы",
-      "Вы уверены, что хотите создать новую тему?"
+      `Вы уверены, что хотите создать новую тему в топике ${topicTitle}?`
     );
   };
+
+  const { popup, setPopup } = usePopup(() => {
+    navigate(`/topic/${postForm.topicID}`);
+  });
+  useEffectOnlyUpdate(() => {
+    if (response.length > 0) setPopup("Создание новой темы", response);
+  }, [response]);
+
+  useEffect(() => {
+    if (postForm.topicID !== topicID) {
+      navigate(`/create/post/${postForm.topicID}`, { replace: true });
+    }
+  }, [postForm.topicID]);
 
   return (
     <div className="add-post">
       {confirm}
+      {popup}
       <div className="add-post__header">Создать новую тему</div>
       <div className="add-post__content">
         <div className="add-post__select-wrapper">
           <SelectTopic
             value={postForm.topicID}
             setValue={setTopicID}
+            title={topicTitle}
+            setTitle={setTopicTitle}
             error={errorPostForm.topicID}
           />
         </div>
@@ -98,7 +120,7 @@ export const AddPost: React.FC = () => {
         </div>
 
         <div className="add-post__button-wrapper">
-          <BlackButton onClick={sendForm}> Создать </BlackButton>
+          <BlackButton onClick={checkForm}> Создать </BlackButton>
         </div>
       </div>
     </div>

@@ -11,8 +11,8 @@ class TopicService {
       parentInfo: topicsInfo.parentInfo,
     };
   }
-  async getAllForPost() {
-    const topics = await TopicRepo.getAllForPost();
+  async getAllForPost(userRole) {
+    const topics = await TopicRepo.getAllForPost(userRole);
     if (topics.length === 0)
       return { status: 404, message: "Список топиков не найден!" };
     return { status: 200, topics };

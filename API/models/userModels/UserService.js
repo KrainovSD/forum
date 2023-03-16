@@ -66,7 +66,8 @@ class UserService {
       };
 
     const userEmail = userInfo[0].email;
-    const changeKey = await bcrypt.genSalt(saltRounds);
+    const changeKey = this.#genKey();
+
     await UserRepo.updatePasswordNote(userID, changeKey);
     await sendEmailWithLink(
       userEmail,
@@ -113,7 +114,7 @@ class UserService {
       };
 
     const userEmail = userInfo[0].email;
-    const changeKey = await bcrypt.genSalt(saltRounds);
+    const changeKey = this.#genKey();
     await UserRepo.updateEmailNote(userID, changeKey);
     await sendEmailWithLink(
       userEmail,
@@ -147,7 +148,7 @@ class UserService {
         status: 400,
         message: "Ключ не существует или истекло время операции!",
       };
-    const newKey = await bcrypt.genSalt(saltRounds);
+    const newKey = this.#genKey();
     await UserRepo.updateEmail(email, newKey, userID);
 
     await sendEmailWithLink(
@@ -223,6 +224,21 @@ class UserService {
     }
     await UserRepo.updateBackImg(file.originalname, userID);
     return { status: 200, message: "Успешно!" };
+  }
+
+  #genKey() {
+    const variables =
+      "QWERTYUIOPASDFGHJKLZXCVBNM0123456789qwertyuiopasdfghjklzxcvbnm";
+    let key = "";
+    for (let i = 1; i <= 29; i++) {
+      const index = this.#random(variables.length - 1);
+      key += variables[index];
+    }
+    return key;
+  }
+  #random(max) {
+    let rand = Math.random() * (max + 1);
+    return Math.floor(rand);
   }
 }
 

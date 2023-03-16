@@ -23,7 +23,7 @@ class AuthServise {
     if (status) return { status: 400, message };
 
     const hash = await bcrypt.hash(password, saltRounds);
-    const confirmEmailKey = await bcrypt.genSalt(saltRounds);
+    const confirmEmailKey = this.#genKey();
 
     await authRepo.createUser(userName, nickName, email, hash, confirmEmailKey);
 
@@ -121,7 +121,7 @@ class AuthServise {
       return {
         status: 400,
         message:
-          "Указанный ключ не существует или вреия проведения операции истекло!",
+          "Указанный ключ не существует или время проведения операции истекло!",
       };
     const user = userInfo[0];
 
@@ -131,7 +131,7 @@ class AuthServise {
       return {
         status: 400,
         message:
-          "Указанный ключ не существует или вреия проведения операции истекло!",
+          "Указанный ключ не существует или время проведения операции истекло!",
       };
     if (emailToConfirm === null || emailToConfirm === "")
       return {
@@ -163,6 +163,20 @@ class AuthServise {
         resolve(decoded);
       });
     });
+  }
+  #genKey() {
+    const variables =
+      "QWERTYUIOPASDFGHJKLZXCVBNM0123456789qwertyuiopasdfghjklzxcvbnm";
+    let key = "";
+    for (let i = 1; i <= 29; i++) {
+      const index = this.#random(variables.length - 1);
+      key += variables[index];
+    }
+    return key;
+  }
+  #random(max) {
+    let rand = Math.random() * (max + 1);
+    return Math.floor(rand);
   }
 }
 

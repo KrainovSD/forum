@@ -7,7 +7,6 @@ class PostController {
       const { page, filter } = req.query;
       const userID = req?.userID ? req.userID : null;
       const userRole = req?.role ? req.role : null;
-      console.log(userID);
       const { status, message, posts, maxPage } =
         await PostService.getAllByTopicID(
           topicID,
@@ -51,6 +50,21 @@ class PostController {
     } catch (e) {
       req.err = e;
       res.status(500).json();
+    }
+  }
+  async getPostAccessByID(req, res) {
+    try {
+      const { id } = req.params;
+      const { status, message, post } = await PostService.getPostAccessByID(
+        id,
+        req.userID,
+        req.role
+      );
+      if (status !== 200) return res.status(status).json(message);
+      return res.status(200).json(post);
+    } catch (e) {
+      req.err = e;
+      return res.status(500).json();
     }
   }
   async updatePostTitle(req, res) {
@@ -119,8 +133,9 @@ class PostController {
   }
   async createPost(req, res) {
     try {
-      const { title, topicID } = req.body;
+      const { title, body, topicID } = req.body;
       const { status, message } = await PostService.createPost(
+        body,
         title,
         topicID,
         req.userID,

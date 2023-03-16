@@ -15,7 +15,7 @@ interface SubMenuProps {
 
 export const SubMenu: React.FC<SubMenuProps> = ({ isVisible, setLoading }) => {
   const dispatch = useAppDispatch();
-  const [sendLogout, isLoading] = useFetching(async () => {
+  const { fetching: sendLogout, isLoading } = useFetching(async () => {
     await axiosInstanceToken.post("/api/auth/logout");
     dispatch(authSlice.actions.logout());
   });

@@ -13,6 +13,7 @@ import useFetching from "../../hooks/useFetching";
 import { axiosInstance } from "../../helpers/axiosInstance";
 import { IPopup, Popup } from "../../components/Popup/Popup";
 import { useNavigate } from "react-router-dom";
+import { usePopup } from "../../hooks/usePopup";
 
 interface RegisterForm {
   [key: string]: string;
@@ -24,6 +25,7 @@ interface RegisterForm {
 }
 
 export const Register: React.FC = () => {
+  const navigate = useNavigate();
   const [registerForm, setRegisterForm] = useState<RegisterForm>({
     userName: "",
     nickName: "",
@@ -38,7 +40,6 @@ export const Register: React.FC = () => {
     password: "",
     repeatPassword: "",
   });
-
   useValidation(
     registerForm,
     errorRegisterForm,
@@ -46,52 +47,38 @@ export const Register: React.FC = () => {
     authValidationField
   );
 
-  const [popupInfo, setPopupInfo] = useState<IPopup>({
-    title: "Регистрация",
-    body: "",
-    isVisible: false,
-  });
-  const navigate = useNavigate();
-
-  const [sendForm, isLoading, error, errorStatus] = useFetching(
-    async () => {
-      const respose = await axiosInstance.post<string>(
-        "/api/auth/register",
-        registerForm
-      );
-      const message = respose.data;
-      setPopupInfo({ ...popupInfo, isVisible: true, body: message });
-    },
-    popupInfo,
-    setPopupInfo
-  );
-
-  const sendRegisterForm = () => {
+  const { popup, setPopup } = usePopup(() => {});
+  const checkForm = () => {
     if (isLoading) return;
     authValidation(registerForm, errorRegisterForm, setErrorRegisterForm);
     for (let field in errorRegisterForm) {
       const fieldData = errorRegisterForm[field];
       if (fieldData.length > 0) return;
     }
-    sendForm();
+    fetching();
   };
+  const sendForm = async () => {
+    const respose = await axiosInstance.post<string>(
+      "/api/auth/register",
+      registerForm
+    );
+    const message = respose.data;
+    setPopup("Регистрация", message, () => {
+      navigate("/", {
+        replace: true,
+      });
+    });
+  };
+  const { fetching, isLoading, status } = useFetching(
+    sendForm,
+    setPopup,
+    "Регистрация"
+  );
 
   return (
     <div className="auth__wrapper">
       {isLoading && <Loader />}
-      {popupInfo.isVisible && (
-        <Popup
-          title={popupInfo.title}
-          body={popupInfo.body}
-          action={() => {
-            if (errorStatus !== 0)
-              return setPopupInfo({ ...popupInfo, isVisible: false, body: "" });
-            navigate("/", {
-              replace: true,
-            });
-          }}
-        />
-      )}
+      {popup}
 
       <div className="auth">
         <div className="auth__contentWapper">
@@ -140,9 +127,7 @@ export const Register: React.FC = () => {
               setRegisterForm({ ...registerForm, repeatPassword: value })
             }
           />
-          <BlackButton onClick={() => sendRegisterForm()}>
-            Регистрация
-          </BlackButton>
+          <BlackButton onClick={() => checkForm()}>Регистрация</BlackButton>
         </div>
       </div>
     </div>

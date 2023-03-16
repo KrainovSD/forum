@@ -36,7 +36,6 @@ export interface IReqGetCommentByPost {
 export interface ICreateComment {
   body: string;
   postID: string;
-  main: boolean;
 }
 
 export interface IUpdateComment {

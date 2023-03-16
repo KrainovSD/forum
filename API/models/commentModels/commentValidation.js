@@ -15,13 +15,6 @@ const create = [
     .withMessage("Поле не должно быть пустым!")
     .isNumeric()
     .withMessage("У поля неверный тип данных!"),
-  body("main")
-    .trim()
-    .not()
-    .isEmpty({ ignore_whitespace: true })
-    .withMessage("Поле не должно быть пустым!")
-    .isBoolean()
-    .withMessage("У поля неверный тип данных!"),
 ];
 const update = [
   body("body")

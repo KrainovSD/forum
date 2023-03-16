@@ -10,6 +10,7 @@ import { NavLink, useParams } from "react-router-dom";
 import { PageNavBar } from "../../models/pageNavBar/PageNavBar";
 import { typeSearch } from "../../models/pageNavBar/types";
 import { usePopup } from "../../hooks/usePopup";
+import { useEffectOnlyUpdate } from "../../hooks/useResponse";
 
 export const PostList: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -17,7 +18,9 @@ export const PostList: React.FC = () => {
     (state) => state.topic
   );
   const { isLoading: isLoadingAuth } = useAppSelector((state) => state.auth);
-  const { isLoading: isLoadingUser } = useAppSelector((state) => state.user);
+  const { isLoading: isLoadingUser, userInfo } = useAppSelector(
+    (state) => state.user
+  );
   const {
     posts,
     isSmallLoading,
@@ -56,18 +59,26 @@ export const PostList: React.FC = () => {
     if (updatedPost) getPost();
   }, [updatedPost]);
 
-  const { popup, setPopup } = usePopup(() => {});
-  useEffect(() => {
+  const { popup, setPopup } = usePopup();
+  useEffectOnlyUpdate(() => {
     if (response.length > 0) setPopup("Посты", response);
   }, [response]);
 
-  if (posts.length === 0 && !topicParentInfo?.accessPost) return <div></div>;
-  else if (posts.length === 0)
+  if (posts.length === 0)
     return (
-      <div className="post-list">
-        <div className="post-list__create-post-button">
-          <img src={messageWhite} alt="" /> <p>Создать новую тему</p>
-        </div>
+      <div>
+        {(topicParentInfo?.accessPost ||
+          userInfo?.role === "admin" ||
+          userInfo?.role === "moder") && (
+          <div className="post-list">
+            <NavLink
+              to={`/create/post/${topicID}`}
+              className="post-list__create-post-button"
+            >
+              <img src={messageWhite} alt="" /> <p>Создать новую тему</p>
+            </NavLink>
+          </div>
+        )}
       </div>
     );
 

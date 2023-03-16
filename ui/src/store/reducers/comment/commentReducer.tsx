@@ -9,6 +9,11 @@ import {
 } from "./commentCreateAction";
 import { IComment, ICommentInitialState } from "./commentTypes";
 import { IActionError } from "../../../store/types";
+import {
+  fulfilledAction,
+  pendingAction,
+  rejectedAction,
+} from "../../../store/helpers/typeActions";
 
 const initialState: ICommentInitialState = {
   comments: [],
@@ -65,29 +70,5 @@ export const CommentSlice = createSlice({
       .addCase(deleteComment.rejected, rejectedAction);
   },
 });
-
-const fulfilledAction = (
-  state: ICommentInitialState,
-  action: { payload: string }
-) => {
-  state.isLoading = false;
-  state.response = action.payload;
-  state.updated = true;
-};
-const pendingAction = (state: ICommentInitialState) => {
-  state.response = "";
-  state.isLoading = true;
-  state.statusError = 0;
-  state.updated = false;
-};
-const rejectedAction = (
-  state: ICommentInitialState,
-  action: PayloadAction<unknown>
-) => {
-  const payload = action.payload as IActionError;
-  state.isLoading = false;
-  state.statusError = payload.status;
-  state.response = payload.message;
-};
 
 export default CommentSlice.reducer;
