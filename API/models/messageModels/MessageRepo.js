@@ -139,7 +139,7 @@ class MessagePostgressRepo {
     `,
       [sessionID, members]
     );
-    console.log(result.rows);
+    if (result.rows.length === 0) throw new Error();
   }
   /* Удаление сообщения у пользователя */
   async getMessageByIDAndUserID(messageID, userID) {

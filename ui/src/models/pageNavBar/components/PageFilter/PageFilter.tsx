@@ -4,18 +4,15 @@ import checkMark from "../../../../assets/media/check-mark.png";
 import { CSSTransition } from "react-transition-group";
 import { useState } from "react";
 import { useCustomSearchParams } from "../../../../hooks/useCustomSearchParams";
-import { typePostSearch } from "../../../post/types/types";
+import { typeSearch } from "models/pageNavBar/types";
+import { IFilterOptions } from "models/pageNavBar/PageNavBar";
 
-export const PageFilter: React.FC = () => {
-  const [search, setSearch] = useCustomSearchParams() as typePostSearch;
+interface IPageFilterProps {
+  filterOptions: IFilterOptions[];
+}
 
-  const filtersOption = [
-    { tag: "last-update", caption: "Последние обновления" },
-    { tag: "title", caption: "Заголовок" },
-    { tag: "last-date-create", caption: "Дата создания" },
-    { tag: "most-view", caption: "Самые просматриваемые" },
-    { tag: "most-comment", caption: "Больше ответов" },
-  ];
+export const PageFilter: React.FC<IPageFilterProps> = ({ filterOptions }) => {
+  const [search, setSearch] = useCustomSearchParams() as typeSearch;
 
   const [isVisibleTooltip, setIsVisibleTooltip] = useState<boolean>(false);
   const toggleTooltip = () => {
@@ -40,7 +37,7 @@ export const PageFilter: React.FC = () => {
         unmountOnExit
       >
         <div className="page-nav-bar__sort-tooltip">
-          {filtersOption.map((filter) => (
+          {filterOptions.map((filter) => (
             <div
               className="page-nav-bar__sort-item"
               key={filter.tag}

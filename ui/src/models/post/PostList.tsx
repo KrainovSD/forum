@@ -64,6 +64,24 @@ export const PostList: React.FC = () => {
     if (response.length > 0) setPopup("Посты", response);
   }, [response]);
 
+  const filterOptions =
+    userInfo && (userInfo.role === "admin" || userInfo.role === "moder")
+      ? [
+          { tag: "last-update", caption: "Последние обновления" },
+          { tag: "title", caption: "Заголовок" },
+          { tag: "last-date-create", caption: "Дата создания" },
+          { tag: "most-view", caption: "Самые просматриваемые" },
+          { tag: "most-comment", caption: "Больше ответов" },
+          { tag: "no-verify", caption: "Не утвержденные" },
+        ]
+      : [
+          { tag: "last-update", caption: "Последние обновления" },
+          { tag: "title", caption: "Заголовок" },
+          { tag: "last-date-create", caption: "Дата создания" },
+          { tag: "most-view", caption: "Самые просматриваемые" },
+          { tag: "most-comment", caption: "Больше ответов" },
+        ];
+
   if (posts.length === 0)
     return (
       <div>
@@ -91,14 +109,24 @@ export const PostList: React.FC = () => {
       >
         <img src={messageWhite} alt="" /> <p>Создать новую тему</p>
       </NavLink>
-      <PageNavBar page={true} filter={true} maxPage={maxPage} />
+      <PageNavBar
+        page={true}
+        filter={true}
+        maxPage={maxPage}
+        filterOptions={filterOptions}
+      />
       <div className="post-list__wrapper">
         {!isLoadingAuth && !isLoadingUser && isSmallLoading && <SmallLoader />}
         {posts.map((post) => (
           <PostItem key={post.id} post={post} />
         ))}
       </div>
-      <PageNavBar page={true} filter={true} maxPage={maxPage} />
+      <PageNavBar
+        page={true}
+        filter={true}
+        maxPage={maxPage}
+        filterOptions={filterOptions}
+      />
     </div>
   );
 };

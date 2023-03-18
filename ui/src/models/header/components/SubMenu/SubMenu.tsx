@@ -1,12 +1,14 @@
 import out from "../../../../assets/media/out.png";
 import setting from "../../../../assets/media/setting.png";
+import moder from "../../../../assets/media/moder.png";
 import { CSSTransition } from "react-transition-group";
 import "./SubMenu.scss";
-import { useAppDispatch } from "../../../../hooks/redux";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import useFetching from "../../../../hooks/useFetching";
 import { authSlice } from "../../../../store/reducers/auth/authReducer";
 import { axiosInstanceToken } from "../../../../helpers/axiosInstanceToken";
 import { useEffect } from "react";
+import { NavLink } from "react-router-dom";
 
 interface SubMenuProps {
   isVisible: boolean;
@@ -15,6 +17,8 @@ interface SubMenuProps {
 
 export const SubMenu: React.FC<SubMenuProps> = ({ isVisible, setLoading }) => {
   const dispatch = useAppDispatch();
+  const { userInfo } = useAppSelector((state) => state.user);
+
   const { fetching: sendLogout, isLoading } = useFetching(async () => {
     await axiosInstanceToken.post("/api/auth/logout");
     dispatch(authSlice.actions.logout());
@@ -40,6 +44,13 @@ export const SubMenu: React.FC<SubMenuProps> = ({ isVisible, setLoading }) => {
           <img src={setting} alt="" />
           <p>Настройки профиля</p>
         </div>
+        {userInfo &&
+          (userInfo.role === "admin" || userInfo.role === "moder") && (
+            <NavLink to="/admin-panel" className="userBar__subMenuItem">
+              <img src={moder} alt="" />
+              <p>Панель администратора</p>
+            </NavLink>
+          )}
         <div className="userBar__subMenuItem" onClick={logout}>
           <img src={out} alt="" />
           <p>Выйти</p>

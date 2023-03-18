@@ -1,12 +1,11 @@
 import CommentRepo from "./CommentRepo.js";
 
 class CommentService {
-  async getAllByPostID(postID, page, userID, userRole) {
-    console.log(userRole);
+  async getByPostID(postID, page, userID, userRole) {
     if (userRole !== "admin" && userRole !== "moder")
       if (!(await CommentRepo.isHasPostAndVerify(postID, userID)))
         return { status: 404, message: "Комментарии не найдены!" };
-    const { comments, maxPage } = await CommentRepo.getAllByPostID(
+    const { comments, maxPage } = await CommentRepo.getByPostID(
       postID,
       page,
       userID,
@@ -14,6 +13,12 @@ class CommentService {
     );
     if (comments.length === 0 || maxPage === 0)
       return { status: 404, message: "Комментарии не найдены" };
+    return { status: 200, comments, maxPage };
+  }
+  async getAll(page, filter) {
+    const { comments, maxPage } = await CommentRepo.getAll(page, filter);
+    if (comments.length === 0)
+      return { status: 404, message: "Комментарии не найдены!" };
     return { status: 200, comments, maxPage };
   }
   async createComment(body, postID, userID, role) {

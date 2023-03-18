@@ -60,7 +60,7 @@ export const getPostByID = createAsyncThunk(
 
 export const getLastPosts = createAsyncThunk(
   "post/last",
-  async (id: string, thunkApi) => {
+  async (_, thunkApi) => {
     try {
       const response = await axiosInstance.get<ILastPost[]>(`/api/post/last`);
       return response.data;

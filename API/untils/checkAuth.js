@@ -7,14 +7,14 @@ export default async (req, res, next) => {
   try {
     const token = req.headers.authorization?.replace(/Bearer\s?/, "");
     const compare = await compareToken(token, accessTokenSecret);
-    if (!compare)
-      return res.status(401).json({ message: "Вы не авторизованы!" });
+    if (!compare) return res.status(401).json("Вы не авторизованы!");
     req.userID = compare.id;
     req.role = compare.role;
     next();
   } catch (e) {
+    req.err = e;
     console.log(e);
-    return res.status(401).json({ message: "Вы не авторизованы!" });
+    return res.status(401).json("Вы не авторизованы!");
   }
 };
 

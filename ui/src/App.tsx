@@ -3,7 +3,12 @@ import { useEffect } from "react";
 import { useRoutes } from "react-router-dom";
 import { checkAuth } from "./store/reducers/auth/authActionCreator";
 import { Header } from "./models/header/Header";
-import { privateRoutes, publicRoutes, moderRoutes } from "./routes/routes";
+import {
+  privateRoutes,
+  publicRoutes,
+  moderRoutes,
+  adminRoutes,
+} from "./routes/routes";
 import { Loader } from "./components/Loader/Loader";
 import { getMyUserInfo } from "./store/reducers/user/userActionCreator";
 import { userSlice } from "./store/reducers/user/userReducer";
@@ -37,7 +42,9 @@ export const App: React.FC = () => {
 
   const route = auth
     ? userInfo && (userInfo.role === "moder" || userInfo.role === "admin")
-      ? moderRoutes
+      ? userInfo.role === "moder"
+        ? moderRoutes
+        : adminRoutes
       : privateRoutes
     : publicRoutes;
   const routes = useRoutes(route);

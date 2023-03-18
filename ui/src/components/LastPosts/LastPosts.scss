@@ -5,4 +5,22 @@
   border: 1px solid rgba(102, 102, 102, 0.315);
   border-radius: 3px;
   box-shadow: rgb(0 0 0 / 10%) 3px 3px 3px;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+
+  &__header {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    & > img {
+      width: 14px;
+      height: 14px;
+      margin-right: 8px;
+    }
+  }
+  &__content {
+  }
 }

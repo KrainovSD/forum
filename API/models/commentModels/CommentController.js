@@ -1,7 +1,7 @@
 import CommentService from "./CommentService.js";
 
 class CommentController {
-  async getAllByPostID(req, res) {
+  async getByPostID(req, res) {
     try {
       const { id } = req.params;
       const { page } = req.query;
@@ -9,11 +9,21 @@ class CommentController {
       const userRole = req?.role || null;
 
       const { status, message, comments, maxPage } =
-        await CommentService.getAllByPostID(
-          id,
+        await CommentService.getByPostID(id, page ? page : 1, userID, userRole);
+      if (status !== 200) return res.status(status).json(message);
+      return res.status(200).json({ comments, maxPage });
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
+    }
+  }
+  async getAll(req, res) {
+    try {
+      const { page, filter } = req.query;
+      const { status, message, comments, maxPage } =
+        await CommentService.getAll(
           page ? page : 1,
-          userID,
-          userRole
+          filter ? filter : "last-date-create"
         );
       if (status !== 200) return res.status(status).json(message);
       return res.status(200).json({ comments, maxPage });

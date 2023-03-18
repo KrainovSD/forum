@@ -8,49 +8,72 @@ import { TopicPage } from "../pages/TopicPage";
 import { PostPage } from "../pages/PostPage";
 import { AddPostPage } from "../pages/AddPostPage";
 import { UpdatePostPage } from "../pages/UpdatePostPage";
+import { AddTopicPage } from "../pages/AddTopicPage";
+import { UpdateTopicPage } from "../pages/UpdateTopicPage";
+import { AdminPanelPage } from "../pages/AdminPanelPage";
+import { AdminPanelCommentList } from "../models/adminPanel/components/AdminPanelCommentsList/AdminPanelCommentList";
+import { AdminPanelPostList } from "../models/adminPanel/components/AdminPanelPostList/AdminPanelPostList";
 
-export const publicRoutes = [
+const commonRoutes = [
   { path: "/", element: <MainPage /> },
   { path: "/profile/:id", element: <ProfilePage /> },
-  { path: "/login", element: <LoginPage /> },
-  { path: "/register", element: <RegisterPage /> },
   { path: "/confirm/:key", element: <ConfirmPage /> },
 
   { path: "/topic/:id", element: <TopicPage /> },
   { path: "/post/:id", element: <PostPage /> },
 
-  { path: "/update/post/:postID", element: <UpdatePostPage /> },
   { path: "*", element: <Navigate to={"/"} replace /> },
+];
+const privateCommonRoutes = [
+  { path: "/create/post?/:topicID", element: <AddPostPage /> },
+  { path: "/update/post/:postID", element: <UpdatePostPage /> },
+];
+
+export const publicRoutes = [
+  { path: "/login", element: <LoginPage /> },
+  { path: "/register", element: <RegisterPage /> },
+
+  {
+    path: "/admin-panel",
+    element: <AdminPanelPage />,
+    children: [{ path: "comments", element: <AdminPanelCommentList /> }],
+  },
+
+  ...commonRoutes,
 ];
 
 export const privateRoutes = [
-  { path: "/", element: <MainPage /> },
-  { path: "/profile/:id", element: <ProfilePage /> },
-  { path: "/confirm/:key", element: <ConfirmPage /> },
-
-  { path: "/topic/:id", element: <TopicPage /> },
-  { path: "/post/:id", element: <PostPage /> },
-
-  { path: "/create/post", element: <AddPostPage /> },
-  { path: "/create/post/:topicID", element: <AddPostPage /> },
-
-  { path: "/update/post/:postID", element: <UpdatePostPage /> },
-
-  { path: "*", element: <Navigate to={"/"} replace /> },
+  {
+    path: "/admin-panel",
+    element: <AdminPanelPage />,
+    children: [{ path: "comments", element: <AdminPanelCommentList /> }],
+  },
+  ...privateCommonRoutes,
+  ...commonRoutes,
 ];
 
 export const moderRoutes = [
-  { path: "/", element: <MainPage /> },
-  { path: "/profile/:id", element: <ProfilePage /> },
-  { path: "/confirm/:key", element: <ConfirmPage /> },
+  {
+    path: "/admin-panel",
+    element: <AdminPanelPage />,
+    children: [{ path: "comments", element: <AdminPanelCommentList /> }],
+  },
+  ...privateCommonRoutes,
+  ...commonRoutes,
+];
 
-  { path: "/topic/:id", element: <TopicPage /> },
-  { path: "/post/:id", element: <PostPage /> },
+export const adminRoutes = [
+  { path: "/create/topic?/:topicID", element: <AddTopicPage /> },
+  { path: "/update/topic/:topicID", element: <UpdateTopicPage /> },
 
-  { path: "/create/post", element: <AddPostPage /> },
-  { path: "/create/post/:topicID", element: <AddPostPage /> },
-
-  { path: "/update/post/:postID", element: <UpdatePostPage /> },
-
-  { path: "*", element: <Navigate to={"/"} replace /> },
+  {
+    path: "/admin-panel",
+    element: <AdminPanelPage />,
+    children: [
+      { path: "comments", element: <AdminPanelCommentList /> },
+      { path: "posts", element: <AdminPanelPostList /> },
+    ],
+  },
+  ...privateCommonRoutes,
+  ...commonRoutes,
 ];

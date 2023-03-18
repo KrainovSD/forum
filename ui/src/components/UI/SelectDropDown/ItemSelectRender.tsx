@@ -37,14 +37,6 @@ export const ItemSelectRender: React.FC<IItemSelectRenderProps> = ({
     setRenderArray([...oldArray]);
   };
 
-  const { userInfo } = useAppSelector((state) => state.user);
-  const conditionToSelectItem = (item: IRenderItemArray) => {
-    return (
-      item.access ||
-      (userInfo && (userInfo.role === "admin" || userInfo.role === "moder"))
-    );
-  };
-
   return (
     <div>
       {renderArray.map((item, index) => (
@@ -71,11 +63,11 @@ export const ItemSelectRender: React.FC<IItemSelectRenderProps> = ({
                   {item.title}
                 </p>
               </div>
-              {conditionToSelectItem(item) && (
+              {item.access && (
                 <span
                   className="_select"
                   onClick={() => {
-                    value == item.id ? setValue("") : setValue(item.id);
+                    value == item.id ? setValue("") : setValue(`${item.id}`);
                   }}
                 >
                   Выбрать

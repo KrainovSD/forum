@@ -63,11 +63,15 @@ export const CommentList: React.FC = () => {
     <div className="comment-list">
       {popup}
       {!isLoadingAuth && !isLoadingUser && isSmallLoading && <SmallLoader />}
+
       <PageNavBar page={true} maxPage={maxPage} />
+
       {comments.map((comment) => (
         <CommentItem comment={comment} key={comment.id} />
       ))}
+
       <PageNavBar page={true} maxPage={maxPage} />
+
       {userInfo && postID && (
         <CommentListFooter userInfo={userInfo} postID={postID} />
       )}

@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   createComment,
   deleteComment,
+  getAllComments,
   getCommentByPostID,
   updateComment,
   updateCommentFixed,
@@ -45,6 +46,27 @@ export const CommentSlice = createSlice({
         state.statusError = 0;
       })
       .addCase(getCommentByPostID.rejected, (state, action) => {
+        const payload = action.payload as IActionError;
+
+        state.comments = [];
+        state.maxPage = 0;
+        state.isSmallLoading = false;
+        state.error = payload.message;
+        state.statusError = payload.status;
+      })
+      .addCase(getAllComments.fulfilled, (state, action) => {
+        state.comments = action.payload.comments;
+        state.maxPage = action.payload.maxPage;
+        state.isSmallLoading = false;
+      })
+      .addCase(getAllComments.pending, (state) => {
+        state.isSmallLoading = true;
+        state.error = "";
+        state.response = "";
+        state.updated = false;
+        state.statusError = 0;
+      })
+      .addCase(getAllComments.rejected, (state, action) => {
         const payload = action.payload as IActionError;
 
         state.comments = [];

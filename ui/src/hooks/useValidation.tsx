@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 interface form {
-  [key: string]: string;
+  [key: string]: any;
 }
 
 export const useValidation = (
@@ -20,7 +20,7 @@ export const useValidation = (
     useEffect(() => {
       const field = key;
       const fieldData = form[key];
-      if (error[key].length > 0)
+      if (key in error && error[key]?.length > 0)
         validation(field, fieldData, error, setError, form);
     }, [form[key]]);
   }

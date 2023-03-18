@@ -167,7 +167,6 @@ class UserPosgressRepo {
   async updatePasswordNote(userID, changeKey) {
     const time = new Date();
     time.setMinutes(time.getMinutes() + 5);
-    console.log(time);
     const result = await db.query(
       `
     UPDATE person
@@ -182,7 +181,6 @@ class UserPosgressRepo {
   async updateEmailNote(userID, changeKey) {
     const time = new Date();
     time.setMinutes(time.getMinutes() + 5);
-    console.log(time);
     const result = await db.query(
       `
     UPDATE person
@@ -212,7 +210,6 @@ class UserPosgressRepo {
   async updateEmail(email, key, userID) {
     const time = new Date();
     time.setMinutes(time.getMinutes() + 5);
-    console.log(time);
     const result = await db.query(
       `
      UPDATE person 

@@ -20,7 +20,7 @@ export interface ILastPost {
   authorNickName: string;
   topicID: string;
   topicTitle: string;
-  countComent: string;
+  countComment: string;
 }
 
 export interface IPostsTypes {

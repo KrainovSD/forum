@@ -2,11 +2,12 @@ import "./SelectDropDown.scss";
 import arrowDown from "../../../assets/media/down.png";
 import { CSSTransition } from "react-transition-group";
 import { ItemSelectRender } from "../SelectDropDown/ItemSelectRender";
-import { usePopup } from "../../../hooks/usePopup";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useAppSelector } from "../../../hooks/redux";
 
 interface ISelectDropDownProps {
-  error: string;
+  error?: string;
+  forbiddenValue?: string[];
   value: string;
   items: IItemSelect[];
   setValue: (v: string) => void;
@@ -37,7 +38,9 @@ export const SelectDropDown: React.FC<ISelectDropDownProps> = ({
   error,
   title,
   setTitle,
+  forbiddenValue,
 }) => {
+  const { userInfo } = useAppSelector((state) => state.user);
   /* Переключение открывающегося меню */
   const [isVisibleSubMenu, setIsVisibleSubMenu] = useState(false);
   const toggleVisible = () => {
@@ -45,6 +48,15 @@ export const SelectDropDown: React.FC<ISelectDropDownProps> = ({
     setIsVisibleSubMenu(visible);
   };
   /* Обработка массива */
+  const conditionToAccess = (item: IItemSelect) => {
+    if (forbiddenValue && forbiddenValue.includes(item.id)) return false;
+    if (
+      item.access ||
+      (userInfo && (userInfo.role === "admin" || userInfo.role === "moder"))
+    )
+      return true;
+    return false;
+  };
   const recursiveGetItem = (
     array: IItemSelect[],
     preferLevel: number,
@@ -54,11 +66,12 @@ export const SelectDropDown: React.FC<ISelectDropDownProps> = ({
     const level = preferLevel + 1;
 
     for (const item of array) {
+      const access = conditionToAccess(item);
       const newItem: IRenderItemArray = {
         id: item.id,
         parent: parentID,
         open: false,
-        access: item.access,
+        access,
         level,
         title: item.title,
         children: item.children.length > 0,
@@ -74,6 +87,13 @@ export const SelectDropDown: React.FC<ISelectDropDownProps> = ({
     return newArray;
   };
   const [renderArray, setRenderArray] = useState<IRenderItemArray[]>([]);
+  const titleList = useMemo(() => {
+    const list = [];
+    for (const item of renderArray) {
+      list.push(item.title);
+    }
+    return list;
+  }, [renderArray]);
   useEffect(() => {
     if (items.length > 0) {
       setRenderArray(recursiveGetItem(items, 0));
@@ -103,7 +123,6 @@ export const SelectDropDown: React.FC<ISelectDropDownProps> = ({
     setRenderArray([...oldArray]);
   };
   const openSelectedItem = (id: string) => {
-    console.log(id);
     if (id === "") return;
     const index = renderArray.findIndex((item) => item.id == id);
     if (index === -1) return;
@@ -113,7 +132,7 @@ export const SelectDropDown: React.FC<ISelectDropDownProps> = ({
   };
 
   useEffect(() => {
-    if (renderArray.length > 0 && title === "" && value !== "") {
+    if (renderArray.length > 0 && !titleList.includes(title) && value !== "") {
       setInfoByID(value);
       openSelectedItem(value);
     }
@@ -131,8 +150,9 @@ export const SelectDropDown: React.FC<ISelectDropDownProps> = ({
           }`}
         >
           {title !== "" && title}
-          {title === "" && error.length === 0 && "Выбрать"}
-          {title === "" && error.length > 0 && error}
+          {title === "" && error && error.length === 0 && "Выбрать"}
+          {title === "" && error && error.length > 0 && error}
+          {title === "" && !error && "Главная"}
         </p>
         <img src={arrowDown} alt="" />
       </div>

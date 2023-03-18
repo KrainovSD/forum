@@ -5,6 +5,7 @@ import { axiosInstanceNoStrictToken } from "../../../helpers/axiosInstanceNoStri
 import {
   IComment,
   ICreateComment,
+  IGetAllComments,
   IReqGetCommentByPost,
   IUpdateComment,
   IUpdateCommentFixed,
@@ -22,6 +23,26 @@ export const getCommentByPostID = createAsyncThunk(
       }>(`/api/comment/byPost/${req.id}`, {
         params: {
           page: req.page,
+        },
+      });
+      return response.data;
+    } catch (e) {
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
+    }
+  }
+);
+export const getAllComments = createAsyncThunk(
+  "comment/all",
+  async (req: IGetAllComments, thunkApi) => {
+    try {
+      const response = await axiosInstanceToken.get<{
+        maxPage: number;
+        comments: IComment[];
+      }>(`/api/comment/all`, {
+        params: {
+          page: req.page,
+          filter: req.filter,
         },
       });
       return response.data;

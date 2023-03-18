@@ -2,6 +2,8 @@ export interface ITopicInitialState {
   topics: ItopicType[];
   parentInfo: ITopicParentInfo | null;
   isLoading: boolean;
+  updated: boolean;
+  response: string;
   error: string;
   statusError: number;
 }
@@ -32,4 +34,20 @@ export interface ITopicLastCommentType {
 interface IsubTitleListType {
   id: string;
   title: string;
+}
+
+export interface IUpdateTopic {
+  title: string;
+  access: boolean;
+  parentID: string | null;
+  topicID: string;
+}
+export interface IUpdateAccessTopic {
+  topicID: string;
+  value: boolean;
+}
+export interface IAddTopic {
+  title: string;
+  access: boolean;
+  parentID: string | null;
 }

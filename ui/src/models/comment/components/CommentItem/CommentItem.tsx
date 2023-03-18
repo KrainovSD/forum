@@ -73,7 +73,7 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
   };
 
   return (
-    <div className="comment-item" id={`${comment.id}`}>
+    <div className="comment-item" id={`comment#${comment.id}`}>
       {!comment.verified && !isVisibleCommentUpdate && (
         <div className="comment-item__no-verify"></div>
       )}

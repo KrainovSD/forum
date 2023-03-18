@@ -5,21 +5,22 @@ import untils from "../../untils/index.js";
 import TopicControllers from "./TopicControllers.js";
 import topicValidation from "./topicValidation.js";
 
-router.get("/getChildren/:id", TopicControllers.getAllByID);
-router.get("/access", untils.checkAuth, TopicControllers.getAllForPost);
+router.get("/children/:id", TopicControllers.getChildren);
+router.get("/AllChildren/:id", TopicControllers.getAllChildren);
+router.get("/access", untils.checkAuth, TopicControllers.getAll);
 router.put(
-  "/title",
+  "/",
   untils.checkAuth,
   untils.checkAdmin,
   topicValidation.update,
   untils.checkValidation,
-  TopicControllers.updateTopicTitle
+  TopicControllers.updateTopic
 );
 router.put(
   "/access",
   untils.checkAuth,
   untils.checkAdmin,
-  topicValidation.update,
+  topicValidation.updateValue,
   untils.checkValidation,
   TopicControllers.updateTopicAccess
 );

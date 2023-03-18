@@ -1,0 +1,24 @@
+.topic-admin-panel {
+  display: flex;
+  text-align: center;
+  padding: 10px 0px;
+  background-color: #cdcdcd;
+  box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 3px;
+  margin-top: 20px;
+  justify-content: center;
+  color: black;
+  font-size: 14px;
+  font-weight: 400;
+
+  &__item {
+    display: flex;
+    border-left: 1px solid rgba(134, 133, 133, 0.337254902);
+    padding: 0 5px;
+    cursor: pointer;
+    align-items: center;
+    & > input {
+      margin-left: 5px;
+      cursor: pointer;
+    }
+  }
+}

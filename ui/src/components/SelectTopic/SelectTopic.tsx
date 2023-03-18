@@ -16,7 +16,8 @@ interface ISelectTopicProps {
   setValue: (v: string) => void;
   title: string;
   setTitle: (v: string) => void;
-  error: string;
+  forbiddenValue?: string[];
+  error?: string;
 }
 
 export const SelectTopic: React.FC<ISelectTopicProps> = ({
@@ -25,6 +26,7 @@ export const SelectTopic: React.FC<ISelectTopicProps> = ({
   title,
   setTitle,
   error,
+  forbiddenValue,
 }) => {
   const navigator = useNavigate();
   const [items, setItems] = useState<IItemSelect[]>([]);
@@ -46,7 +48,6 @@ export const SelectTopic: React.FC<ISelectTopicProps> = ({
   useEffect(() => {
     fetching();
   }, []);
-
   return (
     <div>
       {popup}
@@ -58,6 +59,7 @@ export const SelectTopic: React.FC<ISelectTopicProps> = ({
         setTitle={setTitle}
         items={items}
         error={error}
+        forbiddenValue={forbiddenValue}
       />
     </div>
   );

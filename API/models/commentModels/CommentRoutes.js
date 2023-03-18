@@ -8,7 +8,13 @@ import commentValidation from "./commentValidation.js";
 routes.get(
   "/byPost/:id",
   untils.noStrictCheckAuth,
-  CommentController.getAllByPostID
+  CommentController.getByPostID
+);
+routes.get(
+  "/all",
+  untils.checkAuth,
+  untils.checkModer,
+  CommentController.getAll
 );
 routes.post(
   "/",

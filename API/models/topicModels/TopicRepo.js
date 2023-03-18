@@ -2,7 +2,7 @@ import db from "../../db.js";
 
 class TopicPostgressRepo {
   /* Отображение топиков */
-  async getAllTopicsByParentID(parentID) {
+  async getTopicsByParentID(parentID) {
     let allTopics;
     if (parentID === "null")
       allTopics = await db.query("select * from topic WHERE parent_id is NULL");
@@ -13,7 +13,7 @@ class TopicPostgressRepo {
 
     return allTopics.rows;
   }
-  async getChildTopics(parentID) {
+  async getChildren(parentID) {
     let childTopics;
     if (parentID === "null")
       childTopics = await db.query(`
@@ -65,13 +65,23 @@ class TopicPostgressRepo {
       );
     return childTopics.rows;
   }
-  async getParentTopic(parentID) {
-    const parentTopic = await db.query("SELECT * FROM topic WHERE id = $1", [
-      parentID,
-    ]);
-    return parentTopic.rows;
+  async getAllChildren(topicID) {
+    const children = await db.query(
+      `
+    WITH RECURSIVE temp1 ( "id","parent_id","title", "access_post") 
+    AS (SELECT T1."id",T1."parent_id", T1."title", T1."access_post"
+        FROM topic T1 WHERE parent_id = $1
+    union
+    select T2."id", T2."parent_id", T2."title", T2."access_post"
+        FROM topic T2 INNER JOIN temp1 ON( temp1."id"= T2."parent_id"))
+		
+    SELECT * FROM temp1
+    `,
+      [topicID]
+    );
+    return children.rows;
   }
-  async getAllForPost() {
+  async getAll() {
     const topics =
       await db.query(`WITH RECURSIVE temp1 ( "id","parent_id","title", "access_post", LEAD, LEVEL) 
     AS (SELECT T1."id",T1."parent_id", T1."title", T1."access_post",
@@ -87,20 +97,26 @@ class TopicPostgressRepo {
   }
   /* Обновление топиков */
   async getTopicByID(topicID) {
-    const topic = await db.query(`SELECT * FROM topic WHERE id = $1`, [
-      topicID,
-    ]);
+    const topic = await db.query(
+      `
+    SELECT t1.*, t2.title as parent_title
+    FROM topic as t1
+    LEFT JOIN topic as t2 ON t1.parent_id = t2.id
+    WHERE t1.id = $1
+    `,
+      [topicID]
+    );
     return topic.rows;
   }
-  async updateTopicTitle(topicID, title) {
+  async updateTopic(topicID, title, access, parentID) {
     const result = await db.query(
       `
     UPDATE topic
-    SET title = $2
+    SET title = $2, access_post = $3, parent_id = $4
     WHERE id = $1
     RETURNING*
     `,
-      [topicID, title]
+      [topicID, title, access, parentID]
     );
     if (result.rows.length === 0) throw new Error();
   }
@@ -188,7 +204,7 @@ class TopicRepo {
   /* Отображение топиков */
   async #getParentTopic(parentID) {
     if (parentID === "null") return null;
-    const parentTopic = await this.repo.getParentTopic(parentID);
+    const parentTopic = await this.repo.getTopicByID(parentID);
     if (parentTopic.length === 0) throw new Error();
     return {
       id: parentTopic[0].id,
@@ -196,9 +212,9 @@ class TopicRepo {
       accessPost: parentTopic[0].access_post,
     };
   }
-  async getAllByID(parentID) {
-    const allTopics = await this.repo.getAllTopicsByParentID(parentID);
-    const getChildTopics = await this.repo.getChildTopics(parentID);
+  async getChildren(parentID) {
+    const allTopics = await this.repo.getTopicsByParentID(parentID);
+    const getChildTopics = await this.repo.getChildren(parentID);
     const parentInfo = await this.#getParentTopic(parentID);
 
     const topics = [];
@@ -246,8 +262,31 @@ class TopicRepo {
 
     return { topics, parentInfo };
   }
-  async getAllForPost(userRole) {
-    const topics = await this.repo.getAllForPost();
+  async getAllChildren(topicID) {
+    const topicInfo = await this.getTopicByID(topicID);
+    const childrenInfo = await this.repo.getAllChildren(topicID);
+    if (topicInfo.length === 0) return { topic: null, children: [] };
+
+    const parentTitle = topicInfo[0].parent_title
+      ? topicInfo[0].parent_title
+      : "Главная страница";
+    const topic = {
+      id: topicInfo[0].id,
+      title: topicInfo[0].title,
+      access: topicInfo[0].access_post,
+      parentID: topicInfo[0].parent_id,
+      parentTitle,
+    };
+    const children = [];
+    for (const child of childrenInfo) {
+      children.push(child.id);
+    }
+    children.push(topic.id);
+
+    return { topic, children };
+  }
+  async getAll(userRole) {
+    const topics = await this.repo.getAll();
     if (topics.length === 0) return [];
     return this.#recursiveCreateArray(topics, 1, userRole);
   }
@@ -281,8 +320,8 @@ class TopicRepo {
     const topic = await this.repo.getTopicByID(topicID);
     return topic;
   }
-  async updateTopicTitle(topicID, title) {
-    await this.repo.updateTopicTitle(topicID, title);
+  async updateTopic(topicID, title, access, parentID) {
+    await this.repo.updateTopic(topicID, title, access, parentID);
   }
   async updateTopicAccess(topicID, value) {
     await this.repo.updateTopicAccess(topicID, value);

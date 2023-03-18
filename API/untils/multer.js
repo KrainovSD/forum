@@ -24,7 +24,6 @@ const storageConfig = multer.diskStorage({
       cb(null, dir);
     } catch (e) {
       console.error(e);
-      console.log("there");
     }
   },
   filename: (req, file, cb) => {

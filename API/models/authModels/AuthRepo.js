@@ -109,12 +109,10 @@ class AuthRepo {
   }
   /* Регистрация */
   async isHasSimilarNickOrEmail(nickName, email) {
-    console.log(email);
     const similarNickNameAndEmail = await this.repo.getSimilarNickAndEmail(
       nickName,
       email
     );
-    console.log(similarNickNameAndEmail);
 
     if (similarNickNameAndEmail.length === 0) return { status: false };
     const firstSimilar = similarNickNameAndEmail[0];

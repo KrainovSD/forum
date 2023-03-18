@@ -1,10 +1,10 @@
 import TopicService from "./TopicService.js";
 
 class TopicControllers {
-  async getAllByID(req, res) {
+  async getChildren(req, res) {
     try {
-      const { id } = req.params;
-      const result = await TopicService.getAllByID(id);
+      const { id: topicID } = req.params;
+      const result = await TopicService.getChildren(topicID);
       if (result.status !== 200)
         return res.status(result.status).json(result.message || "");
 
@@ -17,11 +17,21 @@ class TopicControllers {
       return res.status(500).json();
     }
   }
-  async getAllForPost(req, res) {
+  async getAllChildren(req, res) {
     try {
-      const { status, message, topics } = await TopicService.getAllForPost(
-        req.role
-      );
+      const { id: topicID } = req.params;
+      const { status, message, topic, children } =
+        await TopicService.getAllChildren(topicID);
+      if (status !== 200) return req.status(status).json(message);
+      res.status(200).json({ topic, children });
+    } catch (e) {
+      req.err = e;
+      return res.status(500).json();
+    }
+  }
+  async getAll(req, res) {
+    try {
+      const { status, message, topics } = await TopicService.getAll(req.role);
       if (status !== 200) return res.status(status).json(message);
       res.status(200).json(topics);
     } catch (e) {
@@ -29,12 +39,14 @@ class TopicControllers {
       res.status(500).json();
     }
   }
-  async updateTopicTitle(req, res) {
+  async updateTopic(req, res) {
     try {
-      const { topicID, title } = req.body;
-      const { status, message } = await TopicService.updateTopicTitle(
+      const { topicID, title, access, parentID } = req.body;
+      const { status, message } = await TopicService.updateTopic(
         topicID,
-        title
+        title,
+        access,
+        parentID
       );
       return res.status(status).json(message);
     } catch (e) {
@@ -58,6 +70,7 @@ class TopicControllers {
   async createTopic(req, res) {
     try {
       const { title, access, parentID } = req.body;
+
       const { status, message } = await TopicService.createTopic(
         title,
         access,

@@ -288,7 +288,7 @@ class PostRepo {
       userID,
       userRole
     );
-    console.log(sortedPostsInfo);
+
     const posts = [];
 
     for (const sortedPostInfo of sortedPostsInfo) {

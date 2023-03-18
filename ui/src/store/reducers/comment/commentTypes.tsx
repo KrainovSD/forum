@@ -26,11 +26,19 @@ export interface IComment {
   verified: boolean;
   fixed: boolean;
   likes: string[];
+  countLikes: number;
+  postID: string;
+  postTitle: string;
 }
 
 export interface IReqGetCommentByPost {
   page: string;
   id: string;
+}
+
+export interface IGetAllComments {
+  page: string;
+  filter: string;
 }
 
 export interface ICreateComment {

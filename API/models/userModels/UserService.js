@@ -23,7 +23,6 @@ class UserService {
       userID,
       page
     );
-    console.log(userComments);
     if (userComments.length === 0)
       return { status: 404, message: "Сообщения пользователя не найдены!" };
     return { status: 200, userComments, maxPage };
