@@ -1,14 +1,16 @@
 import PostRepo from "./PostRepo.js";
+import CommentService from "../commentModels/CommentService.js";
+
 class PostService {
-  async getAllByTopicID(topicID, page, filter, userID, userRole) {
-    const { posts, maxPage } = await PostRepo.getAllByTopicID(
+  async getByTopicID(topicID, page, filter, userID, userRole) {
+    const { posts, maxPage } = await PostRepo.getByTopicID(
       topicID,
       page,
       filter,
       userID,
       userRole
     );
-    if ((posts.length === 0 && maxPage == 0) || maxPage < page)
+    if (posts.length === 0)
       return { status: 404, message: "Посты не найдены!" };
     return { status: 200, posts, maxPage };
   }
@@ -22,6 +24,12 @@ class PostService {
     if (posts.length === 0)
       return { status: 404, message: "Посты не найдены!" };
     return { status: 200, posts };
+  }
+  async getAll(page, filter) {
+    const { posts, maxPage } = await PostRepo.getAll(page, filter);
+    if (posts.length === 0)
+      return { status: 404, message: "Посты не найдены!" };
+    return { status: 200, posts, maxPage };
   }
   async getPostAccessByID(postID, userID, userRole) {
     const post = await PostRepo.getPostByID(postID);
@@ -58,12 +66,20 @@ class PostService {
     await PostRepo.updatePostClosed(postID, value);
     return { status: 200, message: "Успешно!" };
   }
+
   async updatePostVerified(postID, value) {
     const post = await PostRepo.getPostByID(postID);
-    const mainComment = PostRepo.getMainCommentByPostID(postID);
-    if (post.length === 0 || mainComment.length === 0)
+    if (post.length === 0) throw new Error();
+    await PostRepo.updatePostVerified(postID, value);
+    return { status: 200, message: "Успешно!" };
+  }
+  async updatePostVerifiedWithComment(postID, value) {
+    const post = await PostRepo.getPostByID(postID);
+    const mainComment = await PostRepo.getMainCommentByPostID(postID);
+    if (post.length === 0 || mainComment === 0)
       return { status: 400, message: "Поста не существует!" };
     await PostRepo.updatePostVerified(postID, value);
+    await CommentService.updateCommentVerified(mainComment[0].id, value);
     return { status: 200, message: "Успешно!" };
   }
   async updatePostFixed(postID, value) {

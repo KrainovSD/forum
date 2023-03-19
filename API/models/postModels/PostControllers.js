@@ -1,17 +1,17 @@
 import PostService from "./PostService.js";
 
 class PostController {
-  async getAllByTopicID(req, res) {
+  async getByTopicID(req, res) {
     try {
       const { topicID } = req.params;
       const { page, filter } = req.query;
       const userID = req?.userID ? req.userID : null;
       const userRole = req?.role ? req.role : null;
       const { status, message, posts, maxPage } =
-        await PostService.getAllByTopicID(
+        await PostService.getByTopicID(
           topicID,
-          page,
-          filter,
+          page ? page : 1,
+          filter ? filter : "last-date-create",
           userID,
           userRole
         );
@@ -50,6 +50,20 @@ class PostController {
     } catch (e) {
       req.err = e;
       res.status(500).json();
+    }
+  }
+  async getAll(req, res) {
+    try {
+      const { page, filter } = req.query;
+      const { status, message, posts, maxPage } = await PostService.getAll(
+        page ? page : 1,
+        filter ? filter : "last-date-create"
+      );
+      if (status !== 200) return res.status(status).json(message);
+      return res.status(200).json({ maxPage, posts });
+    } catch (e) {
+      req.err = e;
+      return res.status(500).json();
     }
   }
   async getPostAccessByID(req, res) {
@@ -98,10 +112,8 @@ class PostController {
   async updatePostVerified(req, res) {
     try {
       const { postID, value } = req.body;
-      const { status, message } = await PostService.updatePostVerified(
-        postID,
-        value
-      );
+      const { status, message } =
+        await PostService.updatePostVerifiedWithComment(postID, value);
       return res.status(status).json(message);
     } catch (e) {
       req.err = e;

@@ -1,9 +1,9 @@
 import db from "../../db.js";
-const COUNT_POST_PER_PAGE = 3;
+import { COUNT_POST_PER_PAGE } from "../../const.js";
 
 class PostPostgressRepo {
   /* Отображение постов в топике */
-  async getAllPostByTopicID(topicID, userID, userRole) {
+  async getByTopicID(topicID, userID, userRole) {
     const condition = userID
       ? userRole === "admin" || userRole === "moder"
         ? `(verified = true OR verified = false)`
@@ -90,6 +90,9 @@ class PostPostgressRepo {
       case "most-comment": {
         return "temp4.count_comment DESC, temp1.date DESC";
       }
+      case "no-verify": {
+        return "temp1.verified, temp1.date DESC";
+      }
       default: {
         return "temp1.date DESC";
       }
@@ -144,6 +147,64 @@ class PostPostgressRepo {
 
     return posts.rows;
   }
+  /* Отображение всех доступных постов */
+  async getAll() {
+    const posts = await db.query(`SELECT * FROM post`);
+    return posts.rows;
+  }
+  async getAllSorted(offset, filter) {
+    const filterString = this.#getSortedPostQuery(filter);
+    const posts = await db.query(
+      `
+    WITH 
+    temp1 ("post_id", "parent_id", "title", "fixed", "closed", "verified",  "date", 
+           "author_post_id", "author_post_nick_name") 
+      as (
+      SELECT post.id, post.topic_id, post.title, post.fixed, post.closed, post.verified, 
+        post.date, person.id, person.nick
+      FROM post
+      LEFT JOIN person ON post.person_id  = person.id
+      ),
+    temp2 ("post_id", "count_view")
+      as (
+      SELECT post.id, count(viewed_post.id)
+      FROM post
+      LEFT JOIN viewed_post ON viewed_post.post_id = post.id
+      GROUP BY post.id
+    ),
+    temp3 ("post_id", "count_comment", "last_comment_date")
+      as(
+      SELECT post.id, COUNT(comment.id), MAX(comment.date)
+      FROM post
+      LEFT JOIN comment ON comment.post_id = post.id
+      GROUP BY post.id
+      ),
+    temp4 ("post_id", "count_comment", "last_comment_date", "last_comment_id", "last_comment_author_id", 
+         "last_comment_author_nick_name", "last_comment_author_avatar")
+         as (
+         SELECT temp3.post_id, temp3.count_comment, temp3.last_comment_date, comment.id, 
+            person.id, person.nick, person.avatar
+         FROM temp3
+         LEFT JOIN comment ON comment.date = temp3.last_comment_date AND comment.post_id = temp3.post_id
+         LEFT JOIN person ON person.id = comment.person_id
+         )
+         
+    SELECT temp1."post_id", temp1."parent_id", temp1."title", temp1."fixed", temp1."closed", 
+      temp1."verified", temp1."date", temp1."author_post_id", 
+      temp1."author_post_nick_name", temp2."count_view", temp4."count_comment", temp4."last_comment_date",
+      temp4."last_comment_id", temp4."last_comment_author_id", temp4."last_comment_author_nick_name", 
+      temp4."last_comment_author_avatar"
+    FROM temp1
+    LEFT JOIN temp2 ON temp2.post_id = temp1.post_id
+    LEFT JOIN temp4 ON temp4.post_id = temp1.post_id
+    ORDER BY ${filterString}
+    LIMIT $1 OFFSET $2
+
+    `,
+      [COUNT_POST_PER_PAGE, offset]
+    );
+    return posts.rows;
+  }
   /* Обновление поста */
   async getPostByID(postID) {
     const post = await db.query(`SELECT * FROM post WHERE id = $1`, [postID]);
@@ -173,6 +234,7 @@ class PostPostgressRepo {
     );
     if (result.rows.length === 0) throw new Error();
   }
+
   async updatePostVerified(postID, value) {
     const date = new Date();
     const result = await db.query(
@@ -195,19 +257,7 @@ class PostPostgressRepo {
     );
     return mainComment.rows;
   }
-  async updateMainCommentVerified(postID, value) {
-    const date = new Date();
-    const result = await db.query(
-      `
-    UPDATE comment
-    SET verified = $2, date = $3, updated = false
-    WHERE post_id = $1 AND main = true
-    RETURNING*
-    `,
-      [postID, value, date]
-    );
-    if (result.rows.length === 0) throw new Error();
-  }
+
   async updatePostFixed(postID, value) {
     const result = await db.query(
       `
@@ -269,14 +319,9 @@ class PostRepo {
     this.repo = repo;
   }
   /* Отображение постов в топике */
-  async getAllByTopicID(topicID, page, filter, userID, userRole) {
-    page = page ? page : 1;
+  async getByTopicID(topicID, page, filter, userID, userRole) {
     const offset = (page - 1) * COUNT_POST_PER_PAGE;
-    const allPost = await this.repo.getAllPostByTopicID(
-      topicID,
-      userID,
-      userRole
-    );
+    const allPost = await this.repo.getByTopicID(topicID, userID, userRole);
 
     const maxPage = Math.ceil(allPost.length / COUNT_POST_PER_PAGE);
     if (maxPage === 0 || page > maxPage) return { maxPage, posts: [] };
@@ -362,6 +407,47 @@ class PostRepo {
     }
     return posts;
   }
+  /* Отображение всех доступных постов */
+  async getAll(page, filter) {
+    const offset = (page - 1) * COUNT_POST_PER_PAGE;
+    const allPost = await this.repo.getAll();
+
+    const maxPage = Math.ceil(allPost.length / COUNT_POST_PER_PAGE);
+    if (maxPage === 0 || page > maxPage) return { maxPage, posts: [] };
+
+    const sortedPostsInfo = await this.repo.getAllSorted(offset, filter);
+
+    const posts = [];
+
+    for (const sortedPostInfo of sortedPostsInfo) {
+      const lastComment = !sortedPostInfo.last_comment_id
+        ? null
+        : {
+            userID: sortedPostInfo.last_comment_author_id,
+            avatar: sortedPostInfo.last_comment_author_avatar,
+            nickName: sortedPostInfo.last_comment_author_nick_name,
+            date: sortedPostInfo.last_comment_date,
+            commentID: sortedPostInfo.last_comment_id,
+          };
+
+      const post = {
+        id: sortedPostInfo.post_id,
+        title: sortedPostInfo.title,
+        fixed: sortedPostInfo.fixed,
+        closed: sortedPostInfo.closed,
+        verified: sortedPostInfo.verified,
+        date: sortedPostInfo.date,
+        authorID: sortedPostInfo.author_post_id,
+        authorNickName: sortedPostInfo.author_post_nick_name,
+        viewCount: sortedPostInfo.count_view,
+        countComment: sortedPostInfo.count_comment,
+        lastComment,
+      };
+      posts.push(post);
+    }
+
+    return { posts, maxPage };
+  }
   /* Обновление поста */
   async getPostByID(postID) {
     const post = await this.repo.getPostByID(postID);
@@ -373,14 +459,15 @@ class PostRepo {
   async updatePostClosed(postID, value) {
     await this.repo.updatePostClosed(postID, value);
   }
+
   async getMainCommentByPostID(postID) {
     const mainComment = await this.repo.getMainCommentByPostID(postID);
     return mainComment;
   }
   async updatePostVerified(postID, value) {
     await this.repo.updatePostVerified(postID, value);
-    await this.repo.updateMainCommentVerified(postID, value);
   }
+
   async updatePostFixed(postID, value) {
     await this.repo.updatePostFixed(postID, value);
   }

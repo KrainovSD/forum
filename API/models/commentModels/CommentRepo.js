@@ -181,6 +181,7 @@ class CommentPostgressRepo {
     );
     if (result.rows.length === 0) throw new Error();
   }
+
   async updateCommentVerified(commentID, verified) {
     const date = new Date();
     const result = await db.query(
@@ -190,19 +191,7 @@ class CommentPostgressRepo {
     );
     if (result.rows.length === 0) throw new Error();
   }
-  async updatePostVerified(postID, verified) {
-    const date = new Date();
-    const result = await db.query(
-      `
-    UPDATE post
-    SET verified = $2, date = $3
-    WHERE id = $1
-    RETURNING*
-    `,
-      [postID, verified, date]
-    );
-    if (result.rows.length === 0) throw new Error();
-  }
+
   async updateCommentFixed(commentID, fixed) {
     const result = await db.query(
       `UPDATE comment SET fixed = $1 WHERE id = $2 RETURNING*`,
@@ -214,16 +203,16 @@ class CommentPostgressRepo {
   #getFilter(filter) {
     switch (filter) {
       case "last-update": {
-        return "t1.date_update DESC NULLS LAST";
+        return "t1.date_update DESC NULLS LAST, t1.date DESC";
       }
       case "no-verify": {
-        return "t1.verified";
+        return "t1.verified, t1.date DESC";
       }
       case "last-date-create": {
         return "t1.date DESC";
       }
       case "most-likes": {
-        return "t4.count_like DESC";
+        return "t4.count_like DESC, t1.date DESC";
       }
       default: {
         return "t1.date DESC";
@@ -394,12 +383,11 @@ class CommentRepo {
   async updateCommentBody(commentID, body, userID) {
     await this.repo.updateCommentBody(commentID, body, userID);
   }
+
   async updateCommentVerified(commentID, verified) {
     await this.repo.updateCommentVerified(commentID, verified);
   }
-  async updatePostVerified(postID, verified) {
-    await this.repo.updatePostVerified(postID, verified);
-  }
+
   async updateCommentFixed(commentID, fixed) {
     await this.repo.updateCommentFixed(commentID, fixed);
   }

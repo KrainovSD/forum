@@ -10,6 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const saltRounds = 12;
 const maxSizeAvatar = 5 * 1024 * 1024;
+import { COUNT_COMMENT_FOR_SWITCH_USER_ROLE } from "../../const.js";
 
 class UserService {
   async getUserByID(id) {
@@ -36,6 +37,21 @@ class UserService {
     if (userPosts.length === 0)
       return { status: 404, message: "Сообщения пользователя не найдены!" };
     return { status: 200, userPosts, maxPage };
+  }
+  async switchRoleToUser(userID) {
+    const { userInfo } = await UserRepo.getUserByID(userID);
+    console.log(userInfo);
+    console.log(
+      userInfo &&
+        userInfo.role === "noob" &&
+        userInfo.countComment >= COUNT_COMMENT_FOR_SWITCH_USER_ROLE
+    );
+    if (
+      userInfo &&
+      userInfo.role === "noob" &&
+      userInfo.countComment >= COUNT_COMMENT_FOR_SWITCH_USER_ROLE
+    )
+      await UserRepo.switchRoleToUser(userID);
   }
   async updateNickName(nickName, userID) {
     if (!nickName) return { status: 400, message: "Пустое поле!" };

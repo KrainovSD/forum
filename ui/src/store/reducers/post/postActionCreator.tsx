@@ -6,6 +6,7 @@ import { axiosInstanceNoStrictToken } from "../../../helpers/axiosInstanceNoStri
 import {
   IAdminUpdatePost,
   ICreatePost,
+  IGetAllPosts,
   ILastPost,
   IPostsTypes,
   IPostTypes,
@@ -63,6 +64,27 @@ export const getLastPosts = createAsyncThunk(
   async (_, thunkApi) => {
     try {
       const response = await axiosInstance.get<ILastPost[]>(`/api/post/last`);
+      return response.data;
+    } catch (e) {
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
+    }
+  }
+);
+
+export const getAllPosts = createAsyncThunk(
+  "post/all",
+  async (req: IGetAllPosts, thunkApi) => {
+    try {
+      const response = await axiosInstanceToken.get<{
+        maxPage: number;
+        posts: IPostsTypes[];
+      }>(`/api/post/all`, {
+        params: {
+          filter: req.filter,
+          page: req.page,
+        },
+      });
       return response.data;
     } catch (e) {
       const reqError = getRequestError(e);

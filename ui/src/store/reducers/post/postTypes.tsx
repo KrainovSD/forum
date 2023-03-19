@@ -74,3 +74,8 @@ export interface ICreatePost {
   topicID: string;
   title: string;
 }
+
+export interface IGetAllPosts {
+  page: string;
+  filter: string;
+}

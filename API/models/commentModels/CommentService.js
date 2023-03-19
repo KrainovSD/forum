@@ -1,4 +1,6 @@
 import CommentRepo from "./CommentRepo.js";
+import PostService from "../postModels/PostService.js";
+import UserService from "../userModels/UserService.js";
 
 class CommentService {
   async getByPostID(postID, page, userID, userRole) {
@@ -56,14 +58,22 @@ class CommentService {
     await CommentRepo.updateCommentBody(commentID, body, userID);
     return { status: 200, message: "Успешно" };
   }
+
   async updateCommentVerified(commentID, verified) {
+    const comment = await CommentRepo.getComment(commentID);
+    if (comment.length === 0) throw new Error();
+    await CommentRepo.updateCommentVerified(commentID, verified);
+    await UserService.switchRoleToUser(comment[0].person_id);
+  }
+  async updateCommentVerifiedWithPost(commentID, verified) {
     const comment = await CommentRepo.getComment(commentID);
     if (comment.length === 0)
       return { status: 400, message: "Комметария не существует!" };
     await CommentRepo.updateCommentVerified(commentID, verified);
     if (comment[0].main) {
-      await CommentRepo.updatePostVerified(comment[0].post_id, verified);
+      await PostService.updatePostVerified(comment[0].post_id, verified);
     }
+    await UserService.switchRoleToUser(comment[0].person_id);
     return { status: 200, message: "Успешно" };
   }
   async updateCommentFixed(commentID, fixed) {

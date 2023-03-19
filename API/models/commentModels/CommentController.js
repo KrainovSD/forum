@@ -79,10 +79,8 @@ class CommentController {
   async updateCommentVerified(req, res) {
     try {
       const { commentID, verified } = req.body;
-      const { status, message } = await CommentService.updateCommentVerified(
-        commentID,
-        verified
-      );
+      const { status, message } =
+        await CommentService.updateCommentVerifiedWithPost(commentID, verified);
       return res.status(status).json(message);
     } catch (e) {
       req.err = e;

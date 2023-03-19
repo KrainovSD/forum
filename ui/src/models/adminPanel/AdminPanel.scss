@@ -12,6 +12,7 @@
     padding: 10px;
     display: flex;
     flex-direction: column;
+    align-self: flex-start;
   }
 
   // .admin-panel__content-header
@@ -38,9 +39,5 @@
 
   &__content {
     width: 100%;
-    background: #ffffff;
-    border: 1px solid rgba(102, 102, 102, 0.315);
-    border-radius: 3px;
-    box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 3px;
   }
 }

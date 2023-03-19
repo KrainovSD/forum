@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   createPost,
   deletePost,
+  getAllPosts,
   getLastPosts,
   getPostByID,
   getPostByTopicID,
@@ -99,6 +100,29 @@ export const postSlice = createSlice({
         state.error = payload.message;
         state.statusError = payload.status;
         state.isLoading = false;
+      })
+      .addCase(getAllPosts.fulfilled, (state, action) => {
+        state.posts = action.payload.posts;
+        state.maxPage = action.payload.maxPage;
+        state.isSmallLoading = false;
+      })
+      .addCase(getAllPosts.pending, (state) => {
+        state.isSmallLoading = true;
+        state.error = "";
+        state.response = "";
+        state.updated = false;
+        state.statusError = 0;
+        state.currentPost = null;
+      })
+      .addCase(getAllPosts.rejected, (state, action) => {
+        const payload = action.payload as {
+          message: string;
+          status: number;
+        };
+        state.posts = [];
+        state.error = payload.message;
+        state.statusError = payload.status;
+        state.isSmallLoading = false;
       })
       .addCase(updatePost.fulfilled, fulfilledAction)
       .addCase(updatePost.pending, pendingAction)

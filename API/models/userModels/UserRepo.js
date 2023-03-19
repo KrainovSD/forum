@@ -13,8 +13,8 @@ class UserPosgressRepo {
          SELECT t1.id, t1.nick, t1.role, t1.avatar, t1.back_img, t1.date_registration, t1.last_login, 
            t1.name, t1.email, t1.reset_password_last, t1.confirm_email_last, count(t2.id)
            FROM person as t1
-           LEFT JOIN comment as t2 ON  t2.person_id = t1.id
-           WHERE t1.id = $1 AND t2.verified = true
+           LEFT JOIN comment as t2 ON  t2.person_id = t1.id AND t2.verified = true
+           WHERE t1.id = $1
            GROUP BY t1.id  
          ),
     temp2 ("id", "reputation") as (
@@ -139,6 +139,19 @@ class UserPosgressRepo {
     }
   }
   /* Обновление данных */
+  async switchRoleToUser(userID) {
+    const result = await db.query(
+      `
+    UPDATE person
+    SET role = 'user'
+    WHERE id = $1
+    RETURNING*
+    `,
+      [userID]
+    );
+    if (result.rows.length === 0) throw new Error();
+  }
+
   async updateNickName(nickName, userID) {
     const result = await db.query(
       `
@@ -163,6 +176,7 @@ class UserPosgressRepo {
     );
     if (result.rows.length === 0) throw new Error();
   }
+
   /* Смена входных данных */
   async updatePasswordNote(userID, changeKey) {
     const time = new Date();
@@ -360,6 +374,9 @@ class UserRepo {
     return { userPosts, maxPage };
   }
   /* Обновление данных */
+  async switchRoleToUser(userID) {
+    await this.repo.switchRoleToUser(userID);
+  }
   async updateNickName(nickName, userID) {
     await this.repo.updateNickName(nickName, userID);
   }

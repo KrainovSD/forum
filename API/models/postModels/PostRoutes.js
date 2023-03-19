@@ -8,10 +8,11 @@ import postValidation from "./postValidation.js";
 router.get(
   "/byTopic/:topicID",
   untils.noStrictCheckAuth,
-  PostControllers.getAllByTopicID
+  PostControllers.getByTopicID
 );
 router.get("/byID/:id", untils.noStrictCheckAuth, PostControllers.getOneByID);
 router.get("/last", PostControllers.getLastPosts);
+router.get("/all", untils.checkAuth, untils.checkModer, PostControllers.getAll);
 router.get("/access/:id", untils.checkAuth, PostControllers.getPostAccessByID);
 router.put(
   "/title",
