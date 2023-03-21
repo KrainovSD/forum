@@ -35,7 +35,7 @@ export const getCountCommentMessageCaption = (value: string | number) => {
 
 export const getReputationCaption = (value: string | number) => {
   value = +value;
-  if (value > 0 && value < 100) return "Обычный";
+  if (value >= 0 && value < 100) return "Обычный";
   if (value >= 100 && value < 200) return "Хороший";
   if (value >= 200 && value < 300) return "Очень хороший";
   if (value >= 300 && value < 400) return "Отличный";

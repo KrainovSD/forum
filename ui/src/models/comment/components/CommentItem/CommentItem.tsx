@@ -18,6 +18,7 @@ import { useConfirm } from "../../../../hooks/useConfirm";
 import { UpdateComment } from "../UpdateComment/UpdateComment";
 import { DeleteComment } from "../DeleteComment/DeleteComment";
 import { CommentAdminPanel } from "../CommentAdminPanel/CommentAdminPanel";
+import { getUserLink } from "../../../../helpers/getLinks";
 interface ICommentItemProps {
   comment: IComment;
 }
@@ -28,6 +29,7 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
   const date = useDateFormat(comment.date);
   const dateUpdate = useDateFormat(comment.dateUpdate || "");
   const timePassed = getDiffInHours(comment.date);
+  const userLink = getUserLink(comment.authorID);
   const { userInfo } = useAppSelector((state) => state.user);
 
   const [isVisibleLikes, setIsVisibleLikes] = useState<boolean>(false);
@@ -100,13 +102,13 @@ export const CommentItem: React.FC<ICommentItemProps> = ({ comment }) => {
                 <img src={thumbtack} alt="" />
               </div>
             )}
-            <NavLink to={`/profile/${comment.authorID}`} className="_nick">
+            <NavLink to={userLink} className="_nick">
               {comment.authorNickName}
             </NavLink>
           </div>
-          <div className="_avatar">
+          <NavLink to={userLink} className="_avatar">
             <img src={avatar} alt="" />
-          </div>
+          </NavLink>
           <p className={`_role ${roleClass}`}>{roleString}</p>
           <p className="_reputation">Репутация: {comment.authorReputation}</p>
           <p className="_comment">

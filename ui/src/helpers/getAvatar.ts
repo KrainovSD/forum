@@ -11,5 +11,5 @@ export const getAvatar = (
     ? `/uploads/userImg/${id}/${avatar}`
     : `${HOST}/uploads/userImg/${id}/${avatar}`;
 
-  return avatar && avatar.length > 0 ? link : userAvatar;
+  return avatar && avatar.length > 0 && id ? link : userAvatar;
 };

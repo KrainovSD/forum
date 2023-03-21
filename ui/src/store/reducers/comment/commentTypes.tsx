@@ -60,3 +60,9 @@ export interface IUpdateCommentFixed {
   commentID: string;
   fixed: boolean;
 }
+
+export interface IGetCommentByUserID {
+  page: string;
+  filter?: string;
+  userID: string;
+}

@@ -13,7 +13,7 @@ class CommentService {
       userID,
       userRole
     );
-    if (comments.length === 0 || maxPage === 0)
+    if (comments.length === 0)
       return { status: 404, message: "Комментарии не найдены" };
     return { status: 200, comments, maxPage };
   }
@@ -23,6 +23,19 @@ class CommentService {
       return { status: 404, message: "Комментарии не найдены!" };
     return { status: 200, comments, maxPage };
   }
+  async getByUserID(userID, page, filter, reqUserID, reqUserRole) {
+    const { comments, maxPage } = await CommentRepo.getByUserID(
+      userID,
+      page,
+      filter,
+      reqUserID,
+      reqUserRole
+    );
+    if (comments.length === 0)
+      return { status: 404, message: "Комментарии не найдены" };
+    return { status: 200, comments, maxPage };
+  }
+
   async createComment(body, postID, userID, role) {
     if (!(await CommentRepo.isHasPostAndOpen(postID)))
       return { status: 400, message: "Темы не существует или она закрыта!" };

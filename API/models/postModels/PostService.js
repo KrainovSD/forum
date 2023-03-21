@@ -46,7 +46,20 @@ class PostService {
 
     return { status: 200, post: postInfo };
   }
-  async updatePostTitle(postID, title, userID, userRole) {
+  async getByUserID(userID, page, filter, reqUserID, reqUserRole) {
+    const { posts, maxPage } = await PostRepo.getByUserID(
+      userID,
+      page,
+      filter,
+      reqUserID,
+      reqUserRole
+    );
+    if (posts.length === 0)
+      return { status: 404, message: "Посты не найдены!" };
+    return { status: 200, posts, maxPage };
+  }
+
+  async updatePost(postID, title, topicID, userID, userRole) {
     const post = await PostRepo.getPostByID(postID);
     if (post.length === 0)
       return { status: 400, message: "Поста не существует!" };
@@ -56,7 +69,17 @@ class PostService {
         message:
           "Пост не пренадлежит пользователю или вышло время, когда он может быть изменен!",
       };
-    await PostRepo.updatePostTitle(postID, title);
+    console.log(post[0].topic_id, topicID);
+    if (
+      post[0].topic_id !== topicID &&
+      userRole !== "moder" &&
+      userRole !== "admin"
+    )
+      return {
+        status: 403,
+        message: "Недостаточно прав для смены родительского топика!",
+      };
+    await PostRepo.updatePost(postID, title, topicID);
     return { status: 200, message: "Успешно!" };
   }
   async updatePostClosed(postID, value) {
@@ -66,7 +89,6 @@ class PostService {
     await PostRepo.updatePostClosed(postID, value);
     return { status: 200, message: "Успешно!" };
   }
-
   async updatePostVerified(postID, value) {
     const post = await PostRepo.getPostByID(postID);
     if (post.length === 0) throw new Error();
@@ -89,6 +111,7 @@ class PostService {
     await PostRepo.updatePostFixed(postID, value);
     return { status: 200, message: "Успешно!" };
   }
+
   async deletePost(postID) {
     const post = await PostRepo.getPostByID(postID);
     if (post.length === 0)
@@ -96,6 +119,7 @@ class PostService {
     await PostRepo.deletePost(postID);
     return { status: 200, message: "Успешно!" };
   }
+
   async createPost(body, title, topicID, userID, userRole) {
     const topic = await PostRepo.getTopicByID(topicID);
     if (topic.length === 0)

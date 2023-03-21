@@ -16,10 +16,12 @@ import { useEffectOnlyUpdate } from "../../../../hooks/useResponse";
 import useFetching from "../../../../hooks/useFetching";
 import { axiosInstanceToken } from "../../../../helpers/axiosInstanceToken";
 import { Loader } from "../../../../components/Loader/Loader";
+import { SelectTopic } from "../../../../components/SelectTopic/SelectTopic";
 
 interface IUpdateForm {
   [key: string]: string;
   title: string;
+  topicID: string;
 }
 interface ICurrentPost {
   id: string;
@@ -36,8 +38,11 @@ export const UpdatePost: React.FC = () => {
   const navigate = useNavigate();
   const title = "Редактирование темы";
   const dispatch = useAppDispatch();
+  const { userInfo } = useAppSelector((state) => state.user);
   const { postID } = useParams();
-  const { isLoading, response } = useAppSelector((state) => state.post);
+  const { isLoading, response, updated } = useAppSelector(
+    (state) => state.post
+  );
   /* Создание информационных окон, проверка на доступ к посту */
   const { popup, setPopup } = usePopup();
   const { confirm, checkConfirm } = useConfirm();
@@ -47,7 +52,7 @@ export const UpdatePost: React.FC = () => {
       `/api/post/access/${postID}`
     );
     setCurrentPost(response.data);
-    setTitle(response.data.title);
+    setForm({ title: response.data.title, topicID: response.data.topicID });
   };
   const { fetching, isLoading: isLoadingAccess } = useFetching(
     getPostByID,
@@ -65,11 +70,18 @@ export const UpdatePost: React.FC = () => {
     else fetching();
   }, []);
   /* Инициализация формы и активация валидации */
-  const [form, setForm] = useState<IUpdateForm>({ title: "" });
+  const [form, setForm] = useState<IUpdateForm>({ title: "", topicID: "" });
+  const [topicTitle, setTopicTitle] = useState("");
   const setTitle = (v: string) => {
-    setForm({ title: v });
+    setForm({ ...form, title: v });
   };
-  const [errorForm, setErrorForm] = useState<IUpdateForm>({ title: "" });
+  const setTopicID = (v: string) => {
+    setForm({ ...form, topicID: v });
+  };
+  const [errorForm, setErrorForm] = useState<IUpdateForm>({
+    title: "",
+    topicID: "",
+  });
   useValidation(form, errorForm, setErrorForm, postValidationField);
   const checkForm = () => {
     if (isLoading) return;
@@ -81,13 +93,22 @@ export const UpdatePost: React.FC = () => {
   };
   /* Отправка запроса на обновление и обработка ответа  */
   const sendForm = () => {
-    if (postID) dispatch(updatePost({ postID, title: form.title }));
+    if (postID)
+      dispatch(
+        updatePost({ postID, title: form.title, topicID: form.topicID })
+      );
   };
   useEffectOnlyUpdate(() => {
-    if (response.length > 0)
-      setPopup(title, response, () => {
-        navigate(`/topic/${currentPost?.topicID}`);
-      });
+    if (response.length > 0) {
+      if (updated)
+        setPopup(title, response, () => {
+          navigate(`/topic/${form.topicID}`);
+        });
+      else
+        setPopup(title, response, () => {
+          navigate(`/topic/${currentPost?.topicID}`);
+        });
+    }
   }, [response]);
 
   return (
@@ -100,11 +121,24 @@ export const UpdatePost: React.FC = () => {
       )}
       {currentPost && (
         <div className="update-post__header">
-          Изменить название темы {currentPost.title} в топике{" "}
+          Изменить информацию темы {currentPost.title} в топике{" "}
           {currentPost.topicTitle}
         </div>
       )}
+
       <div className="update-post__content">
+        {userInfo &&
+          (userInfo.role === "admin" || userInfo.role === "moder") && (
+            <div className="add-post__select-wrapper">
+              <SelectTopic
+                value={form.topicID}
+                setValue={setTopicID}
+                title={topicTitle}
+                setTitle={setTopicTitle}
+                error={form.topicID}
+              />
+            </div>
+          )}
         <InputTooltip
           type="text"
           title="Заголовок"

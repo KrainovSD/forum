@@ -32,6 +32,27 @@ class CommentController {
       res.status(500).json();
     }
   }
+  async getByUserID(req, res) {
+    try {
+      const { userID } = req.params;
+      const { page, filter } = req.query;
+      const reqUserID = req.userID ? req.userID : null;
+      const reqRole = req.role ? req.role : null;
+      const { status, message, comments, maxPage } =
+        await CommentService.getByUserID(
+          userID,
+          page ? page : 1,
+          filter ? filter : "last-date-create",
+          reqUserID,
+          reqRole
+        );
+      if (status !== 200) return res.status(status).json(message);
+      return res.status(200).json({ comments, maxPage });
+    } catch (e) {
+      req.err = e;
+      return res.status(500).json();
+    }
+  }
   async createComment(req, res) {
     try {
       const { body, postID } = req.body;

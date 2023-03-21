@@ -7,8 +7,7 @@ import userValidation from "./userValidation.js";
 
 router.get("/me", untils.checkAuth, UserController.getMe);
 router.get("/:id", UserController.getByID);
-router.get("/content/comments/:id", UserController.getUserComments);
-router.get("/content/posts/:id", UserController.getUserPosts);
+router.get("/content/:id", UserController.getUserContent);
 router.put(
   "/nickName",
   untils.checkAuth,
@@ -28,11 +27,16 @@ router.put(
   untils.checkAuth,
   UserController.updatePasswordNote
 );
+router.put(
+  "/password/forgot",
+  userValidation.updatePasswordForgot,
+  untils.checkValidation,
+  UserController.updatePasswordForgot
+);
 router.put("/email/note", untils.checkAuth, UserController.updateEmailNote);
 
 router.put(
   "/password",
-  untils.checkAuth,
   userValidation.updatePassword,
   untils.checkValidation,
   UserController.updatePassword
@@ -57,5 +61,7 @@ router.put(
   untils.multer.single("backImg"),
   UserController.updateBackImg
 );
+router.delete("/avatar", untils.checkAuth, UserController.deleteAvatar);
+router.delete("/backImg", untils.checkAuth, UserController.deleteBackImg);
 
 export default router;

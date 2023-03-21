@@ -7,10 +7,12 @@ import "./TopicList.scss";
 import { useEffectOnlyUpdate } from "../../hooks/useResponse";
 import { usePopup } from "../../hooks/usePopup";
 import { TopicAdminPanel } from "./components/TopicAdminPanel/TopicAdminPanel";
+import { getCreateTopicLink } from "../../helpers/getLinks";
 
 export const TopicList: React.FC = () => {
   const { userInfo } = useAppSelector((state) => state.user);
   const { id: topicID } = useParams();
+  const createTopicLink = getCreateTopicLink(topicID);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { topics, parentInfo, statusError, response, updated } = useAppSelector(
@@ -48,10 +50,7 @@ export const TopicList: React.FC = () => {
         </div>
       )}
       {userInfo && userInfo.role === "admin" && (
-        <NavLink
-          to={`/create/topic${topicID ? `/${topicID}` : ""}`}
-          className="topic-list__create-topic"
-        >
+        <NavLink to={createTopicLink} className="topic-list__create-topic">
           Создать топик
         </NavLink>
       )}

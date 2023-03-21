@@ -23,6 +23,7 @@ export const postValidationField = (
   setError: React.Dispatch<React.SetStateAction<IPostFormValidation>>,
   form: IPostFormValidation
 ) => {
+  if (!(field in error)) return;
   switch (field) {
     case "title": {
       if (fieldData.length === 0) {

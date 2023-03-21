@@ -1,0 +1,17 @@
+.setting {
+  display: flex;
+  // .setting_content
+
+  &_content {
+    width: 100%;
+  }
+
+  // .setting__nav-bar
+
+  &__nav-bar {
+    width: 200px;
+    max-width: 200px;
+    min-width: 200px;
+    margin-right: 20px;
+  }
+}

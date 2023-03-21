@@ -12,6 +12,7 @@ import {
 import { useAppSelector } from "../../../../hooks/redux";
 import { PostAdmitPanel } from "../PostAdminPanel/PostAdminPanel";
 import { getDiffInHours } from "../../../../helpers/getDiffInHours";
+import { getPostLink, getUserLink } from "../../../../helpers/getLinks";
 
 interface IPostItemProps {
   post: IPostsTypes;
@@ -20,6 +21,9 @@ interface IPostItemProps {
 export const PostItem: React.FC<IPostItemProps> = ({ post }) => {
   const { userInfo } = useAppSelector((state) => state.user);
   const postDate = useDateFormat(post.date);
+  const userLink = getUserLink(post.authorID);
+  const postLink = getPostLink(post.id);
+
   const conditionToVisibleAdminPanel = () => {
     if (!userInfo) return false;
     if (userInfo.role !== "admin" && userInfo.role !== "moder") {
@@ -42,11 +46,11 @@ export const PostItem: React.FC<IPostItemProps> = ({ post }) => {
                 <img src={thumbtack} alt="" />
               </div>
             )}
-            <NavLink to={`/post/${post.id}`}>{post.title}</NavLink>
+            <NavLink to={postLink}>{post.title}</NavLink>
           </div>
           <p className="post-item__author">
             Автор{" "}
-            <NavLink to={`/profle/${post.authorID}`} className="_author">
+            <NavLink to={userLink} className="_author">
               {post.authorNickName}
             </NavLink>
             , {postDate}

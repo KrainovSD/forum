@@ -16,6 +16,12 @@ routes.get(
   untils.checkModer,
   CommentController.getAll
 );
+routes.get(
+  "/user/:userID",
+  untils.noStrictCheckAuth,
+  CommentController.getByUserID
+);
+
 routes.post(
   "/",
   untils.checkAuth,

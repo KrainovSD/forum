@@ -1,0 +1,18 @@
+.user-content {
+  display: flex;
+  padding-top: 20px;
+  // .user-content__nav-bar
+
+  &__nav-bar {
+    width: 300px;
+    max-width: 300px;
+    min-width: 300px;
+    margin-right: 20px;
+  }
+
+  // .user-content__content
+
+  &__content {
+    width: 100%;
+  }
+}

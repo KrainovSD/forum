@@ -1,15 +1,20 @@
 import "./Profile.scss";
-import { ProfileActivities } from "./components/ProfileActivities/ProfileActivities";
 import { ProfileHeader } from "./components/ProfileHeader/ProfileHeader";
-import { ProfileInfo } from "./components/ProfileInfo/ProfileInfo";
-import { useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { useEffect, useMemo } from "react";
-import { getUserByID } from "../../store/reducers/user/userActionCreator";
+import {
+  getMyUserInfo,
+  getUserByID,
+} from "../../store/reducers/user/userActionCreator";
+import { useEffectOnlyUpdate } from "../../hooks/useResponse";
 
 export const Profile: React.FC = () => {
-  const { id } = useParams();
+  const { updated: isCommentUpdate } = useAppSelector((state) => state.comment);
+  const { updated: isPostUpdate } = useAppSelector((state) => state.post);
+  const { updated: isLikeUpdate } = useAppSelector((state) => state.like);
 
+  const { id } = useParams();
   const { userInfo, selectedUserInfo } = useAppSelector((state) => state.user);
   const isOwnProfile = useMemo(() => {
     const userID = userInfo ? `${userInfo.id}` : null;
@@ -18,11 +23,25 @@ export const Profile: React.FC = () => {
   }, [id, userInfo?.id]);
 
   const dispatch = useAppDispatch();
-  useEffect(() => {
+  const getUserInfo = () => {
     if (!isOwnProfile && id) {
       dispatch(getUserByID(id));
     }
-  }, [isOwnProfile]);
+    if (isOwnProfile) {
+      dispatch(getMyUserInfo());
+    }
+  };
+  useEffect(getUserInfo, [isOwnProfile, id]);
+
+  useEffectOnlyUpdate(() => {
+    if (isCommentUpdate) getUserInfo();
+  }, [isCommentUpdate]);
+  useEffectOnlyUpdate(() => {
+    if (isPostUpdate) getUserInfo();
+  }, [isPostUpdate]);
+  useEffectOnlyUpdate(() => {
+    if (isLikeUpdate) getUserInfo();
+  }, [isLikeUpdate]);
 
   return (
     <div className="profile">
@@ -39,16 +58,7 @@ export const Profile: React.FC = () => {
           )}
 
           <div className="profile__content">
-            {isOwnProfile && userInfo && (
-              <ProfileInfo user={userInfo} isOwnProfile={isOwnProfile} />
-            )}
-            {!isOwnProfile && selectedUserInfo && (
-              <ProfileInfo
-                user={selectedUserInfo}
-                isOwnProfile={isOwnProfile}
-              />
-            )}
-            <ProfileActivities />
+            <Outlet />
           </div>
         </div>
       )}

@@ -62,6 +62,7 @@ export interface PostLastCommentType {
 export interface IUpdatePost {
   postID: string;
   title: string;
+  topicID: string;
 }
 
 export interface IAdminUpdatePost {
@@ -78,4 +79,10 @@ export interface ICreatePost {
 export interface IGetAllPosts {
   page: string;
   filter: string;
+}
+
+export interface IGetUserPosts {
+  page: string;
+  filter: string;
+  userID: string;
 }

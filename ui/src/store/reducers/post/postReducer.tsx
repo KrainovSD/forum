@@ -6,12 +6,13 @@ import {
   getLastPosts,
   getPostByID,
   getPostByTopicID,
+  getPostByUserID,
   updatePost,
   updatePostClosed,
   updatePostFixed,
   updatePostVerify,
 } from "./postActionCreator";
-import { IPostInitialState, IPostTypes } from "./postTypes";
+import { IPostInitialState, IPostsTypes, IPostTypes } from "./postTypes";
 import { IActionError } from "../../../store/types";
 import {
   fulfilledAction,
@@ -38,29 +39,9 @@ export const postSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getPostByTopicID.fulfilled, (state, action) => {
-        if (action.payload?.posts) state.posts = action.payload.posts;
-        if (action.payload?.maxPage) state.maxPage = action.payload.maxPage;
-        state.isSmallLoading = false;
-      })
-      .addCase(getPostByTopicID.pending, (state) => {
-        state.isSmallLoading = true;
-        state.error = "";
-        state.response = "";
-        state.updated = false;
-        state.statusError = 0;
-        state.currentPost = null;
-      })
-      .addCase(getPostByTopicID.rejected, (state, action) => {
-        const payload = action.payload as {
-          message: string;
-          status: number;
-        };
-        state.posts = [];
-        state.error = payload.message;
-        state.statusError = payload.status;
-        state.isSmallLoading = false;
-      })
+      .addCase(getPostByTopicID.fulfilled, postFulfilledAction)
+      .addCase(getPostByTopicID.pending, postPendingAction)
+      .addCase(getPostByTopicID.rejected, postRejectedAction)
       .addCase(
         getPostByID.fulfilled,
         (state, action: PayloadAction<IPostTypes>) => {
@@ -101,29 +82,12 @@ export const postSlice = createSlice({
         state.statusError = payload.status;
         state.isLoading = false;
       })
-      .addCase(getAllPosts.fulfilled, (state, action) => {
-        state.posts = action.payload.posts;
-        state.maxPage = action.payload.maxPage;
-        state.isSmallLoading = false;
-      })
-      .addCase(getAllPosts.pending, (state) => {
-        state.isSmallLoading = true;
-        state.error = "";
-        state.response = "";
-        state.updated = false;
-        state.statusError = 0;
-        state.currentPost = null;
-      })
-      .addCase(getAllPosts.rejected, (state, action) => {
-        const payload = action.payload as {
-          message: string;
-          status: number;
-        };
-        state.posts = [];
-        state.error = payload.message;
-        state.statusError = payload.status;
-        state.isSmallLoading = false;
-      })
+      .addCase(getAllPosts.fulfilled, postFulfilledAction)
+      .addCase(getAllPosts.pending, postPendingAction)
+      .addCase(getAllPosts.rejected, postRejectedAction)
+      .addCase(getPostByUserID.fulfilled, postFulfilledAction)
+      .addCase(getPostByUserID.pending, postPendingAction)
+      .addCase(getPostByUserID.rejected, postRejectedAction)
       .addCase(updatePost.fulfilled, fulfilledAction)
       .addCase(updatePost.pending, pendingAction)
       .addCase(updatePost.rejected, rejectedAction)
@@ -144,5 +108,37 @@ export const postSlice = createSlice({
       .addCase(deletePost.rejected, rejectedAction);
   },
 });
+
+const postFulfilledAction = (
+  state: IPostInitialState,
+  action: PayloadAction<{ maxPage: number; posts: IPostsTypes[] }>
+) => {
+  state.posts = action.payload.posts;
+  state.maxPage = action.payload.maxPage;
+  state.isSmallLoading = false;
+};
+
+const postPendingAction = (state: IPostInitialState) => {
+  state.isSmallLoading = true;
+  state.error = "";
+  state.response = "";
+  state.updated = false;
+  state.statusError = 0;
+  state.currentPost = null;
+};
+
+const postRejectedAction = (
+  state: IPostInitialState,
+  action: PayloadAction<unknown>
+) => {
+  const payload = action.payload as {
+    message: string;
+    status: number;
+  };
+  state.posts = [];
+  state.error = payload.message;
+  state.statusError = payload.status;
+  state.isSmallLoading = false;
+};
 
 export default postSlice.reducer;

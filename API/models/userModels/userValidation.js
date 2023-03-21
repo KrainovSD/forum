@@ -57,5 +57,22 @@ const updateEmail = [
     .isString()
     .withMessage("У поля  неверный тип данных!"),
 ];
+const updatePasswordForgot = [
+  body("email")
+    .trim()
+    .toLowerCase()
+    .isEmail()
+    .withMessage("Неверный формат почты!")
+    .isString()
+    .withMessage("Неверный формат почты!")
+    .isLength({ max: 255 })
+    .withMessage("Длина почты не должна превышать 255 символов!"),
+];
 
-export default { updateNickName, updateUserName, updatePassword, updateEmail };
+export default {
+  updateNickName,
+  updateUserName,
+  updatePassword,
+  updateEmail,
+  updatePasswordForgot,
+};

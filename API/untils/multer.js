@@ -27,7 +27,12 @@ const storageConfig = multer.diskStorage({
     }
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname); // имя файла после сохранения
+    console.log(file);
+    const now = Date.now();
+    req.uploadDate = now;
+    const extenstion = file.originalname.split(".");
+    const name = `${file.fieldname}-${now}.${extenstion.at(-1)}`;
+    cb(null, name); // имя файла после сохранения
   },
 });
 export const upload = multer({

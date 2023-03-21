@@ -8,7 +8,7 @@ import {
 import { ILikeInitialState } from "./likeTypes";
 
 const initialState: ILikeInitialState = {
-  likes: null,
+  likes: [],
   isLoading: false,
   updated: false,
   error: "",
@@ -29,6 +29,7 @@ export const LikeSlice = createSlice({
         state.isLoading = true;
         state.error = "";
         state.statusError = 0;
+        state.likes = [];
       })
       .addCase(getLikeByCommentID.rejected, (state, action) => {
         const payload = action.payload as IActionError;

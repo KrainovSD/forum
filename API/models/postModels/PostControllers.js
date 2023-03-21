@@ -66,6 +66,26 @@ class PostController {
       return res.status(500).json();
     }
   }
+  async getByUserID(req, res) {
+    try {
+      const { userID } = req.params;
+      const { page, filter } = req.query;
+      const reqUserID = req.userID ? req.userID : null;
+      const reqUserRole = req.role ? req.role : null;
+      const { status, message, maxPage, posts } = await PostService.getByUserID(
+        userID,
+        page ? page : 1,
+        filter ? filter : "last-date-create",
+        reqUserID,
+        reqUserRole
+      );
+      if (status !== 200) return res.status(status).json(message);
+      return res.status(200).json({ maxPage, posts });
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
+    }
+  }
   async getPostAccessByID(req, res) {
     try {
       const { id } = req.params;
@@ -81,12 +101,13 @@ class PostController {
       return res.status(500).json();
     }
   }
-  async updatePostTitle(req, res) {
+  async updatePost(req, res) {
     try {
-      const { postID, title } = req.body;
-      const { status, message } = await PostService.updatePostTitle(
+      const { postID, title, topicID } = req.body;
+      const { status, message } = await PostService.updatePost(
         postID,
         title,
+        topicID,
         req.userID,
         req.role
       );

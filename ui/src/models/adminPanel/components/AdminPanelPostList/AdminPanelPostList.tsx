@@ -27,19 +27,20 @@ export const AdminPanelPostList: React.FC = () => {
     const page = search.page ? search.page : "1";
     const filter = search.filter ? search.filter : "no-verify";
     setSearch({ page, filter }, { replace: true });
-  }, []);
+  }, [search.page, search.filter]);
   useEffect(() => {
     if (statusError === 404 && search.page !== "1")
       setSearch({ page: "1" }, { replace: true });
   }, [statusError]);
 
   const getPost = () => {
-    dispatch(
-      getAllPosts({
-        page: search.page,
-        filter: search.filter,
-      })
-    );
+    if (search.page)
+      dispatch(
+        getAllPosts({
+          page: search.page,
+          filter: search.filter ? search.filter : "last-date-create",
+        })
+      );
   };
   useEffect(() => {
     getPost();
@@ -65,24 +66,29 @@ export const AdminPanelPostList: React.FC = () => {
   return (
     <div className="admin-panel-post-list">
       {popup}
-      <PageNavBar
-        page={true}
-        filter={true}
-        maxPage={maxPage}
-        filterOptions={filterOptions}
-      />
+      {search.page && (
+        <PageNavBar
+          page={true}
+          filter={true}
+          maxPage={maxPage}
+          filterOptions={filterOptions}
+        />
+      )}
       <div className="post-list__wrapper">
         {!isLoadingAuth && !isLoadingUser && isSmallLoading && <SmallLoader />}
+        {posts.length === 0 && <div className="not-found">Темы не найдены</div>}
         {posts.map((post) => (
           <PostItem key={post.id} post={post} />
         ))}
       </div>
-      <PageNavBar
-        page={true}
-        filter={true}
-        maxPage={maxPage}
-        filterOptions={filterOptions}
-      />
+      {search.page && (
+        <PageNavBar
+          page={true}
+          filter={true}
+          maxPage={maxPage}
+          filterOptions={filterOptions}
+        />
+      )}
     </div>
   );
 };

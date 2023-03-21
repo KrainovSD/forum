@@ -2,6 +2,50 @@ import { COUNT_COMMENT_PER_PAGE } from "../../const.js";
 import db from "../../db.js";
 
 class CommentPostgressRepo {
+  #getCommentInfoQuery = `
+  WITH 
+  temp0("comment_id", "person_id", "verified", "like_id", "like_from") as (
+    SELECT t1.id, t1.person_id, t1.verified, t2.id, t2.from
+      FROM comment as t1
+      LEFT JOIN likes as t2 ON t1.id = t2.comment_id
+      WHERE t1.verified = true
+    ),
+  temp1("id", "reputation") as (
+    SELECT t1.id, count(t2.like_id)
+    FROM person as t1
+    LEFT JOIN temp0 as t2 ON t1.id = t2.person_id
+    GROUP BY t1.id
+  ),
+  temp2("id", "count_comment") as (
+  SELECT t1.id, count(t2.id)
+    FROM person as t1
+    LEFT JOIN comment as t2 ON t2.person_id = t1.id
+    WHERE t2.verified = true
+    GROUP BY t1.id
+  ),
+  temp3("id", "nick", "avatar", "role", "reputation", "count_comment") as (
+  SELECT t1.id, t1.nick, t1.avatar, t1.role, t2.reputation, t3.count_comment
+    FROM person as t1
+    LEFT JOIN temp1 as t2 ON t2.id = t1.id
+    LEFT JOIN temp2 as t3 ON t3.id = t1.id
+  ),
+  temp4 ("id", "body", "main", "date", "verified", "fixed", "author_id", "author_nick_name", 
+        "author_avatar", "author_role", "author_reputation", "author_count_comment", "updated", 
+      "date_update", "author_update_id", "post_id" ) 
+        as 
+  (SELECT t1.id, t1.body, t1.main, t1.date, t1.verified, t1.fixed, t2.id, t2.nick, t2.avatar, 
+    t2.role, t2.reputation, t2.count_comment, t1.updated, t1.date_update, t1.person_id_updated, 
+    t1.post_id
+    FROM comment as t1 
+    LEFT JOIN temp3 as t2 ON t1.person_id = t2.id
+  ),
+  temp5("id", count_like) as (
+    SELECT t1.id, count(t2.id)
+      FROM comment as t1
+      LEFT JOIN likes as t2 ON t2.comment_id = t1.id
+      GROUP BY t1.id
+    )`;
+
   /* Отображение комментариев в посте */
   async getAllowComments(id, userID, userRole) {
     const verifySortAllComents = userID
@@ -23,43 +67,7 @@ class CommentPostgressRepo {
       : `t1.verified = true`;
     const commentsInfo = await db.query(
       `
-      WITH 
-      temp1("id", "reputation") as (
-      SELECT t1.id, count(t2.id)
-        FROM person as t1
-        LEFT JOIN likes as t2 ON t2.to = t1.id
-        GROUP BY t1.id
-      ),
-      temp2("id", "count_comment") as (
-      SELECT t1.id, count(t2.id)
-        FROM person as t1
-        LEFT JOIN comment as t2 ON t2.person_id = t1.id
-        WHERE t2.verified = true
-        GROUP BY t1.id
-      ),
-      temp3("id", "nick", "avatar", "role", "reputation", "count_comment") as (
-      SELECT t1.id, t1.nick, t1.avatar, t1.role, t2.reputation, t3.count_comment
-        FROM person as t1
-        LEFT JOIN temp1 as t2 ON t2.id = t1.id
-        LEFT JOIN temp2 as t3 ON t3.id = t1.id
-      ),
-      temp4 ("id", "body", "main", "date", "verified", "fixed", "author_id", "author_nick_name", 
-            "author_avatar", "author_role", "author_reputation", "author_count_comment", "updated", 
-          "date_update", "author_update_id", "post_id" ) 
-            as 
-      (SELECT t1.id, t1.body, t1.main, t1.date, t1.verified, t1.fixed, t2.id, t2.nick, t2.avatar, 
-        t2.role, t2.reputation, t2.count_comment, t1.updated, t1.date_update, t1.person_id_updated, 
-        t1.post_id
-        FROM comment as t1 
-        LEFT JOIN temp3 as t2 ON t1.person_id = t2.id
-      ),
-      temp5("id", count_like) as (
-        SELECT t1.id, count(t2.id)
-          FROM comment as t1
-          LEFT JOIN likes as t2 ON t2.comment_id = t1.id
-          GROUP BY t1.id
-        )
-          
+      ${this.#getCommentInfoQuery}
       SELECT t1.*, t2.nick as author_update_nick_name, t3.title as post_title, t4.count_like
       FROM temp4 as t1
       LEFT JOIN person as t2 ON t2.id = t1.author_update_id
@@ -89,41 +97,7 @@ class CommentPostgressRepo {
     const filterString = this.#getFilter(filter);
     const comments = await db.query(
       `
-    WITH 
-    temp1("id", "reputation") as (
-    SELECT t1.id, count(t2.id)
-      FROM person as t1
-      LEFT JOIN likes as t2 ON t2.to = t1.id
-      GROUP BY t1.id
-    ),
-    temp2("id", "count_comment") as (
-    SELECT t1.id, count(t2.id)
-      FROM person as t1
-      LEFT JOIN comment as t2 ON t2.person_id = t1.id
-      GROUP BY t1.id
-    ),
-    temp3("id", "nick", "avatar", "role", "reputation", "count_comment") as (
-    SELECT t1.id, t1.nick, t1.avatar, t1.role, t2.reputation, t3.count_comment
-      FROM person as t1
-      LEFT JOIN temp1 as t2 ON t2.id = t1.id
-      LEFT JOIN temp2 as t3 ON t3.id = t1.id
-    ),
-    temp4 ("id", "body", "main", "date", "verified", "fixed", "author_id", "author_nick_name", 
-          "author_avatar", "author_role", "author_reputation", "author_count_comment", "updated", 
-        "date_update", "author_update_id", "post_id" ) 
-          as 
-      (SELECT t1.id, t1.body, t1.main, t1.date, t1.verified, t1.fixed, t2.id, t2.nick, t2.avatar, 
-        t2.role, t2.reputation, t2.count_comment, t1.updated, t1.date_update, t1.person_id_updated, 
-    t1.post_id
-        FROM comment as t1 
-        LEFT JOIN temp3 as t2 ON t1.person_id = t2.id
-      ),
-    temp5("id", count_like) as (
-      SELECT t1.id, count(t2.id)
-        FROM comment as t1
-        LEFT JOIN likes as t2 ON t2.comment_id = t1.id
-        GROUP BY t1.id
-      )
+      ${this.#getCommentInfoQuery}
         
       SELECT t1.*, t2.nick as author_update_nick_name, t3.title as post_title, t4.count_like
       FROM temp4 as t1
@@ -134,6 +108,43 @@ class CommentPostgressRepo {
       LIMIT $1 OFFSET $2
     `,
       [COUNT_COMMENT_PER_PAGE, offset]
+    );
+    return comments.rows;
+  }
+  /* Отображение комментариев пользователя */
+  async getByUserID(userID, reqUserID, reqUserRole) {
+    const verifySortAllComents = reqUserID
+      ? reqUserRole == "moder" || reqUserRole == "admin" || userID == reqUserID
+        ? `(verified = true OR verified = false)`
+        : `(verified = true)`
+      : `verified = true`;
+    const allComents = await db.query(
+      `SELECT id FROM comment WHERE comment.person_id = $1 AND ${verifySortAllComents}`,
+      [userID]
+    );
+    return allComents.rows;
+  }
+  async getSortedByUserID(userID, reqUserID, reqUserRole, offset, filter) {
+    const verifySortCommentInfo = reqUserID
+      ? reqUserRole == "moder" || reqUserRole == "admin" || userID == reqUserID
+        ? `(t1.verified = true OR t1.verified = false)`
+        : `t1.verified = true`
+      : `t1.verified = true`;
+    const filterString = this.#getFilter(filter);
+    const comments = await db.query(
+      `
+      ${this.#getCommentInfoQuery}
+        
+      SELECT t1.*, t2.nick as author_update_nick_name, t3.title as post_title, t4.count_like
+      FROM temp4 as t1
+      LEFT JOIN person as t2 ON t2.id = t1.author_update_id
+      LEFT JOIN post as t3 ON t1.post_id = t3.id
+      LEFT JOIN temp5 as t4 ON t1.id = t4.id
+      WHERE t1.author_id = $3 AND ${verifySortCommentInfo}
+      ORDER BY ${filterString}
+      LIMIT $1 OFFSET $2
+    `,
+      [COUNT_COMMENT_PER_PAGE, offset, userID]
     );
     return comments.rows;
   }
@@ -320,6 +331,72 @@ class CommentRepo {
     const comments = [];
     for (const commentInfo of commentsInfo) {
       const likes = likesArrayInfo[commentInfo.id];
+      const comment = {
+        id: commentInfo.id,
+        body: commentInfo.body,
+        main: commentInfo.main,
+        authorID: commentInfo.author_id,
+        authorNickName: commentInfo.author_nick_name,
+        authorAvatar: commentInfo.author_avatar,
+        authorRole: commentInfo.author_role,
+        authorReputation: commentInfo.author_reputation,
+        authorCountComment: commentInfo.author_count_comment,
+        date: commentInfo.date,
+        updated: commentInfo.updated,
+        dateUpdate: commentInfo.date_update,
+        authorUpdateNickName: commentInfo.author_update_nick_name,
+        authorUpdateID: commentInfo.author_update_id,
+        verified: commentInfo.verified,
+        fixed: commentInfo.fixed,
+        countLikes: commentInfo.count_like,
+        likes: likes || [],
+        postID: commentInfo.post_id,
+        postTitle: commentInfo.post_title,
+      };
+      comments.push(comment);
+    }
+
+    return { comments, maxPage };
+  }
+  async getByUserID(userID, page, filter, reqUserID, reqUserRole) {
+    /* find max page */
+    const offset = (page - 1) * COUNT_COMMENT_PER_PAGE;
+    const allowComments = await this.repo.getByUserID(
+      userID,
+      reqUserID,
+      reqUserRole
+    );
+    const maxPage = allowComments?.length
+      ? Math.ceil(allowComments.length / COUNT_COMMENT_PER_PAGE)
+      : 0;
+    if (maxPage === 0 || maxPage < page) return { comments: [], maxPage: 0 };
+    /* find comments Info */
+    const commentsInfo = await this.repo.getSortedByUserID(
+      userID,
+      reqUserID,
+      reqUserRole,
+      offset,
+      filter
+    );
+    const commentListID = [];
+    for (const commentInfo of commentsInfo) {
+      commentListID.push(commentInfo.id);
+    }
+    if (commentListID.length === 0) return { comments: [], maxPage };
+    /* find likes info */
+    const likesInfo = await this.repo.getLikesInfoByCommentID(commentListID);
+    const likesArrayInfo = {};
+    for (const likeInfo of likesInfo) {
+      const index = likeInfo.comment_id;
+      const fromID = likeInfo.from;
+      if (!likesArrayInfo[index]) likesArrayInfo[index] = [];
+      likesArrayInfo[index].push(fromID);
+    }
+    /* find result  */
+    const comments = [];
+    for (const commentInfo of commentsInfo) {
+      const likes = likesArrayInfo[commentInfo.id];
+
       const comment = {
         id: commentInfo.id,
         body: commentInfo.body,

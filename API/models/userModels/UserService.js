@@ -19,25 +19,13 @@ class UserService {
       return { status: 404, message: "Пользователь не найден!" };
     return { status: 200, userInfo, privateUserInfo };
   }
-  async getUserComments(userID, page) {
-    const { userComments, maxPage } = await UserRepo.getUserComments(
-      userID,
-      page
-    );
-    if (userComments.length === 0)
-      return { status: 404, message: "Сообщения пользователя не найдены!" };
-    return { status: 200, userComments, maxPage };
+  async getUserContent(userID) {
+    const content = await UserRepo.getUserContent(userID);
+    if (content.length === 0)
+      return { status: 404, message: "Контент пользователя не найден!" };
+    return { status: 200, content };
   }
-  async getUserPosts(userID, page, filter) {
-    const { userPosts, maxPage } = await UserRepo.getUserPosts(
-      userID,
-      page,
-      filter
-    );
-    if (userPosts.length === 0)
-      return { status: 404, message: "Сообщения пользователя не найдены!" };
-    return { status: 200, userPosts, maxPage };
-  }
+
   async switchRoleToUser(userID) {
     const { userInfo } = await UserRepo.getUserByID(userID);
     console.log(userInfo);
@@ -63,6 +51,7 @@ class UserService {
     await UserRepo.updateUserName(userName, userID);
     return { status: 200, message: "Успешно!" };
   }
+
   async updatePasswordNote(userID) {
     const userInfo = await UserRepo.getUserInfo(userID);
     if (userInfo.length === 0) throw new Error();
@@ -88,7 +77,7 @@ class UserService {
       userEmail,
       "Смена пароля",
       "Для смены пароля пройдите по следующей ссылке, которая действительна в течении 5 минут: ",
-      "changePassword",
+      "password",
       changeKey
     );
     return {
@@ -96,21 +85,62 @@ class UserService {
       message: "На электронную почту была выслана инструкция по смене пароля!",
     };
   }
-  async updatePassword(password, key, userID) {
-    const userInfo = await UserRepo.getUserInfo(userID);
-    if (userInfo.length === 0) throw new Error();
+  async updatePasswordForgot(email) {
+    const userInfo = await UserRepo.getUserInfoByEmail(email);
+    if (userInfo.length === 0)
+      return {
+        status: 400,
+        message: "Указанный вами адресс электронной почты не существует!",
+      };
+    const resetPasswordLast = userInfo[0].reset_password_last;
     const resetPasswordTime = userInfo[0].reset_password_time;
-    const resetPasswordKey = userInfo[0].reset_password_key;
-    if (new Date(resetPasswordTime) < new Date() || resetPasswordKey !== key)
+    if (!this.#isManyDiffPerDaysThanOne(resetPasswordLast))
+      return {
+        status: 400,
+        message: "С прошлой смены пароля не прошел один день!",
+      };
+    if (new Date(resetPasswordTime) > new Date())
+      return {
+        status: 400,
+        message:
+          "Попытка сменить пароль уже начата, следуйте инструкциям на почте!",
+      };
+
+    const userEmail = userInfo[0].email;
+    const changeKey = this.#genKey();
+
+    await UserRepo.updatePasswordNote(userInfo[0].id, changeKey);
+    await sendEmailWithLink(
+      userEmail,
+      "Смена пароля",
+      "Для смены пароля пройдите по следующей ссылке, которая действительна в течении 5 минут: ",
+      "password",
+      changeKey
+    );
+    return {
+      status: 200,
+      message: "На электронную почту была выслана инструкция по смене пароля!",
+    };
+  }
+  async updatePassword(password, key) {
+    const userInfo = await UserRepo.getUserInfoByPasswordKey(key);
+    if (userInfo.length === 0)
+      return {
+        status: 400,
+        message: "Ключ не существует или истекло время операции!",
+      };
+    const resetPasswordTime = userInfo[0].reset_password_time;
+    if (new Date(resetPasswordTime) < new Date())
       return {
         status: 400,
         message: "Ключ не существует или истекло время операции!",
       };
 
     const hash = await bcrypt.hash(password, saltRounds);
-    await UserRepo.updatePassword(hash, userID);
+    await UserRepo.updatePassword(hash, userInfo[0].id);
     return { status: 200, message: "Успешно!" };
   }
+
   async updateEmailNote(userID) {
     const userInfo = await UserRepo.getUserInfo(userID);
     if (userInfo.length === 0) throw new Error();
@@ -135,7 +165,7 @@ class UserService {
       userEmail,
       "Смена электронной почты",
       "Для смены электронной почты пройдите по следующей ссылке, которая действительна в течении 5 минут: ",
-      "changeEmail",
+      "email",
       changeKey
     );
     return {
@@ -184,8 +214,9 @@ class UserService {
     dateFirst.setDate(dateFirst.getDate() + 1);
     return dateFirst < new Date();
   }
-  async updateAvatar(file, userID) {
-    if (!file || file.size > maxSizeAvatar)
+
+  async updateAvatar(file, uploadDate, userID) {
+    if (!file || file.size > maxSizeAvatar || !uploadDate)
       return {
         status: 400,
         message:
@@ -195,7 +226,6 @@ class UserService {
     const userInfo = await UserRepo.getUserInfo(userID);
     if (userInfo.length === 0) throw new Error();
     const avatar = userInfo[0].avatar;
-
     if (avatar !== null && avatar != "") {
       let dir = join(
         __dirname,
@@ -207,13 +237,16 @@ class UserService {
         `${userID}`,
         `${avatar}`
       );
-      if (accessPromise(dir)) await unlink(dir);
+      if (await accessPromise(dir)) await unlink(dir);
     }
-    await UserRepo.updateAvatar(file.originalname, userID);
+
+    const extenstion = file.originalname.split(".");
+    const name = `${file.fieldname}-${uploadDate}.${extenstion.at(-1)}`;
+    await UserRepo.updateAvatar(name, userID);
     return { status: 200, message: "Успешно!" };
   }
-  async updateBackImg(file, userID) {
-    if (!file || file.size > maxSizeAvatar)
+  async updateBackImg(file, uploadDate, userID) {
+    if (!file || file.size > maxSizeAvatar || !uploadDate)
       return {
         status: 400,
         message:
@@ -235,10 +268,55 @@ class UserService {
         `${userID}`,
         `${backImg}`
       );
-      if (accessPromise(dir)) await unlink(dir);
+      if (await accessPromise(dir)) await unlink(dir);
     }
-    await UserRepo.updateBackImg(file.originalname, userID);
+
+    const extenstion = file.originalname.split(".");
+    const name = `${file.fieldname}-${uploadDate}.${extenstion.at(-1)}`;
+    await UserRepo.updateBackImg(name, userID);
     return { status: 200, message: "Успешно!" };
+  }
+  async deleteAvatar(userID) {
+    const userInfo = await UserRepo.getUserInfo(userID);
+    if (userInfo[0].avatar === null || userInfo[0].avatar.length === 0)
+      return {
+        status: 400,
+        message: "У пользователя нет аватара!",
+      };
+    let dir = join(
+      __dirname,
+      "..",
+      "..",
+      "dist",
+      "uploads",
+      "userImg",
+      `${userID}`,
+      `${userInfo[0].avatar}`
+    );
+    if (await accessPromise(dir)) await unlink(dir);
+    await UserRepo.deleteAvatar(userID);
+    return { status: 200, message: "Аватар успешно удален!" };
+  }
+  async deleteBackImg(userID) {
+    const userInfo = await UserRepo.getUserInfo(userID);
+    if (userInfo[0].back_img === null || userInfo[0].back_img.length === 0)
+      return {
+        status: 400,
+        message: "У пользователя нет обложки!",
+      };
+    let dir = join(
+      __dirname,
+      "..",
+      "..",
+      "dist",
+      "uploads",
+      "userImg",
+      `${userID}`,
+      `${userInfo[0].back_img}`
+    );
+    if (await accessPromise(dir)) await unlink(dir);
+    await UserRepo.deleteBackImg(userID);
+    return { status: 200, message: "Обложка профиля успешно удалена!" };
   }
 
   #genKey() {

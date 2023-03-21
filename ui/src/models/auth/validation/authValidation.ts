@@ -25,8 +25,9 @@ export const authValidationField = (
   setError: React.Dispatch<React.SetStateAction<authForm>>,
   authForm: authForm
 ) => {
+  if (!(field in error)) return;
   if (fieldData.length === 0) {
-    error[field] = "Поле обязяательно для заполнения!";
+    error[field] = "Поле обязательно для заполнения!";
     setError({ ...error });
     return;
   }

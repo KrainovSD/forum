@@ -25,32 +25,20 @@ class UserController {
       res.status(500).json();
     }
   }
-  async getUserComments(req, res) {
+  async getUserContent(req, res) {
     try {
       const { id: userID } = req.params;
-      const { page } = req.query;
-      const { status, message, userComments, maxPage } =
-        await UserService.getUserComments(userID, page);
+      const { status, message, content } = await UserService.getUserContent(
+        userID
+      );
       if (status !== 200) return res.status(status).json(message);
-      return res.status(200).json({ userComments, maxPage });
+      return res.status(200).json(content);
     } catch (e) {
       req.err = e;
-      res.status(500).json();
+      return res.status(500).json();
     }
   }
-  async getUserPosts(req, res) {
-    try {
-      const { id: userID } = req.params;
-      const { page, filter } = req.query;
-      const { status, message, userPosts, maxPage } =
-        await UserService.getUserPosts(userID, page, filter);
-      if (status !== 200) return res.status(status).json(message);
-      return res.status(200).json({ userPosts, maxPage });
-    } catch (e) {
-      req.err = e;
-      res.status(500).json();
-    }
-  }
+
   async updateNickName(req, res) {
     try {
       const { nickName } = req.body;
@@ -77,6 +65,7 @@ class UserController {
       return res.status(500).json();
     }
   }
+
   async updatePasswordNote(req, res) {
     try {
       const { status, message } = await UserService.updatePasswordNote(
@@ -88,13 +77,22 @@ class UserController {
       return res.status(500).json();
     }
   }
+  async updatePasswordForgot(req, res) {
+    try {
+      const { email } = req.body;
+      const { status, message } = await UserService.updatePasswordForgot(email);
+      return res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      return res.status(500).json();
+    }
+  }
   async updatePassword(req, res) {
     try {
       const { password, key } = req.body;
       const { status, message } = await UserService.updatePassword(
         password,
-        key,
-        req.userID
+        key
       );
       return res.status(status).json(message);
     } catch (e) {
@@ -102,6 +100,7 @@ class UserController {
       return res.status(500).json();
     }
   }
+
   async updateEmailNote(req, res) {
     try {
       const { status, message } = await UserService.updateEmailNote(req.userID);
@@ -125,11 +124,14 @@ class UserController {
       return res.status(500).json();
     }
   }
+
   async updateAvatar(req, res) {
     try {
       const file = req?.file;
+      const uploadDate = req?.uploadDate;
       const { status, message } = await UserService.updateAvatar(
         file,
+        uploadDate,
         req.userID
       );
       return res.status(status).json(message);
@@ -141,10 +143,33 @@ class UserController {
   async updateBackImg(req, res) {
     try {
       const file = req?.file;
+      const uploadDate = req?.uploadDate;
       const { status, message } = await UserService.updateBackImg(
         file,
+        uploadDate,
         req.userID
       );
+      return res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      return res.status(500).json();
+    }
+  }
+
+  async deleteAvatar(req, res) {
+    try {
+      const userID = req.userID;
+      const { status, message } = await UserService.deleteAvatar(userID);
+      return res.status(status).json(message);
+    } catch (e) {
+      req.err = e;
+      return res.status(500).json();
+    }
+  }
+  async deleteBackImg(req, res) {
+    try {
+      const userID = req.userID;
+      const { status, message } = await UserService.deleteBackImg(userID);
       return res.status(status).json(message);
     } catch (e) {
       req.err = e;

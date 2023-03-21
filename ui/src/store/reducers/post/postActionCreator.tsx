@@ -7,6 +7,7 @@ import {
   IAdminUpdatePost,
   ICreatePost,
   IGetAllPosts,
+  IGetUserPosts,
   ILastPost,
   IPostsTypes,
   IPostTypes,
@@ -93,14 +94,32 @@ export const getAllPosts = createAsyncThunk(
   }
 );
 
+export const getPostByUserID = createAsyncThunk(
+  "post/user",
+  async (req: IGetUserPosts, thunkApi) => {
+    try {
+      const response = await axiosInstanceNoStrictToken.get<{
+        maxPage: number;
+        posts: IPostsTypes[];
+      }>(`/api/post/user/${req.userID}`, {
+        params: {
+          filter: req.filter,
+          page: req.page,
+        },
+      });
+      return response.data;
+    } catch (e) {
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
+    }
+  }
+);
+
 export const updatePost = createAsyncThunk(
   "post/update",
   async (req: IUpdatePost, thunkApi) => {
     try {
-      const response = await axiosInstanceToken.put<string>(
-        `/api/post/title`,
-        req
-      );
+      const response = await axiosInstanceToken.put<string>(`/api/post`, req);
       return response.data;
     } catch (e) {
       const reqError = getRequestError(e);

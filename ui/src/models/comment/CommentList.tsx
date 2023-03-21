@@ -59,6 +59,8 @@ export const CommentList: React.FC = () => {
     if (response.length > 0) setPopup("Комментарии", response);
   }, [response]);
 
+  console.log(comments);
+
   return (
     <div className="comment-list">
       {popup}

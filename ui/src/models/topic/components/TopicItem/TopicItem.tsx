@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 import { LastComment } from "../../../../components/LastComment/LastComment";
 import { TopicAdminPanel } from "../TopicAdminPanel/TopicAdminPanel";
 import { useAppSelector } from "../../../../hooks/redux";
+import { getTopicLink } from "../../../../helpers/getLinks";
 
 interface TopicItemProps {
   topic: ItopicType;
@@ -18,7 +19,7 @@ export const TopicItem: React.FC<TopicItemProps> = ({ topic }) => {
       <div className="topic-item__content">
         <img src={chatIcon} alt="" className="topic-item__icon" />
         <div className="topic-item__title">
-          <NavLink to={`/topic/${topic.id}`} className="_title">
+          <NavLink to={getTopicLink(topic.id)} className="_title">
             {topic.title}
           </NavLink>
           <div className="topic-item__sub-title-list">
@@ -27,7 +28,7 @@ export const TopicItem: React.FC<TopicItemProps> = ({ topic }) => {
                 <NavLink
                   className="_sub-title"
                   key={subTitle.id}
-                  to={`/topic/${subTitle.id}`}
+                  to={getTopicLink(subTitle.id)}
                 >
                   {subTitle.title}
                 </NavLink>

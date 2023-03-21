@@ -8,6 +8,7 @@ import {
 } from "../../../../store/reducers/post/postActionCreator";
 import { DeletePost } from "../DeletePost/DeletePost";
 import { NavLink } from "react-router-dom";
+import { getUpdatePostLink } from "../../../../helpers/getLinks";
 
 interface IPostAdminPanelProps {
   postID: string;
@@ -22,9 +23,11 @@ export const PostAdmitPanel: React.FC<IPostAdminPanelProps> = ({
   fixed,
   verified,
 }) => {
+  const updatePostLink = getUpdatePostLink(postID);
   const { userInfo } = useAppSelector((state) => state.user);
   const titleConfirm = "Изменить статус поста";
   const dispatch = useAppDispatch();
+
   const changeClosed = () => {
     const value = closed ? false : true;
     dispatch(updatePostClosed({ postID, value }));
@@ -39,7 +42,6 @@ export const PostAdmitPanel: React.FC<IPostAdminPanelProps> = ({
   };
 
   const { confirm, checkConfirm } = useConfirm();
-
   const conditionToVisibleAdminTools =
     userInfo && (userInfo.role === "admin" || userInfo.role === "moder");
 
@@ -47,7 +49,7 @@ export const PostAdmitPanel: React.FC<IPostAdminPanelProps> = ({
     <div className="post-admin-panel">
       {confirm}
       {conditionToVisibleAdminTools && <DeletePost postID={postID} />}
-      <NavLink to={`/update/post/${postID}`} className="post-admin-panel__item">
+      <NavLink to={updatePostLink} className="post-admin-panel__item">
         Изменить
       </NavLink>
       {conditionToVisibleAdminTools && (

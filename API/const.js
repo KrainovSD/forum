@@ -1,3 +1,4 @@
-export const COUNT_COMMENT_PER_PAGE = 3;
-export const COUNT_POST_PER_PAGE = 3;
-export const COUNT_COMMENT_FOR_SWITCH_USER_ROLE = 4;
+export const COUNT_COMMENT_PER_PAGE = 5;
+export const COUNT_POST_PER_PAGE = 5;
+export const COUNT_USER_CONTENT_PER_PAGE = 5;
+export const COUNT_COMMENT_FOR_SWITCH_USER_ROLE = 30;

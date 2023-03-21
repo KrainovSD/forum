@@ -1,18 +1,14 @@
 import "./ProfileInfo.scss";
 import arrowRight from "../../../../assets/media/arrow-right.png";
 import { getAvatar } from "../../../../helpers/getAvatar";
-import { IUserInfoProp } from "../../../../models/profile/types/UserInfo";
 import { getReputationCaption } from "../../../../helpers/getCaption";
+import { ISelectedUserInfo, IUserInfo } from "store/reducers/user/userTypes";
 
 interface IProfileInfoProps {
-  user: IUserInfoProp;
-  isOwnProfile: boolean;
+  user: IUserInfo | ISelectedUserInfo;
 }
-export const ProfileInfo: React.FC<IProfileInfoProps> = ({
-  user,
-  isOwnProfile,
-}) => {
-  const avatar = getAvatar(user.avatar);
+export const ProfileInfo: React.FC<IProfileInfoProps> = ({ user }) => {
+  const avatar = getAvatar(user.avatar, user.id);
   const reputationCaption = getReputationCaption(user.reputation);
 
   return (
@@ -23,12 +19,6 @@ export const ProfileInfo: React.FC<IProfileInfoProps> = ({
           <h3>{user.reputation}</h3>
           <p>{reputationCaption}</p>
         </div>
-        <div className="profile-info__reputation-tracker">
-          <div>
-            <p>История репутации</p>
-            <img src={arrowRight} alt="" />
-          </div>
-        </div>
       </div>
       <div className="profile-info__subscribers" data-tooltip="В разработке">
         <div className="profile-info__subscribers-wrapper">
@@ -36,9 +26,9 @@ export const ProfileInfo: React.FC<IProfileInfoProps> = ({
             <p>0 Подписчиков</p>
           </div>
           <div className="profile-info__subscribers-list">
-            <div className="profile-info__subscribers-item">
+            {/*<div className="profile-info__subscribers-item">
               <img src={avatar} alt="" />
-            </div>
+  </div>*/}
           </div>
         </div>
         <div className="profile-info__subscribers-footer">

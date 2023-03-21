@@ -13,4 +13,7 @@
   &:hover {
     background: #737373;
   }
+  &[data-disabled="true"] {
+    background: #5757572c;
+  }
 }

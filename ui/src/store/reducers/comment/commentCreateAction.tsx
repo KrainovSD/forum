@@ -6,6 +6,7 @@ import {
   IComment,
   ICreateComment,
   IGetAllComments,
+  IGetCommentByUserID,
   IReqGetCommentByPost,
   IUpdateComment,
   IUpdateCommentFixed,
@@ -52,6 +53,26 @@ export const getAllComments = createAsyncThunk(
     }
   }
 );
+export const getCommentByUserID = createAsyncThunk(
+  "comment/user",
+  async (req: IGetCommentByUserID, thunkApi) => {
+    try {
+      const response = await axiosInstanceNoStrictToken.get<{
+        maxPage: number;
+        comments: IComment[];
+      }>(`/api/comment/user/${req.userID}`, {
+        params: {
+          page: req.page,
+          filter: req.filter,
+        },
+      });
+      return response.data;
+    } catch (e) {
+      const reqError = getRequestError(e);
+      return thunkApi.rejectWithValue(reqError);
+    }
+  }
+);
 
 export const createComment = createAsyncThunk(
   "comment/create",
@@ -68,7 +89,6 @@ export const createComment = createAsyncThunk(
     }
   }
 );
-
 export const updateComment = createAsyncThunk(
   "comment/update",
   async (req: IUpdateComment, thunkApi) => {
@@ -84,7 +104,6 @@ export const updateComment = createAsyncThunk(
     }
   }
 );
-
 export const updateCommentVerified = createAsyncThunk(
   "comment/updateVerified",
   async (req: IUpdateCommentVerified, thunkApi) => {
@@ -100,7 +119,6 @@ export const updateCommentVerified = createAsyncThunk(
     }
   }
 );
-
 export const updateCommentFixed = createAsyncThunk(
   "comment/updateFixed",
   async (req: IUpdateCommentFixed, thunkApi) => {
@@ -116,7 +134,6 @@ export const updateCommentFixed = createAsyncThunk(
     }
   }
 );
-
 export const deleteComment = createAsyncThunk(
   "comment/delete",
   async (commentID: string, thunkApi) => {

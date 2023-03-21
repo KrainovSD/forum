@@ -12,15 +12,18 @@ import {
 import { Loader } from "./components/Loader/Loader";
 import { getMyUserInfo } from "./store/reducers/user/userActionCreator";
 import { userSlice } from "./store/reducers/user/userReducer";
+import { useEffectOnlyUpdate } from "./hooks/useResponse";
 
 export const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const { auth, isLoading: isLoadingAuth } = useAppSelector(
     (state) => state.auth
   );
-  const { isLoading: isLoadingUser, userInfo } = useAppSelector(
-    (state) => state.user
-  );
+  const {
+    isLoading: isLoadingUser,
+    userInfo,
+    updated: isUpdateUserInfo,
+  } = useAppSelector((state) => state.user);
   const { isLoading: isLoadingTopic } = useAppSelector((state) => state.topic);
   const { isLoading: isLoadingPost } = useAppSelector((state) => state.post);
   const { isLoading: isLoadingLike } = useAppSelector((state) => state.like);
@@ -39,6 +42,10 @@ export const App: React.FC = () => {
     if (!auth) dispatch(userSlice.actions.clearUserInfo());
     else dispatch(getMyUserInfo());
   }, [auth]);
+
+  useEffectOnlyUpdate(() => {
+    if (isUpdateUserInfo && auth) dispatch(getMyUserInfo());
+  }, [isUpdateUserInfo]);
 
   const route = auth
     ? userInfo && (userInfo.role === "moder" || userInfo.role === "admin")

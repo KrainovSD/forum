@@ -32,7 +32,7 @@ const create = [
     .isNumeric()
     .withMessage("У поля неверный тип данных!"),
 ];
-const updateTitle = [
+const update = [
   body("title")
     .trim()
     .not()
@@ -49,6 +49,13 @@ const updateTitle = [
       "Поле должно состоять из букв русского или английского алфавита, цифр и знаков препинания!"
     ),
   body("postID")
+    .trim()
+    .not()
+    .isEmpty({ ignore_whitespace: true })
+    .withMessage("Поле не должно быть пустым!")
+    .isNumeric()
+    .withMessage("У поля неверный тип данных!"),
+  body("topicID")
     .trim()
     .not()
     .isEmpty({ ignore_whitespace: true })
@@ -75,6 +82,6 @@ const updateValue = [
 
 export default {
   create,
-  updateTitle,
+  update,
   updateValue,
 };

@@ -11,6 +11,7 @@ import { PageNavBar } from "../../models/pageNavBar/PageNavBar";
 import { typeSearch } from "../../models/pageNavBar/types";
 import { usePopup } from "../../hooks/usePopup";
 import { useEffectOnlyUpdate } from "../../hooks/useResponse";
+import { getCreatePostLink } from "../../helpers/getLinks";
 
 export const PostList: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -82,6 +83,8 @@ export const PostList: React.FC = () => {
           { tag: "most-comment", caption: "Больше ответов" },
         ];
 
+  const createPostLink = getCreatePostLink(topicID);
+
   if (posts.length === 0)
     return (
       <div>
@@ -90,7 +93,7 @@ export const PostList: React.FC = () => {
           userInfo?.role === "moder") && (
           <div className="post-list">
             <NavLink
-              to={`/create/post/${topicID}`}
+              to={createPostLink}
               className="post-list__create-post-button"
             >
               <img src={messageWhite} alt="" /> <p>Создать новую тему</p>
@@ -103,10 +106,7 @@ export const PostList: React.FC = () => {
   return (
     <div className="post-list">
       {popup}
-      <NavLink
-        to={`/create/post/${topicID}`}
-        className="post-list__create-post-button"
-      >
+      <NavLink to={createPostLink} className="post-list__create-post-button">
         <img src={messageWhite} alt="" /> <p>Создать новую тему</p>
       </NavLink>
       <PageNavBar

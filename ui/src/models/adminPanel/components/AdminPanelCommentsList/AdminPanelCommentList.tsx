@@ -30,15 +30,20 @@ export const AdminPanelCommentList: React.FC = () => {
     const page = search.page ? search.page : "1";
     const filter = search.filter ? search.filter : "last-date-create";
     setSearch({ page, filter }, { replace: true });
-  }, []);
+  }, [search.page, search.filter]);
   useEffect(() => {
     if (statusError === 404 && search.page !== "1")
       setSearch({ page: "1" }, { replace: true });
   }, [statusError]);
 
   const getComments = () => {
-    if (search.page && search.filter)
-      dispatch(getAllComments({ page: search.page, filter: search.filter }));
+    if (search.page)
+      dispatch(
+        getAllComments({
+          page: search.page,
+          filter: search.filter ? search.filter : "last-date-create",
+        })
+      );
   };
   useEffect(() => {
     getComments();
@@ -58,8 +63,7 @@ export const AdminPanelCommentList: React.FC = () => {
   const filterOptions = [
     { tag: "last-update", caption: "Последние обновления" },
     { tag: "last-date-create", caption: "Дата создания" },
-    { tag: "most-likes", caption: "Самые просматриваемые" },
-    { tag: "most-comment", caption: "Больше ответов" },
+    { tag: "most-likes", caption: "Самые популярные" },
     { tag: "no-verify", caption: "Не утвержденные" },
   ];
 
@@ -68,23 +72,29 @@ export const AdminPanelCommentList: React.FC = () => {
       {popup}
       {!isLoadingAuth && !isLoadingUser && isSmallLoading && <SmallLoader />}
 
-      <PageNavBar
-        page={true}
-        maxPage={maxPage}
-        filter={true}
-        filterOptions={filterOptions}
-      />
-
+      {search.page && (
+        <PageNavBar
+          page={true}
+          maxPage={maxPage}
+          filter={true}
+          filterOptions={filterOptions}
+        />
+      )}
+      {comments.length === 0 && (
+        <div className="not-found">Комментарии не найдены</div>
+      )}
       {comments.map((comment) => (
         <CommentItem comment={comment} key={comment.id} />
       ))}
 
-      <PageNavBar
-        page={true}
-        maxPage={maxPage}
-        filter={true}
-        filterOptions={filterOptions}
-      />
+      {search.page && (
+        <PageNavBar
+          page={true}
+          maxPage={maxPage}
+          filter={true}
+          filterOptions={filterOptions}
+        />
+      )}
     </div>
   );
 };

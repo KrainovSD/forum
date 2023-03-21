@@ -6,6 +6,11 @@ import { NavLink } from "react-router-dom";
 import { useDateFormat } from "../../../../hooks/useDateFormat";
 import { getAvatar } from "../../../../helpers/getAvatar";
 import { IPostTypes } from "store/reducers/post/postTypes";
+import {
+  getCreatePostLink,
+  getTopicLink,
+  getUserLink,
+} from "../../../../helpers/getLinks";
 
 interface IPostCommonHeaderProps {
   currentPost: IPostTypes;
@@ -19,14 +24,14 @@ export const PostCommonHeader: React.FC<IPostCommonHeaderProps> = ({
   const avatar = getAvatar(currentPost.authorAvatar, currentPost.authorID);
   const dateString = currentPost.date as string;
   const date = useDateFormat(dateString);
+  const topicLink = getTopicLink(currentPost.topicID);
+  const userLink = getUserLink(currentPost.authorID);
+  const createPostLink = getCreatePostLink(currentPost.topicID);
 
   return (
     <div>
       <div className="post-common-header">
-        <NavLink
-          to={`/profile/${currentPost?.authorID}`}
-          className="post-common-header__avatar"
-        >
+        <NavLink to={userLink} className="post-common-header__avatar">
           <img src={avatar} alt="" />
         </NavLink>
         <div className="post-common-header__info-wrapper">
@@ -40,14 +45,11 @@ export const PostCommonHeader: React.FC<IPostCommonHeaderProps> = ({
           </div>
           <div className="post-common-header__author">
             Автор{" "}
-            <NavLink
-              to={`/profile/${currentPost?.authorID}`}
-              className="_author"
-            >
+            <NavLink to={userLink} className="_author">
               {currentPost?.authorNickName}
             </NavLink>
             , {date} в
-            <NavLink to={`/topic/${currentPost?.topicID}`} className="_topic">
+            <NavLink to={topicLink} className="_topic">
               {` ${currentPost?.topicTitle}`}
             </NavLink>
           </div>
@@ -57,7 +59,7 @@ export const PostCommonHeader: React.FC<IPostCommonHeaderProps> = ({
       {userInfo && (
         <div className="post-common-header__tools">
           <NavLink
-            to={`/create/post/${currentPost.topicID}`}
+            to={createPostLink}
             className="post-common-header__create-new-post"
           >
             Создать новую тему

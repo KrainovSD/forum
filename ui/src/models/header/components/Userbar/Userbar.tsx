@@ -8,6 +8,7 @@ import { useEvent } from "../../../../hooks/useEvent";
 import { NavLink } from "react-router-dom";
 import { useAppSelector } from "../../../../hooks/redux";
 import { Loader } from "../../../../components/Loader/Loader";
+import { getCreatePostLink, getUserLink } from "../../../../helpers/getLinks";
 
 export const Userbar: React.FC = () => {
   const [isSubMenuVisible, setIsSubMenuVisible] = useState<boolean>(false);
@@ -56,13 +57,15 @@ export const Userbar: React.FC = () => {
     <div className="userBar">
       {isLoading && <Loader />}
       <div className="userBar__wrapper">
-        <NavLink
-          to={`/profile/${userInfo?.id}`}
-          className="userBar__img-container"
-          data-tooltip="Профиль"
-        >
-          <img src={user} alt="" className="userBar__img" />
-        </NavLink>
+        {userInfo && (
+          <NavLink
+            to={getUserLink(userInfo.id)}
+            className="userBar__img-container"
+            data-tooltip="Профиль"
+          >
+            <img src={user} alt="" className="userBar__img" />
+          </NavLink>
+        )}
         <div className="userBar__nickNameWrapper">
           <div className="userBar__nickName" onClick={toggleSubMenuVisible}>
             <p>Serega_Krainov48</p>
@@ -71,17 +74,23 @@ export const Userbar: React.FC = () => {
           <SubMenu
             isVisible={isSubMenuVisible}
             setLoading={(v: boolean) => setIsLoading(v)}
+            closeMenu={() => {
+              setIsSubMenuVisible(false);
+            }}
           />
         </div>
         <NavLink
-          to={"/create/post"}
+          to={getCreatePostLink()}
           className="userBar__newContent"
           data-tooltip="Создать новый контент"
         >
           <img src={plus} alt="" className="userBar__plus" />
           <p>Создать</p>
         </NavLink>
-        <div className="userBar__notice" data-tooltip="Уведомления">
+        <div
+          className="userBar__notice"
+          data-tooltip="Уведомления (В разработке)"
+        >
           <div className="userBar__noticeImg"></div>
         </div>
         <div className="userBar__chat" data-tooltip-left="Личные сообщения">

@@ -9,13 +9,19 @@ import { authSlice } from "../../../../store/reducers/auth/authReducer";
 import { axiosInstanceToken } from "../../../../helpers/axiosInstanceToken";
 import { useEffect } from "react";
 import { NavLink } from "react-router-dom";
+import { getSettingLink } from "../../../../helpers/getLinks";
 
 interface SubMenuProps {
   isVisible: boolean;
   setLoading: (v: boolean) => void;
+  closeMenu: () => void;
 }
 
-export const SubMenu: React.FC<SubMenuProps> = ({ isVisible, setLoading }) => {
+export const SubMenu: React.FC<SubMenuProps> = ({
+  isVisible,
+  setLoading,
+  closeMenu,
+}) => {
   const dispatch = useAppDispatch();
   const { userInfo } = useAppSelector((state) => state.user);
 
@@ -40,13 +46,21 @@ export const SubMenu: React.FC<SubMenuProps> = ({ isVisible, setLoading }) => {
     >
       <div className="userBar__subMenu">
         <p className="userBar__subMenuHeader">НАСТРОЙКИ</p>
-        <div className="userBar__subMenuItem">
+        <NavLink
+          to={getSettingLink("review")}
+          className="userBar__subMenuItem"
+          onClick={closeMenu}
+        >
           <img src={setting} alt="" />
           <p>Настройки профиля</p>
-        </div>
+        </NavLink>
         {userInfo &&
           (userInfo.role === "admin" || userInfo.role === "moder") && (
-            <NavLink to="/admin-panel" className="userBar__subMenuItem">
+            <NavLink
+              to="/admin-panel"
+              className="userBar__subMenuItem"
+              onClick={closeMenu}
+            >
               <img src={moder} alt="" />
               <p>Панель администратора</p>
             </NavLink>

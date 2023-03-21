@@ -1,5 +1,5 @@
 export interface ILikeInitialState {
-  likes: ILike[] | null;
+  likes: ILike[];
   isLoading: boolean;
   updated: boolean;
   error: string;

@@ -13,13 +13,18 @@ router.get(
 router.get("/byID/:id", untils.noStrictCheckAuth, PostControllers.getOneByID);
 router.get("/last", PostControllers.getLastPosts);
 router.get("/all", untils.checkAuth, untils.checkModer, PostControllers.getAll);
+router.get(
+  "/user/:userID",
+  untils.noStrictCheckAuth,
+  PostControllers.getByUserID
+);
 router.get("/access/:id", untils.checkAuth, PostControllers.getPostAccessByID);
 router.put(
-  "/title",
+  "/",
   untils.checkAuth,
-  postValidation.updateTitle,
+  postValidation.update,
   untils.checkValidation,
-  PostControllers.updatePostTitle
+  PostControllers.updatePost
 );
 router.put(
   "/closed",
