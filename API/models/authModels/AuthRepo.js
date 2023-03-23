@@ -99,6 +99,14 @@ class AuthPostgressRepo {
     );
     if (result.rows.length === 0) throw new Error();
   }
+
+  async updateLastLogin(userID) {
+    const date = new Date();
+    const result = await db.query(
+      `UPDATE person SET last_login=$1 WHERE id=$2`,
+      [date, userID]
+    );
+  }
 }
 
 class AuthRepo {
@@ -210,6 +218,10 @@ class AuthRepo {
     if (!email) throw new Error();
 
     await this.repo.switchConfirm(email, key);
+  }
+
+  async updateLastLogin(userID) {
+    await this.repo.updateLastLogin(userID);
   }
 }
 

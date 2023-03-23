@@ -35,6 +35,7 @@ export interface IPostsTypes {
   countComment: string;
   viewCount: string;
   lastComment: PostLastCommentType | null;
+  viewed: boolean;
 }
 
 export interface IPostTypes {

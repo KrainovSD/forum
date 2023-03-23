@@ -17,6 +17,9 @@ class PostService {
   async getOneByID(id, userID, userRole) {
     const post = await PostRepo.getOneByID(id, userID, userRole);
     if (!post) return { status: 404, message: "Пост не найден" };
+    const { viewed, updated } = await PostRepo.getViewedInfo(id, userID);
+    if (updated) await PostRepo.switchUpdatedView(id, userID, false);
+    if (!viewed) await PostRepo.addView(id, userID);
     return { status: 200, post };
   }
   async getLastPosts() {
@@ -25,8 +28,8 @@ class PostService {
       return { status: 404, message: "Посты не найдены!" };
     return { status: 200, posts };
   }
-  async getAll(page, filter) {
-    const { posts, maxPage } = await PostRepo.getAll(page, filter);
+  async getAll(page, filter, userID) {
+    const { posts, maxPage } = await PostRepo.getAll(page, filter, userID);
     if (posts.length === 0)
       return { status: 404, message: "Посты не найдены!" };
     return { status: 200, posts, maxPage };
@@ -134,8 +137,13 @@ class PostService {
       };
 
     const post = await PostRepo.createPost(title, topicID, userID, userRole);
+    await PostRepo.addView(post.id, userID);
     await PostRepo.createComment(body, post.id, userID, userRole);
     return { status: 200, message: "Успешно!" };
+  }
+
+  async switchAllUpdatedView(postID, userID) {
+    await PostRepo.switchAllUpdatedView(postID, userID, true);
   }
 
   #getDiffInHours(date) {

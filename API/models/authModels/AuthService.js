@@ -96,18 +96,22 @@ class AuthServise {
       );
       if (!checkRefreshToken)
         return { status: 401, message: "Вы не авторизованы!" };
-      const refreshTokenInBD = await authRepo.findRefreshTokenByUserID(
-        checkRefreshToken.id
-      );
+
+      const userID = checkRefreshToken.id;
+      const userRole = checkRefreshToken.role;
+
+      const refreshTokenInBD = await authRepo.findRefreshTokenByUserID(userID);
       if (refreshToken !== refreshTokenInBD)
         return { status: 401, message: "Вы не авторизованы!" };
 
       const accessToken = await this.#getToken(
-        checkRefreshToken.id,
-        checkRefreshToken.role,
+        userID,
+        userRole,
         accessTokenSecret,
         acessTokenLiveTime
       );
+
+      await AuthRepo.updateLastLogin(userID);
 
       return { status: 200, accessToken };
     } catch (e) {

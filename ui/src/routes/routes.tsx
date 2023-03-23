@@ -24,6 +24,9 @@ import { SettingUserName } from "../models/setting/components/SettingUserName/Se
 import { SettingPassword } from "../models/setting/components/SettingPassword/SettingPassword";
 import { SettingEmail } from "../models/setting/components/SettingEmail/SettingEmail";
 import { SettingForgotPassword } from "../models/setting/components/SettingForgotPassword/SettingForgotPassword";
+import { MessagePage } from "../pages/MessagePage";
+import { SessionList } from "../models/message/SessionList";
+import { MessageList } from "../models/message/MessageList";
 
 const commonRoutes = [
   { path: "/", element: <MainPage /> },
@@ -46,18 +49,17 @@ const commonRoutes = [
   { path: "/password/:key", element: <SettingPassword /> },
   { path: "/email/:key", element: <SettingEmail /> },
 
-  {
-    path: "/setting",
-    element: <SettingPage />,
-    children: [
-      { path: "review", element: <SettingReview /> },
-      { path: "nick-name", element: <SettingNickName /> },
-      { path: "user-name", element: <SettingUserName /> },
-    ],
-  },
-
   { path: "/topic/:id", element: <TopicPage /> },
   { path: "/post/:id", element: <PostPage /> },
+
+  {
+    path: "/message",
+    element: <MessagePage />,
+    children: [
+      { path: "", element: <SessionList /> },
+      { path: "id/:id", element: <MessageList /> },
+    ],
+  },
 
   { path: "*", element: <Navigate to={"/"} replace /> },
 ];
@@ -67,6 +69,15 @@ const onlyPublicRoutes = [
   { path: "/forgot", element: <SettingForgotPassword /> },
 ];
 const privateCommonRoutes = [
+  {
+    path: "/setting",
+    element: <SettingPage />,
+    children: [
+      { path: "review", element: <SettingReview /> },
+      { path: "nick-name", element: <SettingNickName /> },
+      { path: "user-name", element: <SettingUserName /> },
+    ],
+  },
   { path: "/create/post?/:topicID", element: <AddPostPage /> },
   { path: "/update/post/:postID", element: <UpdatePostPage /> },
 ];

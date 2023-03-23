@@ -35,6 +35,65 @@ class PostPostgressRepo {
          LEFT JOIN comment ON comment.date = temp3.last_comment_date AND comment.post_id = temp3.post_id
          LEFT JOIN person ON person.id = comment.person_id
          )
+
+    SELECT temp1."post_id", temp1."parent_id", temp1."title", temp1."fixed", temp1."closed", 
+    temp1."verified", temp1."date", temp1."author_post_id", 
+    temp1."author_post_nick_name", temp2."count_view", temp4."count_comment", temp4."last_comment_date",
+    temp4."last_comment_id", temp4."last_comment_author_id", temp4."last_comment_author_nick_name", 
+    temp4."last_comment_author_avatar"
+      FROM temp1
+      LEFT JOIN temp2 ON temp2.post_id = temp1.post_id
+      LEFT JOIN temp4 ON temp4.post_id = temp1.post_id
+  `;
+  #getPostInfoQueryForAuthUsers = `
+  WITH 
+  temp1 ("post_id", "parent_id", "title", "fixed", "closed", "verified",  "date", 
+         "author_post_id", "author_post_nick_name") 
+    as (
+    SELECT post.id, post.topic_id, post.title, post.fixed, post.closed, post.verified, 
+      post.date, person.id, person.nick
+    FROM post
+    LEFT JOIN person ON post.person_id  = person.id
+    ),
+  temp2 ("post_id", "count_view")
+    as (
+    SELECT post.id, count(viewed_post.id)
+    FROM post
+    LEFT JOIN viewed_post ON viewed_post.post_id = post.id
+    GROUP BY post.id
+  ),
+  temp3 ("post_id", "count_comment", "last_comment_date")
+    as(
+    SELECT post.id, COUNT(comment.id), MAX(comment.date)
+    FROM post
+    LEFT JOIN comment ON comment.post_id = post.id
+    GROUP BY post.id
+    ),
+  temp4 ("post_id", "count_comment", "last_comment_date", "last_comment_id", "last_comment_author_id", 
+       "last_comment_author_nick_name", "last_comment_author_avatar")
+       as (
+       SELECT temp3.post_id, temp3.count_comment, temp3.last_comment_date, comment.id, 
+          person.id, person.nick, person.avatar
+       FROM temp3
+       LEFT JOIN comment ON comment.date = temp3.last_comment_date AND comment.post_id = temp3.post_id
+       LEFT JOIN person ON person.id = comment.person_id
+       ),
+  temp5("post_id", "viewed") AS (
+  SELECT t1.id, t2.id
+    FROM post as t1
+    LEFT JOIN viewed_post as t2 ON t1.id = t2.post_id AND t2.person_id = $1 AND t2.updated = false
+  )
+      
+
+    SELECT temp1."post_id", temp1."parent_id", temp1."title", temp1."fixed", temp1."closed", 
+    temp1."verified", temp1."date", temp1."author_post_id", 
+    temp1."author_post_nick_name", temp2."count_view", temp4."count_comment", temp4."last_comment_date",
+    temp4."last_comment_id", temp4."last_comment_author_id", temp4."last_comment_author_nick_name", 
+    temp4."last_comment_author_avatar", temp5.viewed
+      FROM temp1
+      LEFT JOIN temp2 ON temp2.post_id = temp1.post_id
+      LEFT JOIN temp4 ON temp4.post_id = temp1.post_id     
+      LEFT JOIN temp5 ON temp5.post_id = temp1.post_id
   `;
 
   /* Отображение постов в топике */
@@ -58,22 +117,22 @@ class PostPostgressRepo {
         : `(temp1.verified = true OR (temp1.verified = false AND temp1.author_post_id = ${userID}))`
       : `temp1.verified = true`;
     const sortCondition = this.#getSortedPostQuery(filter);
-    const postsInfo = await db.query(
-      `
+
+    const fullQuery = userID
+      ? `${this.#getPostInfoQueryForAuthUsers} 
+    WHERE temp1.parent_id = $2 AND ${verifyCondition}
+    ORDER BY temp1.fixed DESC, ${sortCondition} 
+    LIMIT $3 OFFSET $4`
+      : `
     ${this.#getPostInfoQuery} 
-    SELECT temp1."post_id", temp1."parent_id", temp1."title", temp1."fixed", temp1."closed", 
-      temp1."verified", temp1."date", temp1."author_post_id", 
-      temp1."author_post_nick_name", temp2."count_view", temp4."count_comment", temp4."last_comment_date",
-      temp4."last_comment_id", temp4."last_comment_author_id", temp4."last_comment_author_nick_name", 
-      temp4."last_comment_author_avatar"
-    FROM temp1
-    LEFT JOIN temp2 ON temp2.post_id = temp1.post_id
-    LEFT JOIN temp4 ON temp4.post_id = temp1.post_id
     WHERE temp1.parent_id = $1 AND ${verifyCondition}
     ORDER BY temp1.fixed DESC, ${sortCondition} 
-    LIMIT $2 OFFSET $3`,
-      [topicID, COUNT_POST_PER_PAGE, offset]
-    );
+    LIMIT $2 OFFSET $3`;
+    const variable = userID
+      ? [userID, topicID, COUNT_POST_PER_PAGE, offset]
+      : [topicID, COUNT_POST_PER_PAGE, offset];
+
+    const postsInfo = await db.query(fullQuery, variable);
     return postsInfo.rows;
   }
   #getSortedPostQuery(filter) {
@@ -123,6 +182,41 @@ class PostPostgressRepo {
     );
     return postInfo.rows;
   }
+  async getViewedInfo(id, userID) {
+    const viewed = await db.query(
+      `
+    SELECT * FROM viewed_post
+    WHERE post_id = $1 AND person_id = $2
+    `,
+      [id, userID]
+    );
+    return viewed.rows;
+  }
+  async switchUpdatedView(id, userID, value) {
+    const result = await db.query(
+      `
+    UPDATE viewed_post
+    SET updated = $3
+    WHERE post_id = $1 AND person_id = $2
+    RETURNING*
+    `,
+      [id, userID, value]
+    );
+    if (result.rows.length === 0) throw new Error();
+  }
+  async addView(id, userID) {
+    const result = await db.query(
+      `
+    INSERT INTO viewed_post
+    ("post_id", "person_id", "updated")
+    VALUES 
+    ($1, $2, $3)
+    RETURNING*
+    `,
+      [id, userID, false]
+    );
+    if (result.rows.length === 0) throw new Error();
+  }
   /* Отображение последних постов */
   async getLastPosts() {
     const posts = await db.query(`
@@ -155,25 +249,16 @@ class PostPostgressRepo {
     const posts = await db.query(`SELECT * FROM post`);
     return posts.rows;
   }
-  async getAllSorted(offset, filter) {
+  async getAllSorted(offset, filter, userID) {
     const filterString = this.#getSortedPostQuery(filter);
     const posts = await db.query(
       `
-    ${this.#getPostInfoQuery} 
-         
-    SELECT temp1."post_id", temp1."parent_id", temp1."title", temp1."fixed", temp1."closed", 
-      temp1."verified", temp1."date", temp1."author_post_id", 
-      temp1."author_post_nick_name", temp2."count_view", temp4."count_comment", temp4."last_comment_date",
-      temp4."last_comment_id", temp4."last_comment_author_id", temp4."last_comment_author_nick_name", 
-      temp4."last_comment_author_avatar"
-    FROM temp1
-    LEFT JOIN temp2 ON temp2.post_id = temp1.post_id
-    LEFT JOIN temp4 ON temp4.post_id = temp1.post_id
+    ${this.#getPostInfoQueryForAuthUsers} 
     ORDER BY ${filterString}
-    LIMIT $1 OFFSET $2
+    LIMIT $2 OFFSET $3
 
     `,
-      [COUNT_POST_PER_PAGE, offset]
+      [userID, COUNT_POST_PER_PAGE, offset]
     );
     return posts.rows;
   }
@@ -202,23 +287,23 @@ class PostPostgressRepo {
         : `temp1.verified = true`
       : `temp1.verified = true`;
     const sortCondition = this.#getSortedPostQuery(filter);
-    const postsInfo = await db.query(
-      `
+
+    const fullQuery = userID
+      ? `${this.#getPostInfoQueryForAuthUsers} 
+      WHERE temp1.author_post_id = $2 AND ${verifyCondition}
+      ORDER BY  ${sortCondition} 
+      LIMIT $3 OFFSET $4`
+      : `
     ${this.#getPostInfoQuery} 
-         
-    SELECT temp1."post_id", temp1."parent_id", temp1."title", temp1."fixed", temp1."closed", 
-      temp1."verified", temp1."date", temp1."author_post_id", 
-      temp1."author_post_nick_name", temp2."count_view", temp4."count_comment", temp4."last_comment_date",
-      temp4."last_comment_id", temp4."last_comment_author_id", temp4."last_comment_author_nick_name", 
-      temp4."last_comment_author_avatar"
-    FROM temp1
-    LEFT JOIN temp2 ON temp2.post_id = temp1.post_id
-    LEFT JOIN temp4 ON temp4.post_id = temp1.post_id
     WHERE temp1.author_post_id = $1 AND ${verifyCondition}
     ORDER BY  ${sortCondition} 
-    LIMIT $2 OFFSET $3`,
-      [userID, COUNT_POST_PER_PAGE, offset]
-    );
+    LIMIT $2 OFFSET $3`;
+    const variable = userID
+      ? [reqUserID, userID, COUNT_POST_PER_PAGE, offset]
+      : [userID, COUNT_POST_PER_PAGE, offset];
+
+    const postsInfo = await db.query(fullQuery, variable);
+
     return postsInfo.rows;
   }
   /* Обновление поста */
@@ -328,11 +413,54 @@ class PostPostgressRepo {
     );
     if (result.rows.length === 0) throw new Error();
   }
+
+  async switchAllUpdatedView(postID, userID, value) {
+    const result = await db.query(
+      `
+      UPDATE viewed_post
+      SET updated = $3
+      WHERE post_id = $1 AND NOT person_id = $2
+    `,
+      [postID, userID, value]
+    );
+    console.log(result.rows);
+  }
 }
 
 class PostRepo {
   constructor(repo) {
     this.repo = repo;
+  }
+  #getPostsFromPostsInfo(postsInfo) {
+    const posts = [];
+    for (const sortedPostInfo of postsInfo) {
+      const lastComment = !sortedPostInfo.last_comment_id
+        ? null
+        : {
+            userID: sortedPostInfo.last_comment_author_id,
+            avatar: sortedPostInfo.last_comment_author_avatar,
+            nickName: sortedPostInfo.last_comment_author_nick_name,
+            date: sortedPostInfo.last_comment_date,
+            commentID: sortedPostInfo.last_comment_id,
+          };
+
+      const post = {
+        id: sortedPostInfo.post_id,
+        title: sortedPostInfo.title,
+        viewed: sortedPostInfo.viewed ? true : false,
+        fixed: sortedPostInfo.fixed,
+        closed: sortedPostInfo.closed,
+        verified: sortedPostInfo.verified,
+        date: sortedPostInfo.date,
+        authorID: sortedPostInfo.author_post_id,
+        authorNickName: sortedPostInfo.author_post_nick_name,
+        viewCount: sortedPostInfo.count_view,
+        countComment: sortedPostInfo.count_comment,
+        lastComment,
+      };
+      posts.push(post);
+    }
+    return posts;
   }
   /* Отображение постов в топике */
   async getByTopicID(topicID, page, filter, userID, userRole) {
@@ -350,34 +478,7 @@ class PostRepo {
       userRole
     );
 
-    const posts = [];
-
-    for (const sortedPostInfo of sortedPostsInfo) {
-      const lastComment = !sortedPostInfo.last_comment_id
-        ? null
-        : {
-            userID: sortedPostInfo.last_comment_author_id,
-            avatar: sortedPostInfo.last_comment_author_avatar,
-            nickName: sortedPostInfo.last_comment_author_nick_name,
-            date: sortedPostInfo.last_comment_date,
-            commentID: sortedPostInfo.last_comment_id,
-          };
-
-      const post = {
-        id: sortedPostInfo.post_id,
-        title: sortedPostInfo.title,
-        fixed: sortedPostInfo.fixed,
-        closed: sortedPostInfo.closed,
-        verified: sortedPostInfo.verified,
-        date: sortedPostInfo.date,
-        authorID: sortedPostInfo.author_post_id,
-        authorNickName: sortedPostInfo.author_post_nick_name,
-        viewCount: sortedPostInfo.count_view,
-        countComment: sortedPostInfo.count_comment,
-        lastComment,
-      };
-      posts.push(post);
-    }
+    const posts = this.#getPostsFromPostsInfo(sortedPostsInfo);
 
     return { posts, maxPage };
   }
@@ -403,6 +504,17 @@ class PostRepo {
 
     return post;
   }
+  async getViewedInfo(id, userID) {
+    const viewed = await this.repo.getViewedInfo(id, userID);
+    if (viewed.length === 0) return { viewed: false, updated: false };
+    return { viewed: true, updated: viewed[0].updated };
+  }
+  async switchUpdatedView(id, userID, value) {
+    await this.repo.switchUpdatedView(id, userID, value);
+  }
+  async addView(id, userID) {
+    await this.repo.addView(id, userID);
+  }
   /* Отображение последних постов */
   async getLastPosts() {
     const postsInfo = await this.repo.getLastPosts();
@@ -424,43 +536,20 @@ class PostRepo {
     return posts;
   }
   /* Отображение всех доступных постов */
-  async getAll(page, filter) {
+  async getAll(page, filter, userID) {
     const offset = (page - 1) * COUNT_POST_PER_PAGE;
     const allPost = await this.repo.getAll();
 
     const maxPage = Math.ceil(allPost.length / COUNT_POST_PER_PAGE);
     if (maxPage === 0 || page > maxPage) return { maxPage, posts: [] };
 
-    const sortedPostsInfo = await this.repo.getAllSorted(offset, filter);
+    const sortedPostsInfo = await this.repo.getAllSorted(
+      offset,
+      filter,
+      userID
+    );
 
-    const posts = [];
-
-    for (const sortedPostInfo of sortedPostsInfo) {
-      const lastComment = !sortedPostInfo.last_comment_id
-        ? null
-        : {
-            userID: sortedPostInfo.last_comment_author_id,
-            avatar: sortedPostInfo.last_comment_author_avatar,
-            nickName: sortedPostInfo.last_comment_author_nick_name,
-            date: sortedPostInfo.last_comment_date,
-            commentID: sortedPostInfo.last_comment_id,
-          };
-
-      const post = {
-        id: sortedPostInfo.post_id,
-        title: sortedPostInfo.title,
-        fixed: sortedPostInfo.fixed,
-        closed: sortedPostInfo.closed,
-        verified: sortedPostInfo.verified,
-        date: sortedPostInfo.date,
-        authorID: sortedPostInfo.author_post_id,
-        authorNickName: sortedPostInfo.author_post_nick_name,
-        viewCount: sortedPostInfo.count_view,
-        countComment: sortedPostInfo.count_comment,
-        lastComment,
-      };
-      posts.push(post);
-    }
+    const posts = this.#getPostsFromPostsInfo(sortedPostsInfo);
 
     return { posts, maxPage };
   }
@@ -480,34 +569,7 @@ class PostRepo {
       reqUserRole
     );
 
-    const posts = [];
-
-    for (const sortedPostInfo of sortedPostsInfo) {
-      const lastComment = !sortedPostInfo.last_comment_id
-        ? null
-        : {
-            userID: sortedPostInfo.last_comment_author_id,
-            avatar: sortedPostInfo.last_comment_author_avatar,
-            nickName: sortedPostInfo.last_comment_author_nick_name,
-            date: sortedPostInfo.last_comment_date,
-            commentID: sortedPostInfo.last_comment_id,
-          };
-
-      const post = {
-        id: sortedPostInfo.post_id,
-        title: sortedPostInfo.title,
-        fixed: sortedPostInfo.fixed,
-        closed: sortedPostInfo.closed,
-        verified: sortedPostInfo.verified,
-        date: sortedPostInfo.date,
-        authorID: sortedPostInfo.author_post_id,
-        authorNickName: sortedPostInfo.author_post_nick_name,
-        viewCount: sortedPostInfo.count_view,
-        countComment: sortedPostInfo.count_comment,
-        lastComment,
-      };
-      posts.push(post);
-    }
+    const posts = this.#getPostsFromPostsInfo(sortedPostsInfo);
 
     return { posts, maxPage };
   }
@@ -552,6 +614,10 @@ class PostRepo {
   async createComment(body, postID, userID, userRole) {
     const verified = userRole === "noob" ? false : true;
     await this.repo.createComment(body, postID, userID, verified);
+  }
+
+  async switchAllUpdatedView(postID, userID, value) {
+    await this.repo.switchAllUpdatedView(postID, userID, value);
   }
 }
 

@@ -1,0 +1,9 @@
+.add-message {
+  display: flex;
+  padding: 20px;
+  background-color: #eaf5ff;
+  &__button-wrapper {
+    display: flex;
+    margin: auto 0 0 10px;
+  }
+}

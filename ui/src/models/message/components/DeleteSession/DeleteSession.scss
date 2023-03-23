@@ -1,0 +1,18 @@
+.delete-session {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px 10px;
+  &:hover {
+    background-color: #f0f2f5;
+  }
+  & > img {
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
+  }
+  & > p {
+    white-space: nowrap;
+    font-size: 14px;
+  }
+}

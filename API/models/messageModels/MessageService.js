@@ -6,14 +6,25 @@ class MessageService {
       return { status: 404, message: "Сообщения не найдены!" };
     return { status: 200, messages };
   }
-  async getBySessionID(sessionID, userID) {
+  async getSessionByID(sessionID, userID) {
+    const session = await MessageRepo.getSessionByID(sessionID, userID);
+    if (!session) return { status: 404, message: "Сессия не найдена!" };
+    return { status: 200, session };
+  }
+  async getBySessionID(sessionID, page, userID) {
     if (!(await MessageRepo.isHasActiveSession(sessionID, userID)))
       return { status: 400, message: "Сессии не существует!" };
 
-    const messages = await MessageRepo.getBySessionID(sessionID, userID);
+    const { messages, maxPage } = await MessageRepo.getBySessionID(
+      sessionID,
+      page,
+      userID
+    );
     if (messages.length === 0)
       return { status: 404, message: "Сообщения не найдены!" };
-    return { status: 200, messages };
+
+    await MessageRepo.updateView(sessionID, userID);
+    return { status: 200, messages, maxPage };
   }
   async createMessage(body, members, userID) {
     let sessionID = await MessageRepo.findSessionIDByMembers(members);
@@ -23,8 +34,11 @@ class MessageService {
     return { status: 200, message: "Успешно!" };
   }
   async deleteMessage(messageID, userID) {
-    if (!(await MessageRepo.isHasAccessToMessage(messageID, userID)))
-      return { status: 400, message: "Сообщение не доступно для удаления!" };
+    const messages = await MessageRepo.getMessagesByID(messageID, userID);
+    console.log(messages);
+    if (messages.length !== messageID.length)
+      return { status: 400, message: "Произошла ошибка при удалении!" };
+    console.log(messages);
     await MessageRepo.deleteMessage(messageID, userID);
     return { status: 200, message: "Успешно!" };
   }

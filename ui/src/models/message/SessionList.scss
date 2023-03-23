@@ -1,0 +1,19 @@
+.session-list {
+  width: 767px;
+  background: #ffffff;
+  border: 1px solid rgba(102, 102, 102, 0.315);
+  border-radius: 3px;
+  box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 3px;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  &__wrapper {
+    width: 767px;
+    border-top: 1px solid rgba(170, 169, 169, 0.385);
+    margin: 20px auto 0 auto;
+  }
+  &__button-wrapper {
+    align-self: flex-start;
+    margin-left: 10px;
+  }
+}

@@ -33,7 +33,7 @@ export const ProfileHeader: React.FC<IProfileHeaderProps> = ({
   const location = useLocation();
   const option = location.pathname.split("/")[2];
 
-  const [isVisibleAvatarPopup, setIsVisibleAvatarPopup] = useState(true);
+  const [isVisibleAvatarPopup, setIsVisibleAvatarPopup] = useState(false);
   const [isVisibleBackImgPopup, setIsVisibleBackImgPopup] = useState(false);
 
   return (

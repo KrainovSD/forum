@@ -6,6 +6,7 @@ import untils from "../../untils/index.js";
 import userValidation from "./userValidation.js";
 
 router.get("/me", untils.checkAuth, UserController.getMe);
+router.get("/list", untils.checkAuth, UserController.getAll);
 router.get("/:id", UserController.getByID);
 router.get("/content/:id", UserController.getUserContent);
 router.put(

@@ -1,0 +1,58 @@
+.add-session {
+  margin: auto;
+  width: 700px;
+  background: #ffffff;
+  border: 1px solid rgba(102, 102, 102, 0.315);
+  border-radius: 3px;
+  box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 3px;
+  display: flex;
+  flex-direction: column;
+  // .add-session__close
+
+  &__close {
+    width: 20px;
+    height: 20px;
+    align-self: flex-end;
+    margin: 5px 5px 0 0;
+    cursor: pointer;
+  }
+
+  &__header {
+    margin: auto;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 5px;
+  }
+
+  // .add-session__selected-user
+
+  &__selected-user {
+    margin-top: 15px;
+    min-height: 30px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+  }
+
+  // .add-session__selected-user-item
+
+  &__selected-user-item {
+    padding: 3px 0;
+    display: flex;
+    align-items: center;
+    width: 40%;
+    justify-content: space-between;
+    font-weight: 500;
+    & > img {
+      margin-left: 5px;
+      width: 10px;
+      height: 10px;
+      cursor: pointer;
+    }
+  }
+
+  &__select-wrapper {
+    width: 70%;
+    margin-left: 10px;
+    margin-top: 20px;
+  }
+}

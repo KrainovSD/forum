@@ -25,6 +25,13 @@ class UserService {
       return { status: 404, message: "Контент пользователя не найден!" };
     return { status: 200, content };
   }
+  async getAll(userID) {
+    console.log("enter");
+    const users = await UserRepo.getAll(userID);
+    if (users.length === 0)
+      return { status: 404, message: "Пользователи не найдены!" };
+    return { status: 200, users };
+  }
 
   async switchRoleToUser(userID) {
     const { userInfo } = await UserRepo.getUserByID(userID);

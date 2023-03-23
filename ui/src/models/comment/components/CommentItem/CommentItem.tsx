@@ -13,7 +13,7 @@ import { LikesPopup } from "../../../likes/LikesPopup";
 import { CSSTransition } from "react-transition-group";
 import { AddLike } from "../../../../models/likes/components/AddLike/AddLike";
 import { DeleteLike } from "../../../../models/likes/components/DeleteLike/DeleteLike";
-import { getDiffInHours } from "../../../../helpers/getDiffInHours";
+import { getDiffInHours } from "../../../../helpers/getDiffInTimes";
 import { useConfirm } from "../../../../hooks/useConfirm";
 import { UpdateComment } from "../UpdateComment/UpdateComment";
 import { DeleteComment } from "../DeleteComment/DeleteComment";

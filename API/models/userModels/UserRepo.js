@@ -57,6 +57,12 @@ class UserPosgressRepo {
     );
     return lastContent.rows;
   }
+  async getAll(userID) {
+    const users = await db.query(`SELECT * FROM person WHERE NOT id = $1`, [
+      userID,
+    ]);
+    return users.rows;
+  }
   /* Вспомогательные */
   async getUserInfo(id) {
     const userInfo = await db.query("SELECT * FROM person WHERE id = $1", [id]);
@@ -281,6 +287,20 @@ class UserRepo {
       content.push(contentItem);
     }
     return content;
+  }
+  async getAll(userID) {
+    const usersInfo = await this.repo.getAll(userID);
+    const users = [];
+    for (const userInfo of usersInfo) {
+      const user = {
+        id: userInfo.id,
+        avatar: userInfo.avatar,
+        nickName: userInfo.nick,
+      };
+      users.push(user);
+    }
+
+    return users;
   }
 
   /* Обновление данных */

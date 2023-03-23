@@ -40,6 +40,8 @@ class CommentService {
     if (!(await CommentRepo.isHasPostAndOpen(postID)))
       return { status: 400, message: "Темы не существует или она закрыта!" };
     await CommentRepo.createComment(body, postID, userID, role);
+    console.log(role);
+    if (role !== "noob") await PostService.switchAllUpdatedView(postID, userID);
     return { status: 200, message: "Успешно!" };
   }
   async deleteComment(commentID, userID, userRole) {
@@ -77,6 +79,10 @@ class CommentService {
     if (comment.length === 0) throw new Error();
     await CommentRepo.updateCommentVerified(commentID, verified);
     await UserService.switchRoleToUser(comment[0].person_id);
+    await PostService.switchAllUpdatedView(
+      comment[0].post_id,
+      comment[0].person_id
+    );
   }
   async updateCommentVerifiedWithPost(commentID, verified) {
     const comment = await CommentRepo.getComment(commentID);
@@ -87,6 +93,10 @@ class CommentService {
       await PostService.updatePostVerified(comment[0].post_id, verified);
     }
     await UserService.switchRoleToUser(comment[0].person_id);
+    await PostService.switchAllUpdatedView(
+      comment[0].post_id,
+      comment[0].person_id
+    );
     return { status: 200, message: "Успешно" };
   }
   async updateCommentFixed(commentID, fixed) {

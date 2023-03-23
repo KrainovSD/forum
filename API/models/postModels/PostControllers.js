@@ -57,7 +57,8 @@ class PostController {
       const { page, filter } = req.query;
       const { status, message, posts, maxPage } = await PostService.getAll(
         page ? page : 1,
-        filter ? filter : "last-date-create"
+        filter ? filter : "last-date-create",
+        req.userID
       );
       if (status !== 200) return res.status(status).json(message);
       return res.status(200).json({ maxPage, posts });

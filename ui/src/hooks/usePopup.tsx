@@ -6,7 +6,7 @@ type IusePopup = (customCallback?: () => void) => {
   popup: JSX.Element;
   setPopup: IsetPopup;
 };
-type IsetPopup = (
+export type IsetPopup = (
   title: string,
   body: string,
   newCallback?: (() => void) | null

@@ -6,7 +6,7 @@ type IuseConfirm = (
   OK?: () => void,
   CANCEL?: () => void
 ) => { confirm: JSX.Element; checkConfirm: IcheckConfirm };
-type IcheckConfirm = (
+export type IcheckConfirm = (
   title: string,
   body: string,
   newOk?: (() => void) | null,

@@ -68,7 +68,7 @@ export const Userbar: React.FC = () => {
         )}
         <div className="userBar__nickNameWrapper">
           <div className="userBar__nickName" onClick={toggleSubMenuVisible}>
-            <p>Serega_Krainov48</p>
+            <p>{userInfo?.nickName}</p>
             <img src={arrowDown} alt="" className="userBar__arrow" />
           </div>
           <SubMenu
@@ -93,9 +93,13 @@ export const Userbar: React.FC = () => {
         >
           <div className="userBar__noticeImg"></div>
         </div>
-        <div className="userBar__chat" data-tooltip-left="Личные сообщения">
+        <NavLink
+          to={`/message`}
+          className="userBar__chat"
+          data-tooltip-left="Личные сообщения"
+        >
           <div className="userBar__chatImg"></div>
-        </div>
+        </NavLink>
       </div>
     </div>
   );

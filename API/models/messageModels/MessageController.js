@@ -14,16 +14,29 @@ class MessageController {
       res.status(500).json();
     }
   }
-  async getBySessionID(req, res) {
+  async getSessionByID(req, res) {
     try {
       const { id: sessionID } = req.params;
-      const { status, message, messages } = await MessageService.getBySessionID(
+      const { status, message, session } = await MessageService.getSessionByID(
         sessionID,
         req.userID
       );
       if (status !== 200) return res.status(status).json(message);
+      return res.status(200).json(session);
+    } catch (e) {
+      req.err = e;
+      return res.status(500).json();
+    }
+  }
+  async getBySessionID(req, res) {
+    try {
+      const { id: sessionID } = req.params;
+      const { page } = req.query;
+      const { status, message, messages, maxPage } =
+        await MessageService.getBySessionID(sessionID, page, req.userID);
+      if (status !== 200) return res.status(status).json(message);
 
-      return res.status(200).json(messages);
+      return res.status(200).json({ maxPage, messages });
     } catch (e) {
       req.err = e;
       res.status(500).json();
@@ -46,7 +59,7 @@ class MessageController {
   }
   async deleteMessage(req, res) {
     try {
-      const { id: messageID } = req.params;
+      const { messageID } = req.body;
       const { status, message } = await MessageService.deleteMessage(
         messageID,
         req.userID

@@ -38,4 +38,19 @@ const update = [
     .isNumeric()
     .withMessage("У поля неверный тип данных!"),
 ];
-export default { create, update };
+const remove = [
+  body("messageID")
+    .custom((value) => {
+      if (value.length == 0) throw new Error("Список получаетелей пуст!");
+      return true;
+    })
+    .withMessage("id не должно быть пустым!"),
+  body("messageID.*")
+    .trim()
+    .not()
+    .isEmpty({ ignore_whitespace: true })
+    .withMessage("Некорректный id получателя!")
+    .isNumeric()
+    .withMessage("Некорректный id получателя!"),
+];
+export default { create, update, remove };

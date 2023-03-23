@@ -9,7 +9,7 @@ export const BlackButton: React.FC<PropsWithChildren<BlackButtonProps>> = ({
   ...props
 }) => {
   return (
-    <div className="black-button" {...props}>
+    <div className="black-button no-interaction" {...props}>
       {children}
     </div>
   );

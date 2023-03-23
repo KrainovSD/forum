@@ -1,0 +1,23 @@
+.message-list {
+  width: 767px;
+  background: #ffffff;
+  border: 1px solid rgba(102, 102, 102, 0.315);
+  border-radius: 3px;
+  box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 3px;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  // .message-list__header
+
+  // .message-list__content
+
+  &__content {
+    display: flex;
+    flex-direction: column-reverse;
+    height: 400px;
+    overflow-y: auto;
+    & ._detect {
+      height: 1px;
+    }
+  }
+}

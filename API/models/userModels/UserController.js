@@ -25,6 +25,17 @@ class UserController {
       res.status(500).json();
     }
   }
+  async getAll(req, res) {
+    try {
+      console.log("enter");
+      const { status, message, users } = await UserService.getAll(req.userID);
+      if (status !== 200) return res.status(status).json(message);
+      return res.status(200).json(users);
+    } catch (e) {
+      req.err = e;
+      return res.status(500).json();
+    }
+  }
   async getUserContent(req, res) {
     try {
       const { id: userID } = req.params;

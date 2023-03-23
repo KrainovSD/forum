@@ -11,6 +11,7 @@ router.get(
   untils.checkAuth,
   MessageController.getBySessionID
 );
+router.get("/session/:id", untils.checkAuth, MessageController.getSessionByID);
 router.post(
   "/",
   untils.checkAuth,
@@ -18,7 +19,13 @@ router.post(
   untils.checkValidation,
   MessageController.createMessage
 );
-router.delete("/:id", untils.checkAuth, MessageController.deleteMessage);
+router.post(
+  "/delete",
+  messageValidation.remove,
+  untils.checkValidation,
+  untils.checkAuth,
+  MessageController.deleteMessage
+);
 router.delete(
   "/session/:id",
   untils.checkAuth,

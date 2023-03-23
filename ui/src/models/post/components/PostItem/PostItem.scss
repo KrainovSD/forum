@@ -24,8 +24,10 @@
   // .post-item__title
 
   &__title {
-    font-weight: bold;
     display: flex;
+    &._unviewed {
+      font-weight: bold;
+    }
 
     & > img {
       width: 16px;

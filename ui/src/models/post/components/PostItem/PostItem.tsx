@@ -11,7 +11,7 @@ import {
 } from "../../../../helpers/getCaption";
 import { useAppSelector } from "../../../../hooks/redux";
 import { PostAdmitPanel } from "../PostAdminPanel/PostAdminPanel";
-import { getDiffInHours } from "../../../../helpers/getDiffInHours";
+import { getDiffInHours } from "../../../../helpers/getDiffInTimes";
 import { getPostLink, getUserLink } from "../../../../helpers/getLinks";
 
 interface IPostItemProps {
@@ -35,11 +35,17 @@ export const PostItem: React.FC<IPostItemProps> = ({ post }) => {
     return true;
   };
 
+  console.log(post.viewed, post.id);
+
   return (
     <div className={`post-item ${post.verified ? "" : "_no-verify"}`}>
       <div className="post-item__content">
         <div className="post-item__main-info">
-          <div className="post-item__title">
+          <div
+            className={`post-item__title ${
+              userInfo && !post.viewed ? "_unviewed" : ""
+            }`}
+          >
             {post.closed && <img src={padlock} alt="" />}
             {post.fixed && (
               <div className="post-item__thumbtack">
