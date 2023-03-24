@@ -8,6 +8,7 @@ import topicValidation from "./topicValidation.js";
 router.get("/children/:id", TopicControllers.getChildren);
 router.get("/AllChildren/:id", TopicControllers.getAllChildren);
 router.get("/access", untils.checkAuth, TopicControllers.getAll);
+router.get("/parent/:id", TopicControllers.getParentInfo);
 router.put(
   "/",
   untils.checkAuth,

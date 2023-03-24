@@ -13,6 +13,7 @@ import { Loader } from "./components/Loader/Loader";
 import { getMyUserInfo } from "./store/reducers/user/userActionCreator";
 import { userSlice } from "./store/reducers/user/userReducer";
 import { useEffectOnlyUpdate } from "./hooks/useResponse";
+import { PreContentBar } from "./components/PreContentBar/PreContentBar";
 
 export const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -67,6 +68,7 @@ export const App: React.FC = () => {
         isLoadingMessage) && <Loader />}
       <Header />
       <div className="workplace">{routes}</div>
+      <PreContentBar />
     </div>
   );
 };

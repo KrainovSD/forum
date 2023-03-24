@@ -181,6 +181,23 @@ class PostController {
       return res.status(500).json();
     }
   }
+
+  async getParentInfo(req, res) {
+    try {
+      const { id: postID } = req.params;
+      const userID = req.userID || null;
+      const userRole = req.role || null;
+      const { status, message, parentsInfo } = await PostService.getParentInfo(
+        postID,
+        userID,
+        userRole
+      );
+      if (status !== 200) return res.status(status).json(message);
+      return res.status(200).json(parentsInfo);
+    } catch (e) {
+      req.err = e;
+    }
+  }
 }
 
 export default new PostController();

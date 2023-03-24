@@ -81,7 +81,6 @@ export const UserPostList: React.FC = () => {
           { tag: "most-comment", caption: "Больше ответов" },
         ];
 
-  console.log(posts);
   return (
     <div className="user-post-list">
       {popup}

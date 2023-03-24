@@ -195,6 +195,35 @@ class TopicPostgressRepo {
 
     if (result.rows.length === 0) throw new Error();
   }
+
+  async getParentInfo(topicID) {
+    const parents = await db.query(
+      `
+    WITH RECURSIVE
+    temp1 (id, parent_id, path_id, path_title, LEVEL) 
+    AS (SELECT T1.id, T1.parent_id,
+        cast (array[T1."id"] as integer[]),
+		cast (array[T1."title"] as varchar[]),
+		1
+    FROM topic T1
+		WHERE T1.id = $1	
+    union
+    select T2.id, T2.parent_id,
+        cast(temp1.path_id || T2."id" as integer[]),
+		cast (temp1.path_title || T2."title" as varchar[]),
+		LEVEL + 1
+        FROM topic T2 INNER JOIN temp1 ON ( temp1."parent_id"= T2."id"))
+		
+    SELECT * 
+    FROM temp1 
+    WHERE id IS NOT NULL
+    ORDER BY LEVEL 
+    DESC LIMIT 1
+    `,
+      [topicID]
+    );
+    return parents.rows;
+  }
 }
 
 class TopicRepo {
@@ -333,6 +362,27 @@ class TopicRepo {
   /* Удаление топиков*/
   async deleteTopic(topicID, parentID) {
     await this.repo.deleteTopicAndAllChildren(topicID, parentID);
+  }
+
+  async getParentInfo(topicID) {
+    const parents = await this.repo.getParentInfo(topicID);
+    if (parents.length === 0) return null;
+
+    if (parents[0].path_id.length !== parents[0].path_title.length) return null;
+
+    const topicInfo = [];
+    for (const index in parents[0].path_id) {
+      const topic = {
+        topicID: parents[0].path_id[index],
+        topicTitle: parents[0].path_title[index],
+      };
+      topicInfo.push(topic);
+    }
+    const parentsInfo = {
+      topicInfo: topicInfo.reverse(),
+      postTitle: parents[0].post_title,
+    };
+    return parentsInfo;
   }
 }
 

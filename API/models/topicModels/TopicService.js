@@ -22,6 +22,11 @@ class TopicService {
       return { status: 404, message: "Список топиков не найден!" };
     return { status: 200, topics };
   }
+  async getParentInfo(topicID) {
+    const parentsInfo = await TopicRepo.getParentInfo(topicID);
+    if (!parentsInfo) return { status: 404, message: "Информация не найдена!" };
+    return { status: 200, parentsInfo };
+  }
   async updateTopic(topicID, title, access, parentID) {
     const { topic, children } = await TopicRepo.getAllChildren(topicID);
     if (!topic) return { status: 400, message: "Топика не существует!" };

@@ -19,6 +19,11 @@ router.get(
   PostControllers.getByUserID
 );
 router.get("/access/:id", untils.checkAuth, PostControllers.getPostAccessByID);
+router.get(
+  "/parent/:id",
+  untils.noStrictCheckAuth,
+  PostControllers.getParentInfo
+);
 router.put(
   "/",
   untils.checkAuth,

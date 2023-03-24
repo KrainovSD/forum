@@ -61,6 +61,23 @@ class PostService {
       return { status: 404, message: "Посты не найдены!" };
     return { status: 200, posts, maxPage };
   }
+  async getParentInfo(postID, userID, userRole) {
+    const postInfo = await PostRepo.getPostByID(postID);
+    if (postInfo.length === 0)
+      return { status: 404, message: "Информация о контенте не найдена!" };
+    if (
+      postInfo[0].verified === false &&
+      postInfo[0].person_id !== userID &&
+      userRole !== "admin" &&
+      userRole !== "moder"
+    )
+      return { status: 404, message: "Информация о контенте не найдена!" };
+
+    const parentsInfo = await PostRepo.getParentInfo(postID, userID);
+    if (!parentsInfo)
+      return { status: 404, message: "Информация о контенте не найдена!" };
+    return { status: 200, parentsInfo };
+  }
 
   async updatePost(postID, title, topicID, userID, userRole) {
     const post = await PostRepo.getPostByID(postID);

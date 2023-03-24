@@ -39,6 +39,19 @@ class TopicControllers {
       res.status(500).json();
     }
   }
+  async getParentInfo(req, res) {
+    try {
+      const { id: topicID } = req.params;
+      const { status, message, parentsInfo } = await TopicService.getParentInfo(
+        topicID
+      );
+      if (status !== 200) return res.status(status).json(message);
+      return res.status(200).json(parentsInfo);
+    } catch (e) {
+      req.err = e;
+      res.status(500).json();
+    }
+  }
   async updateTopic(req, res) {
     try {
       const { topicID, title, access, parentID } = req.body;

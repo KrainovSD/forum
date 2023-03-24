@@ -35,8 +35,6 @@ export const PostItem: React.FC<IPostItemProps> = ({ post }) => {
     return true;
   };
 
-  console.log(post.viewed, post.id);
-
   return (
     <div className={`post-item ${post.verified ? "" : "_no-verify"}`}>
       <div className="post-item__content">
